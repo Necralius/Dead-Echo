@@ -10,7 +10,7 @@ public class Controller : MonoBehaviour
     private int VerticalHash = 0;
     private int AttackHash = 0;
 
-
+    //============ DECRAPTED ==============//
     private void Start()
     {
        HorizontalHash = Animator.StringToHash("Horizontal");
