@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7273858882203011085}
   - component: {fileID: 8843009160944326279}
+  - component: {fileID: 4904693136233013113}
   m_Layer: 10
   m_Name: Sensor
   m_TagString: Untagged
@@ -53,6 +54,18 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 20
   m_Center: {x: 0, y: 1.61, z: 0}
+--- !u!114 &4904693136233013113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1990784822900000023}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecc207b5dc064e41ac605266a9c2f08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2229257354478813517
 GameObject:
   m_ObjectHideFlags: 0
@@ -877,6 +890,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 8238191984776588325}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e9ad29c1cfdcd81439a03e5cc55cac69,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5563509195268111463}
   m_SourcePrefab: {fileID: 100100000, guid: e9ad29c1cfdcd81439a03e5cc55cac69, type: 3}
 --- !u!4 &8562548175988907191 stripped
 Transform:
@@ -962,3 +979,26 @@ CapsuleCollider:
   m_Height: 1.84
   m_Direction: 1
   m_Center: {x: 0, y: 0.87, z: 0}
+--- !u!114 &5563509195268111463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9052121587847562765}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 155031eee7a0eff48896076a4ee96114, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _currentStateType: 1
+  _targetTrigger: {fileID: 7481748300708804886}
+  _sensorTrigger: {fileID: 8843009160944326279}
+  _stoppingDistance: 1
+  _fov: 50
+  _sight: 1
+  _hearing: 1
+  _agression: 1
+  _health: 100
+  _intelligence: 0.5
+  _satisfaction: 1

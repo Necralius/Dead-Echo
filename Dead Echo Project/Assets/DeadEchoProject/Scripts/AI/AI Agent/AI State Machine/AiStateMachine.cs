@@ -1,13 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 
 public enum AIStateType { None, Idle, Alerted, Patrol, Attack, Feeding, Pursuit, Dead }
 public enum AITargetType { None, Waypoint, Visual_Player, Visual_Light, Visual_Food, Audio }
 public enum AITriggerEventType { Enter, Stay, Exit}
-
 
 // ------------------------------------------------------------------------
 // Class    :  AITarget
@@ -47,13 +44,19 @@ public struct AITarget
 
 public abstract class AiStateMachine : MonoBehaviour
 {
+    //Public
     public AITarget  VisualThreat = new AITarget();
     public AITarget AudioThreat = new AITarget();
 
+    //Protected
     protected AIState _currentState;
     protected Dictionary<AIStateType, AIState> _states = new Dictionary<AIStateType, AIState>();
     protected AITarget _target = new AITarget();
+    protected int _rootPositionRefCount = 0;
+    protected int _rootRotationRefCount = 0;
 
+
+    //Protected Inspector Assigned
     [SerializeField] protected AIStateType _currentStateType = AIStateType.Idle;
     [SerializeField] protected SphereCollider _targetTrigger = null;
     [SerializeField] protected SphereCollider _sensorTrigger = null;
@@ -68,6 +71,30 @@ public abstract class AiStateMachine : MonoBehaviour
     //Public properties
     public Animator animator { get { return _animator; } }
     public NavMeshAgent navAgent { get { return _navAgent; } }  
+    public Vector3 sensorPosition
+    {
+        get
+        {
+            if (_sensorTrigger == null) return Vector3.zero;
+            Vector3 point = _sensorTrigger.transform.position;
+            point.x += _sensorTrigger.center.x * _sensorTrigger.transform.lossyScale.x;
+            point.y += _sensorTrigger.center.y * _sensorTrigger.transform.lossyScale.y;
+            point.z += _sensorTrigger.center.z * _sensorTrigger.transform.lossyScale.z;
+            return point;
+        }
+    }
+    public float sensorRadius
+    {
+        get
+        {
+            if (_sensorTrigger == null) return 0.0f;
+            float radius = Mathf.Max(   _sensorTrigger.radius * _sensorTrigger.transform.lossyScale.x, 
+                                        _sensorTrigger.radius * _sensorTrigger.transform.lossyScale.y);
+            return Mathf.Max(radius, _sensorTrigger.radius * _sensorTrigger.transform.lossyScale.z);
+        }
+    }
+    public bool useRootPosition { get { return _rootPositionRefCount > 0; } }
+    public bool useRootRotation { get { return _rootRotationRefCount > 0; } }   
 
 
     // ---------------------------------
@@ -76,10 +103,18 @@ public abstract class AiStateMachine : MonoBehaviour
     // ---------------------------------
     protected virtual void Awake()
     {
+        //Get and store all frequently acessed components
         _transform = transform;
         _animator = GetComponent<Animator>();
         _navAgent = GetComponent<NavMeshAgent>();
         _collider = GetComponent<Collider>();
+
+        if (GameSceneManager.instance != null)
+        {
+            //Register State Machines with Scene Database
+            if (_collider) GameSceneManager.instance.RegisterAIStateMachine(_collider.GetInstanceID(), this);
+            if (_sensorTrigger) GameSceneManager.instance.RegisterAIStateMachine(_sensorTrigger.GetInstanceID(), this);
+        }
     }
 
 
@@ -89,6 +124,12 @@ public abstract class AiStateMachine : MonoBehaviour
     // ---------------------------------------------------------
     protected virtual void Start()
     {
+        if (_sensorTrigger != null)
+        {
+            AISensor script = _sensorTrigger.GetComponent<AISensor>();
+            if (script != null) script.parentStateMachine = this;
+        }
+
         AIState[] currentStates = GetComponents<AIState>();
         foreach (AIState state in currentStates)
         {
@@ -105,6 +146,12 @@ public abstract class AiStateMachine : MonoBehaviour
             _currentState.OnEnterState();
         }
         else _currentState = null;
+
+        if (_animator)
+        {
+            AIStateMachineLink[] _scripts = _animator.GetBehaviours<AIStateMachineLink>();
+            foreach(AIStateMachineLink link in _scripts) link.stateMachine = this;
+        }
     }
 
     public void SetTarget(AITargetType targetType, Collider targetCollider, Vector3 targetPosition, float targetDistance)
@@ -184,5 +231,50 @@ public abstract class AiStateMachine : MonoBehaviour
             }
             _currentStateType = newStateType;
         }
+    }
+
+    // ----------------------------------------------------------------------
+    // Name : OnTriggerEnter
+    // Desc : Called by Physics system when the AI's Main collider enters
+    //        its trigger. This Allows the child state to know when it has
+    //        entered the sphere of influence of a waypoint or last player
+    //        sighted position.
+    // ----------------------------------------------------------------------
+    protected virtual void OnTriggerEnter(Collider other)
+    {
+        if (_targetTrigger == null || other != _targetTrigger) return;
+
+        if (_currentState) _currentState.OnDestinationReached(true);
+    }
+    public virtual void OnTriggerExit(Collider other)
+    {
+        if (_targetTrigger == null || _targetTrigger != other) return;
+        if (_currentState != null) _currentState.OnDestinationReached(false);
+    }
+    public virtual void OnTriggerEvent(AITriggerEventType type, Collider other)
+    {
+        if (_currentState != null) _currentState.OnTriggerEvent(type, other);
+    }
+
+    protected virtual void OnAnimatorMove()
+    {
+        if (_currentState != null) _currentState.OnAnimatorUpdated();
+    }
+    protected virtual void OnAnimatorIK(int layerIndex)
+    {
+        if (_currentState != null) _currentState.OnAnimatorIKUpdated();
+    }
+    public void NavAgentControl(bool positionUpdate, bool rotationUpdate)
+    {
+        if (navAgent)
+        {
+            navAgent.updatePosition = positionUpdate;
+            navAgent.updateRotation = rotationUpdate;
+        }
+    }
+    public void AddRootMotionRequest(int rootPosition, int rootRotation)
+    {
+        _rootPositionRefCount += rootPosition;
+        _rootRotationRefCount += rootRotation;
     }
 }
