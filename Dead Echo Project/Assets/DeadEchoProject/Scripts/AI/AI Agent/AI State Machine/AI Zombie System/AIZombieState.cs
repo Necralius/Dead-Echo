@@ -2,44 +2,106 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AIZombieState : AIState
+public abstract class AIZombieState : AIState
 {
     //Private
     protected int _playerLayerMask = -1;
     protected int _bodyPartLayer = -1;
+    protected int _visualLayerMask = -1;
 
+    protected AIZombieStateMachine _zombieStateMachine = null;
+     
     private void Awake()
     {
         _playerLayerMask = LayerMask.GetMask("Player", "AI Body Part") + 1;
-        _bodyPartLayer = LayerMask.GetMask("AI Body Part");
-    }
+        _visualLayerMask = LayerMask.GetMask("Player", "AI Body Part", "Visual Aggravator") + 1;
 
-    public override AIStateType GetStateType()
-    {
-        throw new System.NotImplementedException();
+        _bodyPartLayer = LayerMask.NameToLayer("AI Body Part");
     }
-
-    public override AIStateType OnUpdate()
+    public override void SetStateMachine(AiStateMachine stateMachine)
     {
-        throw new System.NotImplementedException();
+        if (stateMachine.GetType() == typeof(AIZombieStateMachine))
+        {
+            base.SetStateMachine(stateMachine);
+            _zombieStateMachine = (AIZombieStateMachine)stateMachine;
+        }
     }
     public override void OnTriggerEvent(AITriggerEventType eventType, Collider other)
     {
-        if (_stateMachine == null) return;
+        if (_zombieStateMachine == null) return;
         
         if (eventType != AITriggerEventType.Exit)
         {
-            AITargetType curType = _stateMachine.VisualThreat.type;
+            AITargetType curType = _zombieStateMachine.VisualThreat.type;
 
             if (other.CompareTag("Player"))
             {
-                float distance = Vector3.Distance(_stateMachine.sensorPosition, other.transform.position);
-                if (curType != AITargetType.Visual_Player || (curType == AITargetType.Visual_Player && distance < _stateMachine.VisualThreat.distance))
+                float distance = Vector3.Distance(_zombieStateMachine.sensorPosition, other.transform.position);
+                if (curType != AITargetType.Visual_Player || (curType == AITargetType.Visual_Player && distance < _zombieStateMachine.VisualThreat.distance))
                 {
                     RaycastHit hitInfo;
                     if (ColliderIsVisible(other, out hitInfo, _playerLayerMask))
                     {
-                        _stateMachine.VisualThreat.Set(AITargetType.Visual_Player, other, other.transform.position, distance);
+                        _zombieStateMachine.VisualThreat.Set(AITargetType.Visual_Player, other, other.transform.position, distance);
+                    }
+                }
+            }
+            else if (other.CompareTag("Flash Light") && curType != AITargetType.Visual_Player)
+            {
+                BoxCollider flashlightTrigger = (BoxCollider)other;
+                float distanceToThreat = Vector3.Distance(_zombieStateMachine.sensorPosition, flashlightTrigger.transform.position);
+                float zSize = flashlightTrigger.size.z * flashlightTrigger.transform.lossyScale.z;
+
+                float aggrFactor = distanceToThreat / zSize;
+
+                if (aggrFactor <= _zombieStateMachine.sight && aggrFactor <= _zombieStateMachine.intelligence) 
+                {
+                    _zombieStateMachine.VisualThreat.Set(AITargetType.Visual_Light, other, other.transform.position, distanceToThreat);
+                }
+            }
+            else if (other.CompareTag("AI Sound Emitter"))
+            {
+                SphereCollider soundTrigger = (SphereCollider) other;
+                if (soundTrigger == null) return;
+
+                Vector3 agentSensorPosition = _zombieStateMachine.sensorPosition;
+
+                Vector3 soundPos;
+                float soundRadius;
+
+                ConvertSphereColliderToWorldSpace(soundTrigger, out soundPos, out soundRadius);
+
+                //How far inside the sound's radius are the AI istance
+                float distanceToThreat = (soundPos - agentSensorPosition).magnitude;
+
+                //Calculate a distance factor such that it is 1.0 when at sound radius 0 when at center
+                float distanceFactor = (distanceToThreat / soundRadius);
+
+                //Bias the factor based on hearing ability of Agent
+                distanceFactor += distanceFactor * (1.0f - _zombieStateMachine.hearing);
+
+                //Audio threat is too far away
+                if (distanceFactor > 1.0f) return;
+
+                // If we can hear it and is it closer then what we previously have stored
+                if (distanceToThreat < _zombieStateMachine.AudioThreat.distance)
+                {
+                    //Most dangerous audio threat so far
+                    _zombieStateMachine.AudioThreat.Set(AITargetType.Audio, other, soundPos, distanceToThreat);
+                }
+            }
+            else if (other.CompareTag("AI Food") && curType != AITargetType.Visual_Player && curType != 
+                AITargetType.Visual_Light && _zombieStateMachine.satisfaction <= 0.9f && 
+                _zombieStateMachine.AudioThreat.type == AITargetType.None)
+            {
+                float distanceToThreat = Vector3.Distance(other.transform.position, _zombieStateMachine.sensorPosition);
+                
+                if (distanceToThreat < _zombieStateMachine.VisualThreat.distance)
+                {
+                    RaycastHit hitInfo;
+                    if (ColliderIsVisible(other, out hitInfo, _visualLayerMask))
+                    {
+                        _zombieStateMachine.VisualThreat.Set(AITargetType.Visual_Food, other, other.transform.position, distanceToThreat);
                     }
                 }
             }
@@ -48,16 +110,15 @@ public class AIZombieState : AIState
     protected virtual bool ColliderIsVisible(Collider other, out RaycastHit hitInfo, int layerMask = -1)
     {
         hitInfo = new RaycastHit();
-        if (_stateMachine == null || _stateMachine.GetType() != typeof(AIZombieStateMachine)) return false;
-        AIZombieStateMachine zombieMachine = (AIZombieStateMachine)_stateMachine;
+        if (_zombieStateMachine == null) return false;
 
         Vector3 head = _stateMachine.sensorPosition;
         Vector3 direction = other.transform.position - head;
         float angle = Vector3.Angle(direction, transform.forward);
 
-        if (angle > zombieMachine.fov * 0.5f) return false;
+        if (angle > _zombieStateMachine.fov * 0.5f) return false;
 
-        RaycastHit[] hits = Physics.RaycastAll(head, direction.normalized, _stateMachine.sensorRadius * zombieMachine.sight, layerMask);
+        RaycastHit[] hits = Physics.RaycastAll(head, direction.normalized, _stateMachine.sensorRadius * _zombieStateMachine.sight, layerMask);
 
         float closesColliderDistance = float.MaxValue;
         Collider closestCollider = null;

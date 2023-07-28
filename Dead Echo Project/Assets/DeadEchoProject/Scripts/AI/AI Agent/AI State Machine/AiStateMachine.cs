@@ -130,10 +130,10 @@ public abstract class AiStateMachine : MonoBehaviour
             if (script != null) script.parentStateMachine = this;
         }
 
-        AIState[] currentStates = GetComponents<AIState>();
-        foreach (AIState state in currentStates)
+        AIState[] states = GetComponents<AIState>();
+        foreach (AIState state in states)
         {
-            if (state != null && _states.ContainsKey(state.GetStateType()))
+            if (state != null && !_states.ContainsKey(state.GetStateType()))
             {
                 _states[state.GetStateType()] = state;
                 state.SetStateMachine(this);
@@ -177,6 +177,21 @@ public abstract class AiStateMachine : MonoBehaviour
         }
     }
 
+    public void SetTarget(AITarget target)
+    {
+        // Assign the new target
+        _target = target;
+
+        // Configure and enable the target trigger at the correct
+        // position and with the correct radius
+        if (_targetTrigger != null)
+        {
+            _targetTrigger.radius = _stoppingDistance;
+            _targetTrigger.transform.position = target.position;
+            _targetTrigger.enabled = true;
+        }
+    }
+
     // ---------------------------------------
     // Name : ClearTarget
     // Desc : Clears the current target
@@ -212,7 +227,7 @@ public abstract class AiStateMachine : MonoBehaviour
     protected virtual void Update()
     {
         if (_currentState == null) return;
-        
+
         AIStateType newStateType = _currentState.OnUpdate();
         if (newStateType != _currentStateType)
         {
@@ -223,12 +238,14 @@ public abstract class AiStateMachine : MonoBehaviour
                 newState.OnEnterState();
                 _currentState = newState;
             }
-            else if (_states.TryGetValue(AIStateType.Idle, out newState))
+            else
+            if (_states.TryGetValue(AIStateType.Idle, out newState))
             {
                 _currentState.OnExitState();
                 newState.OnEnterState();
                 _currentState = newState;
             }
+
             _currentStateType = newStateType;
         }
     }

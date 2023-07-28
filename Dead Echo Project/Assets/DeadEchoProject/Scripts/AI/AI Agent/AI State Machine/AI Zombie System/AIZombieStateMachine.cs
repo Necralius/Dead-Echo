@@ -19,6 +19,7 @@ public class AIZombieStateMachine : AiStateMachine
     private bool    _feeding    = false;
     private bool    _crawling   = false;
     private int     _attackType = 0;
+    private float _speed = 0.0f;
 
 
     //Animation parameters hashes
@@ -32,7 +33,7 @@ public class AIZombieStateMachine : AiStateMachine
     public float    fov             { get { return _fov; } }
     public float    hearing         { get { return _hearing; } }
     public float    sight           { get { return _sight; } }
-    public float    intelligence    { get { return _attackType; } }
+    public float    intelligence    { get { return _intelligence; } }
     public bool     crawling        { get { return _crawling; } }
     public float    satisfaction    { get { return _satisfaction; }     set { _satisfaction = value; } }
     public float    aggression      { get { return _agression; }        set { _agression = value; } }
@@ -42,8 +43,8 @@ public class AIZombieStateMachine : AiStateMachine
     public int      seeking         { get { return _seeking; }          set { _seeking = value; } }
     public float    speed
     {
-        get { return navAgent != null ? navAgent.speed : 0;}
-        set { if (navAgent != null)  navAgent.speed = value; }
+        get { return _speed; }
+        set { _speed = value; }
     }
 
     protected override void Update()
@@ -52,7 +53,7 @@ public class AIZombieStateMachine : AiStateMachine
 
         if (navAgent != null)
         {
-            _animator.SetFloat(_speedHash, navAgent.speed);
+            _animator.SetFloat(_speedHash, _speed);
             _animator.SetBool(_feedingHash, _feeding);
             _animator.SetInteger(_seekingHash, _seeking);
             _animator.SetInteger(_attackHash, _attackType);
