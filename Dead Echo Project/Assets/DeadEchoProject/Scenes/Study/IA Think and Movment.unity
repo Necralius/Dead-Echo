@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2157.4832, g: 2260.7466, b: 3282.0337, a: 1}
+  m_IndirectSpecularColor: {r: 2159.3, g: 2262.681, b: 3284.1133, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2081,6 +2081,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Omni Zombie Jill
+      objectReference: {fileID: 0}
+    - target: {fileID: 8674708437067529941, guid: 80a7c3c0afd4d7e4bb9210dc3c457118,
+        type: 3}
+      propertyPath: _waypointNetwork
+      value: 
+      objectReference: {fileID: 289873916}
+    - target: {fileID: 8674708437067529941, guid: 80a7c3c0afd4d7e4bb9210dc3c457118,
+        type: 3}
+      propertyPath: _turnOnSpotThershold
+      value: 90
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

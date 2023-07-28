@@ -898,6 +898,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 761675141994331383}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e9ad29c1cfdcd81439a03e5cc55cac69,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8674708437067529941}
   m_SourcePrefab: {fileID: 100100000, guid: e9ad29c1cfdcd81439a03e5cc55cac69, type: 3}
 --- !u!4 &8562548175988907191 stripped
 Transform:
@@ -1018,4 +1022,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 407bde4eeb68024499eb85f9f6dca6fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _idleTimeRange: {x: 10, y: 60}
+  _idleTimeRange: {x: 5, y: 10}
+--- !u!114 &8674708437067529941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9052121587847562765}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e7c17bd4a5736640b5d66c580c7b92b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _waypointNetwork: {fileID: 0}
+  _randomPatrol: 0
+  _currentWaypoint: 0
+  _turnOnSpotThershold: 360
+  _slerpRotationSpeed: 5
+  _speed: 2

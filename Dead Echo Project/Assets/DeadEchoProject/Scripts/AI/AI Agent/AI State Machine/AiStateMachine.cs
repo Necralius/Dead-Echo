@@ -95,7 +95,8 @@ public abstract class AiStateMachine : MonoBehaviour
     }
     public bool useRootPosition { get { return _rootPositionRefCount > 0; } }
     public bool useRootRotation { get { return _rootRotationRefCount > 0; } }   
-
+    public AITargetType targetType {  get { return _target.type; } }
+    public Vector3 targetPosition { get { return _target.position; } }
 
     // ---------------------------------
     // Name : Awake
