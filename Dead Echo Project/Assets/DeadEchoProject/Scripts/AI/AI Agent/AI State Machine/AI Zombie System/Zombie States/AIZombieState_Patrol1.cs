@@ -132,12 +132,12 @@ public class AIZombieState_Patrol1 : AIZombieState
     // Name : OnAnimatorIKUpdated
     // Desc : Overrid IK Goals
     // ----------------------------------------------------------------------
-    public override void OnAnimatorIKUpdated()
-    {
-        if (_zombieStateMachine == null) return;
+    //public override void OnAnimatorIKUpdated()
+    //{
+    //    if (_zombieStateMachine == null) return;
 
-        _zombieStateMachine.animator.SetLookAtPosition(_zombieStateMachine.targetPosition + Vector3.up);
-        _zombieStateMachine.animator.SetLookAtWeight(0.55f);
-    }
+    //    _zombieStateMachine.animator.SetLookAtPosition(_zombieStateMachine.targetPosition + Vector3.up);
+    //    _zombieStateMachine.animator.SetLookAtWeight(0.55f);
+    //}
 
 }

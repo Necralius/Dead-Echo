@@ -54,7 +54,7 @@ public abstract class AiStateMachine : MonoBehaviour
     protected AITarget _target = new AITarget();
     protected int _rootPositionRefCount = 0;
     protected int _rootRotationRefCount = 0;
-
+    protected bool _isTargetReached = false;
 
     //Protected Inspector Assigned
     [SerializeField] protected AIStateType _currentStateType = AIStateType.Idle;
@@ -69,8 +69,10 @@ public abstract class AiStateMachine : MonoBehaviour
     protected Transform _transform = null;
 
     //Public properties
-    public Animator animator { get { return _animator; } }
-    public NavMeshAgent navAgent { get { return _navAgent; } }  
+    public bool isTargetReached { get =>_isTargetReached; }
+    public bool inMeleeRange { get; set; }
+    public Animator animator { get => _animator; }
+    public NavMeshAgent navAgent { get => _navAgent; }  
     public Vector3 sensorPosition
     {
         get
@@ -93,10 +95,12 @@ public abstract class AiStateMachine : MonoBehaviour
             return Mathf.Max(radius, _sensorTrigger.radius * _sensorTrigger.transform.lossyScale.z);
         }
     }
-    public bool useRootPosition { get { return _rootPositionRefCount > 0; } }
-    public bool useRootRotation { get { return _rootRotationRefCount > 0; } }   
-    public AITargetType targetType {  get { return _target.type; } }
-    public Vector3 targetPosition { get { return _target.position; } }
+    public bool useRootPosition { get => _rootPositionRefCount > 0;  }
+    public bool useRootRotation { get => _rootRotationRefCount > 0;  }   
+    public AITargetType targetType {  get => _target.type;  }
+    public Vector3 targetPosition { get => _target.position;  }
+    public int targetColliderID { get => _target.collider ? _target.collider.GetInstanceID() : -1; }
+
 
     // ---------------------------------
     // Name : Awake
@@ -214,10 +218,9 @@ public abstract class AiStateMachine : MonoBehaviour
         VisualThreat.Clear();
         AudioThreat.Clear();
 
-        if (_target.type != AITargetType.None)
-        {
-            _target.distance = Vector3.Distance(transform.position, _target.position);
-        }
+        if (_target.type != AITargetType.None) _target.distance = Vector3.Distance(transform.position, _target.position);
+
+        _isTargetReached = false;
     }
 
     // ----------------------------------------------------------------------
@@ -262,11 +265,21 @@ public abstract class AiStateMachine : MonoBehaviour
     {
         if (_targetTrigger == null || other != _targetTrigger) return;
 
+        _isTargetReached = true;
+
         if (_currentState) _currentState.OnDestinationReached(true);
     }
-    public virtual void OnTriggerExit(Collider other)
+    protected virtual void OnTriggerStay(Collider other)
+    {
+        if (_targetTrigger == null || other != _targetTrigger) return;
+        _isTargetReached = true;
+    }
+    protected virtual void OnTriggerExit(Collider other)
     {
         if (_targetTrigger == null || _targetTrigger != other) return;
+
+        _isTargetReached = false;
+
         if (_currentState != null) _currentState.OnDestinationReached(false);
     }
     public virtual void OnTriggerEvent(AITriggerEventType type, Collider other)
