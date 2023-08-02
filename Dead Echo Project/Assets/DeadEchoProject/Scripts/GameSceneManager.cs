@@ -14,13 +14,14 @@ public class GameSceneManager : MonoBehaviour
             return _instance;
         }
     }
-
     #endregion
-
-
 
     //Private
     private Dictionary<int, AiStateMachine> _stateMachines = new Dictionary<int, AiStateMachine>();
+    [SerializeField] private ParticleSystem _bloodParticles = null;
+    
+    //Public
+    public ParticleSystem bloodParticles { get => _bloodParticles; }
 
     //Public Methods
 
@@ -29,10 +30,7 @@ public class GameSceneManager : MonoBehaviour
     // Desc : Stores the passed state machine in the dictionary with the
     //        instance ID as an key.
     // ----------------------------------------------------------------------
-    public void RegisterAIStateMachine(int key, AiStateMachine stateMachine)
-    {
-        if (!_stateMachines.ContainsKey(key)) _stateMachines[key] = stateMachine;
-    }
+    public void RegisterAIStateMachine(int key, AiStateMachine stateMachine) { if (!_stateMachines.ContainsKey(key)) _stateMachines[key] = stateMachine; }
 
     // ----------------------------------------------------------------------
     // Name : GetAIStateMachine
@@ -46,12 +44,4 @@ public class GameSceneManager : MonoBehaviour
         if (_stateMachines.TryGetValue(key, out machine)) return machine;
         return null;
     }
-
-    
-
-
-
-
-
-
 }
