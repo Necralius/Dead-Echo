@@ -902,6 +902,18 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 8674708437067529941}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e9ad29c1cfdcd81439a03e5cc55cac69,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2036571517894557398}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e9ad29c1cfdcd81439a03e5cc55cac69,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6369538733233562101}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e9ad29c1cfdcd81439a03e5cc55cac69,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3671158187473098615}
   m_SourcePrefab: {fileID: 100100000, guid: e9ad29c1cfdcd81439a03e5cc55cac69, type: 3}
 --- !u!4 &8562548175988907191 stripped
 Transform:
@@ -1003,13 +1015,18 @@ MonoBehaviour:
   _targetTrigger: {fileID: 7481748300708804886}
   _sensorTrigger: {fileID: 8843009160944326279}
   _stoppingDistance: 1
+  _waypointNetwork: {fileID: 0}
+  _randomPatrol: 0
+  _currentWaypoint: -1
   _fov: 50
   _sight: 1
   _hearing: 1
   _agression: 1
   _health: 100
-  _intelligence: 0.5
-  _satisfaction: 1
+  _intelligence: 1
+  _satisfaction: 0
+  _replenishRate: 0.5
+  _depletionRate: 0.1
 --- !u!114 &761675141994331383
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1035,9 +1052,55 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e7c17bd4a5736640b5d66c580c7b92b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _waypointNetwork: {fileID: 0}
-  _randomPatrol: 0
-  _currentWaypoint: 0
-  _turnOnSpotThershold: 360
+  _turnOnSpotThershold: 90
   _slerpRotationSpeed: 5
-  _speed: 2
+  _speed: 1
+--- !u!114 &2036571517894557398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9052121587847562765}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13ad2f20152f8844ca0623742657c80d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxDuration: 7
+  _waypointAngleThreshold: 25
+  _threatAngleThreshold: 15
+  _directionChangeTime: 1.5
+--- !u!114 &6369538733233562101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9052121587847562765}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ab80108fe4e2d649a89f72a08f3d44f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _speed: 3
+  _slerpSeepd: 5
+  _repathDistanceMultiplier: 0.035
+  _repathVisualMinDuration: 0.05
+  _repathVisualMaxDuration: 5
+  _repathAudioMinDuruation: 0.25
+  _repathAudioMaxDuration: 5
+  _maxDuration: 40
+--- !u!114 &3671158187473098615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9052121587847562765}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f8e8cab1b7f90c498902a8977a842c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _slerpSpeed: 5

@@ -13,6 +13,8 @@ public class AIZombieStateMachine : AiStateMachine
     [SerializeField, Range(0, 100)] int _health = 100; 
     [SerializeField, Range(0f, 1f)] float _intelligence = 0.5f; 
     [SerializeField, Range(0f, 1f)] float _satisfaction = 1f;
+    [SerializeField] float _replenishRate = 0.5f;
+    [SerializeField] float _depletionRate = 0.1f;
 
     //Private
     private int     _seeking    = 0;
@@ -28,24 +30,20 @@ public class AIZombieStateMachine : AiStateMachine
     private int _feedingHash = Animator.StringToHash("Feeding");
     private int _attackHash = Animator.StringToHash("Attack");
 
-
     //Public
-    public float    fov             { get { return _fov; } }
-    public float    hearing         { get { return _hearing; } }
-    public float    sight           { get { return _sight; } }
-    public float    intelligence    { get { return _intelligence; } }
-    public bool     crawling        { get { return _crawling; } }
-    public float    satisfaction    { get { return _satisfaction; }     set { _satisfaction = value; } }
-    public float    aggression      { get { return _agression; }        set { _agression = value; } }
-    public int      health          { get { return _health; }           set { _health = value; } }
-    public int      attackType      { get { return _attackType; }       set { _attackType = value; } }
-    public bool     feeding         { get { return _feeding; }          set { _feeding = value; } }
-    public int      seeking         { get { return _seeking; }          set { _seeking = value; } }
-    public float    speed
-    {
-        get { return _speed; }
-        set { _speed = value; }
-    }
+    public float    replenishRate   { get => _replenishRate;    }
+    public float    fov             { get => _fov;              }
+    public float    hearing         { get => _hearing;          }
+    public float    sight           { get => _sight;            }
+    public float    intelligence    { get => _intelligence;     }
+    public bool     crawling        { get => _crawling;         }
+    public float    satisfaction    { get => _satisfaction;     set => _satisfaction    =  value; }
+    public float    aggression      { get => _agression;        set => _agression       =  value; }
+    public int      health          { get => _health;           set => _health          =  value; }
+    public int      attackType      { get => _attackType;       set => _attackType      =  value; }
+    public bool     feeding         { get => _feeding;          set => _feeding         =  value; }
+    public int      seeking         { get => _seeking;          set => _seeking         =  value; }
+    public float    speed           { get => _speed;            set => _speed           =  value; }
 
     protected override void Update()
     {

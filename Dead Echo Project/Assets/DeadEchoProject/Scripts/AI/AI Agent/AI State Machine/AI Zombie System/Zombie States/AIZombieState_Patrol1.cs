@@ -3,9 +3,7 @@ using Random = UnityEngine.Random;
 
 public class AIZombieState_Patrol1 : AIZombieState
 {
-    [SerializeField] WaypointNetwork _waypointNetwork = null;
-    [SerializeField] bool _randomPatrol = false;
-    [SerializeField] int _currentWaypoint = 0;
+    //Inspector
     [SerializeField] float _turnOnSpotThershold = 80f;
     [SerializeField] float _slerpRotationSpeed = 5f;
 
@@ -18,7 +16,6 @@ public class AIZombieState_Patrol1 : AIZombieState
 
     public override void OnEnterState()
     {
-        Debug.Log("Entering Patrol State!");
         base.OnEnterState();
         if (_zombieStateMachine == null) return;
 
@@ -28,26 +25,8 @@ public class AIZombieState_Patrol1 : AIZombieState
         _zombieStateMachine.feeding = false;
         _zombieStateMachine.attackType = 0;
 
-        if (_zombieStateMachine.targetType != AITargetType.Waypoint)
-        {
-            _zombieStateMachine.ClearTarget();
-            if (_waypointNetwork != null && _waypointNetwork.waypoints.Count > 0)
-            {
-                if (_randomPatrol) _currentWaypoint = Random.Range(0, _waypointNetwork.waypoints.Count);
-
-                if (_currentWaypoint < _waypointNetwork.waypoints.Count)
-                {
-                    Transform waypoint = _waypointNetwork.waypoints[_currentWaypoint];
-                    if (waypoint != null)
-                    {
-                        _zombieStateMachine.SetTarget(AITargetType.Waypoint,
-                            null, waypoint.position, Vector3.Distance(_zombieStateMachine.transform.position, waypoint.position));
-                        
-                        _zombieStateMachine.navAgent.SetDestination(waypoint.position);
-                    }
-                }
-            }
-        }
+        _zombieStateMachine.navAgent.SetDestination(_zombieStateMachine.GetWaypointPosition(false));
+      
         _zombieStateMachine.navAgent.isStopped = false;
     }
     public override AIStateType OnUpdate()
@@ -97,35 +76,16 @@ public class AIZombieState_Patrol1 : AIZombieState
             !_zombieStateMachine.navAgent.hasPath || 
             _zombieStateMachine.navAgent.pathStatus != UnityEngine.AI.NavMeshPathStatus.PathComplete)
         {
-            NextWaypoint();
+            _zombieStateMachine.GetWaypointPosition(true);
         }
 
         return AIStateType.Patrol;
-    }
-    private void NextWaypoint()
-    {
-        if (_randomPatrol && _waypointNetwork.waypoints.Count > 1)
-        {
-            int oldWaypoint = _currentWaypoint;
-            while (_currentWaypoint == oldWaypoint) _currentWaypoint = Random.Range(0, _waypointNetwork.waypoints.Count);
-        }
-        else _currentWaypoint = _currentWaypoint == _waypointNetwork.waypoints.Count - 1 ? 0 : _currentWaypoint + 1;
-
-        if (_waypointNetwork.waypoints[_currentWaypoint] != null)
-        {
-            Transform newWaypoint = _waypointNetwork.waypoints[_currentWaypoint];
-
-            _zombieStateMachine.SetTarget(AITargetType.Waypoint, 
-                null, newWaypoint.position, Vector3.Distance(newWaypoint.position, _zombieStateMachine.transform.position));
-            
-            _zombieStateMachine.navAgent.SetDestination(newWaypoint.position);
-        }
     }
     public override void OnDestinationReached(bool isReached)
     {
         if (_zombieStateMachine == null || !isReached) return;
 
-        if (_zombieStateMachine.targetType == AITargetType.Waypoint) NextWaypoint();
+        if (_zombieStateMachine.targetType == AITargetType.Waypoint) _zombieStateMachine.GetWaypointPosition(true);
     }
 
     // ----------------------------------------------------------------------

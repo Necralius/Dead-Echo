@@ -62,6 +62,10 @@ public abstract class AiStateMachine : MonoBehaviour
     [SerializeField] protected SphereCollider _sensorTrigger = null;
     [SerializeField, Range(0, 15)] protected float _stoppingDistance = 1.0f;
 
+    [SerializeField] protected WaypointNetwork _waypointNetwork = null;
+    [SerializeField] protected bool _randomPatrol = false;
+    [SerializeField] protected int _currentWaypoint = -1;
+
     //Component Cache
     protected Animator _animator = null;
     protected NavMeshAgent _navAgent = null;
@@ -252,6 +256,40 @@ public abstract class AiStateMachine : MonoBehaviour
 
             _currentStateType = newStateType;
         }
+    }
+    private void NextWaypoint()
+    {
+        if (_randomPatrol && _waypointNetwork.waypoints.Count > 1)
+        {
+            int oldWaypoint = _currentWaypoint;
+            while (_currentWaypoint == oldWaypoint) _currentWaypoint = Random.Range(0, _waypointNetwork.waypoints.Count);
+        }
+        else _currentWaypoint = _currentWaypoint == _waypointNetwork.waypoints.Count - 1 ? 0 : _currentWaypoint + 1;
+    }
+
+    // ----------------------------------------------------------------------
+    // Name : GetWaypointPosition
+    // Desc : Fetched the world space position of the state machine's
+    //        currently set waypoint with optional increment.
+    // ----------------------------------------------------------------------
+    public Vector3 GetWaypointPosition(bool increment)
+    {
+        if (_currentWaypoint == -1)
+        {
+            if (_randomPatrol) _currentWaypoint = Random.Range(0, _waypointNetwork.waypoints.Count);
+            else _currentWaypoint = 0;
+        }
+        else if (increment) NextWaypoint();
+
+        if (_waypointNetwork.waypoints[_currentWaypoint] != null)
+        {
+            Transform newWaypoint = _waypointNetwork.waypoints[_currentWaypoint];
+
+            SetTarget(AITargetType.Waypoint,
+                null, newWaypoint.position, Vector3.Distance(newWaypoint.position, transform.position));
+            return newWaypoint.position;
+        }
+        return Vector3.zero;
     }
 
     // ----------------------------------------------------------------------
