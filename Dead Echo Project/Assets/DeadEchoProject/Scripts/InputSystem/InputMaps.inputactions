@@ -31,6 +31,51 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ReloadAction",
+                    "type": "Button",
+                    "id": "05b057e4-ddbe-4c7e-b513-7afaff3dfac5",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ShootAction",
+                    "type": "Button",
+                    "id": "0ce985b0-ff59-4651-8348-475c8f227ccb",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "AimAction",
+                    "type": "Button",
+                    "id": "74ed7541-5876-4bcc-8bfe-24deadeff1a5",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "JumpAction",
+                    "type": "Button",
+                    "id": "86b93aa6-8a7c-4c23-aa91-6a96ee6fbff3",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "CrouchAction",
+                    "type": "Button",
+                    "id": "8ba6f3c5-b014-4ec2-a48b-3743121d18eb",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -108,6 +153,61 @@
                     "processors": "",
                     "groups": "",
                     "action": "SprintAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f0c0bf4d-8c6d-4783-8c12-c288995b740a",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ReloadAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "915a71ff-630d-4414-b47f-71b45d5ffeae",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ShootAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1a6ed2fc-749b-4453-b113-72814d065177",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AimAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5fb44032-9168-4008-be58-44dea3ee670f",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "JumpAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "610f58d6-e4fe-426e-9297-f6dd7311c5fc",
+                    "path": "<Keyboard>/leftCtrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CrouchAction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

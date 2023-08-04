@@ -53,6 +53,51 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ReloadAction"",
+                    ""type"": ""Button"",
+                    ""id"": ""05b057e4-ddbe-4c7e-b513-7afaff3dfac5"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ShootAction"",
+                    ""type"": ""Button"",
+                    ""id"": ""0ce985b0-ff59-4651-8348-475c8f227ccb"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""AimAction"",
+                    ""type"": ""Button"",
+                    ""id"": ""74ed7541-5876-4bcc-8bfe-24deadeff1a5"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""JumpAction"",
+                    ""type"": ""Button"",
+                    ""id"": ""86b93aa6-8a7c-4c23-aa91-6a96ee6fbff3"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CrouchAction"",
+                    ""type"": ""Button"",
+                    ""id"": ""8ba6f3c5-b014-4ec2-a48b-3743121d18eb"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -132,6 +177,61 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
                     ""action"": ""SprintAction"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f0c0bf4d-8c6d-4783-8c12-c288995b740a"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ReloadAction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""915a71ff-630d-4414-b47f-71b45d5ffeae"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ShootAction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1a6ed2fc-749b-4453-b113-72814d065177"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AimAction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5fb44032-9168-4008-be58-44dea3ee670f"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""JumpAction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""610f58d6-e4fe-426e-9297-f6dd7311c5fc"",
+                    ""path"": ""<Keyboard>/leftCtrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CrouchAction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -143,6 +243,11 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
         m_PC_Map_Look = m_PC_Map.FindAction("Look", throwIfNotFound: true);
         m_PC_Map_Move = m_PC_Map.FindAction("Move", throwIfNotFound: true);
         m_PC_Map_SprintAction = m_PC_Map.FindAction("SprintAction", throwIfNotFound: true);
+        m_PC_Map_ReloadAction = m_PC_Map.FindAction("ReloadAction", throwIfNotFound: true);
+        m_PC_Map_ShootAction = m_PC_Map.FindAction("ShootAction", throwIfNotFound: true);
+        m_PC_Map_AimAction = m_PC_Map.FindAction("AimAction", throwIfNotFound: true);
+        m_PC_Map_JumpAction = m_PC_Map.FindAction("JumpAction", throwIfNotFound: true);
+        m_PC_Map_CrouchAction = m_PC_Map.FindAction("CrouchAction", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -207,6 +312,11 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
     private readonly InputAction m_PC_Map_Look;
     private readonly InputAction m_PC_Map_Move;
     private readonly InputAction m_PC_Map_SprintAction;
+    private readonly InputAction m_PC_Map_ReloadAction;
+    private readonly InputAction m_PC_Map_ShootAction;
+    private readonly InputAction m_PC_Map_AimAction;
+    private readonly InputAction m_PC_Map_JumpAction;
+    private readonly InputAction m_PC_Map_CrouchAction;
     public struct PC_MapActions
     {
         private @InputMaps m_Wrapper;
@@ -214,6 +324,11 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
         public InputAction @Look => m_Wrapper.m_PC_Map_Look;
         public InputAction @Move => m_Wrapper.m_PC_Map_Move;
         public InputAction @SprintAction => m_Wrapper.m_PC_Map_SprintAction;
+        public InputAction @ReloadAction => m_Wrapper.m_PC_Map_ReloadAction;
+        public InputAction @ShootAction => m_Wrapper.m_PC_Map_ShootAction;
+        public InputAction @AimAction => m_Wrapper.m_PC_Map_AimAction;
+        public InputAction @JumpAction => m_Wrapper.m_PC_Map_JumpAction;
+        public InputAction @CrouchAction => m_Wrapper.m_PC_Map_CrouchAction;
         public InputActionMap Get() { return m_Wrapper.m_PC_Map; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -232,6 +347,21 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
             @SprintAction.started += instance.OnSprintAction;
             @SprintAction.performed += instance.OnSprintAction;
             @SprintAction.canceled += instance.OnSprintAction;
+            @ReloadAction.started += instance.OnReloadAction;
+            @ReloadAction.performed += instance.OnReloadAction;
+            @ReloadAction.canceled += instance.OnReloadAction;
+            @ShootAction.started += instance.OnShootAction;
+            @ShootAction.performed += instance.OnShootAction;
+            @ShootAction.canceled += instance.OnShootAction;
+            @AimAction.started += instance.OnAimAction;
+            @AimAction.performed += instance.OnAimAction;
+            @AimAction.canceled += instance.OnAimAction;
+            @JumpAction.started += instance.OnJumpAction;
+            @JumpAction.performed += instance.OnJumpAction;
+            @JumpAction.canceled += instance.OnJumpAction;
+            @CrouchAction.started += instance.OnCrouchAction;
+            @CrouchAction.performed += instance.OnCrouchAction;
+            @CrouchAction.canceled += instance.OnCrouchAction;
         }
 
         private void UnregisterCallbacks(IPC_MapActions instance)
@@ -245,6 +375,21 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
             @SprintAction.started -= instance.OnSprintAction;
             @SprintAction.performed -= instance.OnSprintAction;
             @SprintAction.canceled -= instance.OnSprintAction;
+            @ReloadAction.started -= instance.OnReloadAction;
+            @ReloadAction.performed -= instance.OnReloadAction;
+            @ReloadAction.canceled -= instance.OnReloadAction;
+            @ShootAction.started -= instance.OnShootAction;
+            @ShootAction.performed -= instance.OnShootAction;
+            @ShootAction.canceled -= instance.OnShootAction;
+            @AimAction.started -= instance.OnAimAction;
+            @AimAction.performed -= instance.OnAimAction;
+            @AimAction.canceled -= instance.OnAimAction;
+            @JumpAction.started -= instance.OnJumpAction;
+            @JumpAction.performed -= instance.OnJumpAction;
+            @JumpAction.canceled -= instance.OnJumpAction;
+            @CrouchAction.started -= instance.OnCrouchAction;
+            @CrouchAction.performed -= instance.OnCrouchAction;
+            @CrouchAction.canceled -= instance.OnCrouchAction;
         }
 
         public void RemoveCallbacks(IPC_MapActions instance)
@@ -267,5 +412,10 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
         void OnLook(InputAction.CallbackContext context);
         void OnMove(InputAction.CallbackContext context);
         void OnSprintAction(InputAction.CallbackContext context);
+        void OnReloadAction(InputAction.CallbackContext context);
+        void OnShootAction(InputAction.CallbackContext context);
+        void OnAimAction(InputAction.CallbackContext context);
+        void OnJumpAction(InputAction.CallbackContext context);
+        void OnCrouchAction(InputAction.CallbackContext context);
     }
 }

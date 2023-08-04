@@ -22,14 +22,24 @@ public class InputManager : MonoBehaviour
     public Vector2 Move { get; private set; }
     public Vector2 Look { get; private set; }
 
-    public bool sprinting;
+    public bool sprint;
+    public bool reload;
+    public bool shooting;
+    public bool aiming;
+    public bool jumping;
+    public bool crouching;
 
     //Private Data
     private InputActionMap currentMap;
+
     private InputAction moveAction;
     private InputAction lookAction;
-
+    private InputAction reloadAction;
+    private InputAction shootAction;
+    private InputAction aimAction;
+    private InputAction jumpAction;
     private InputAction sprintAction;
+    private InputAction crouchAction;
     #endregion
 
     // ---------------------------- Methods ----------------------------
@@ -46,24 +56,44 @@ public class InputManager : MonoBehaviour
         if (Instance != null) Destroy(this);
         else Instance = this;
 
-        currentMap = playerInput.currentActionMap;
-        moveAction = currentMap.FindAction("Move");
-        lookAction = currentMap.FindAction("Look");
-        sprintAction = currentMap.FindAction("SprintAction");
+        currentMap      = playerInput.currentActionMap;
+        moveAction      = currentMap.FindAction("Move");
+        lookAction      = currentMap.FindAction("Look");
+        sprintAction    = currentMap.FindAction("SprintAction");
+        reloadAction    = currentMap.FindAction("ReloadAction");
+        shootAction     = currentMap.FindAction("ShootAction");
+        aimAction       = currentMap.FindAction("AimAction");
+        jumpAction      = currentMap.FindAction("JumpAction");
+        crouchAction    = currentMap.FindAction("CrouchAction");
 
-        moveAction.performed += onMove;
-        lookAction.performed += onLook;
-        sprintAction.performed += onSprint;
+        moveAction.performed    += onMove;
+        lookAction.performed    += onLook;
+        sprintAction.performed  += onSprint;
+        reloadAction.performed  += onReload;
+        shootAction.performed   += onShoot;
+        aimAction.performed     += onAim;
+        jumpAction.performed    += onJump;
+        crouchAction.performed  += onCrouch; 
 
-        moveAction.canceled += onMove;
-        lookAction.canceled += onLook;
-        sprintAction.canceled += onSprint;
+        moveAction.canceled     += onMove;
+        lookAction.canceled     += onLook;
+        sprintAction.canceled   += onSprint;
+        reloadAction.canceled   += onReload;
+        shootAction.canceled    += onShoot;
+        aimAction.canceled      += onAim;
+        jumpAction.canceled     += onJump;
+        crouchAction.canceled   += onCrouch;
     }
     #endregion
 
     #region - Input Gethering -
-    private void onMove(InputAction.CallbackContext context) => Move = context.ReadValue<Vector2>();
-    private void onLook(InputAction.CallbackContext context) => Look = context.ReadValue<Vector2>();
-    private void onSprint(InputAction.CallbackContext context) => sprinting = context.ReadValueAsButton();
+    private void onMove(InputAction.CallbackContext context)    => Move         = context.ReadValue<Vector2>();
+    private void onLook(InputAction.CallbackContext context)    => Look         = context.ReadValue<Vector2>();
+    private void onSprint(InputAction.CallbackContext context)  => sprint       = context.ReadValueAsButton();
+    private void onReload(InputAction.CallbackContext context)  => reload       = context.ReadValueAsButton();
+    private void onShoot(InputAction.CallbackContext context)   => shooting     = context.ReadValueAsButton();
+    private void onAim(InputAction.CallbackContext context)     => aiming       = context.ReadValueAsButton();
+    private void onJump(InputAction.CallbackContext context)    => jumping      = context.ReadValueAsButton();
+    private void onCrouch(InputAction.CallbackContext context)  => crouching    = context.ReadValueAsButton();
     #endregion
 }
