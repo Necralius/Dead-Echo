@@ -4,16 +4,19 @@ using UnityEngine;
 
 public class AutomaticRifle : GunBase
 {
-    protected override void Aim()
-    {
-        base.Aim();
-    }
-    protected override void Reload()
-    {
-        base.Reload();
-    }
     protected override IEnumerator Shoot()
     {
-        throw new System.NotImplementedException();
+        isShooting = true;
+        BulletBase bullet = ObjectPooler.Instance.SpawnFromPool(bulletTag,
+            _shootPoint.transform.position,
+            _shootPoint.transform.rotation).GetComponent<BulletBase>();
+
+        bullet.Initialize(_shootPoint, bulletSpeed, _bulletGravity);
+        recoilAsset.RecoilFire();
+        magAmmo--;
+
+        yield return new WaitForSeconds(rateOfFire);
+
+        isShooting = false;
     }
 }

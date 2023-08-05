@@ -12,9 +12,14 @@ public class FPS_Controller : MonoBehaviour
     #region - Dependencies -
     private CharacterController controller  => GetComponent<CharacterController>();
     private Animator bodyAnimator           => GetComponent<Animator>();
-    private Transform bodyCamera               => GetComponentInChildren<Camera>().transform.parent;
+    private Transform bodyCamera            => GetComponentInChildren<Camera>().transform.parent;
+    public GameObject cameraObject          => GetComponentInChildren<Camera>().gameObject;
     private InputManager inputManager       => InputManager.Instance != null ? InputManager.Instance : null;
     #endregion
+    [Header("Gun System Dependencies")]
+    public GunBase equippedGun;
+    public Animator armsAnimator;
+    public Transform aimHolder;
 
     #region - Player Data Settings -
     [Header("Player Data Settings")]
@@ -73,7 +78,6 @@ public class FPS_Controller : MonoBehaviour
     private Vector3 _moveDirection   = Vector3.zero;
     #endregion
 
-
     #region - Public Data -
     public bool isSprinting { get => _isSprinting; }
     #endregion
@@ -104,7 +108,7 @@ public class FPS_Controller : MonoBehaviour
     }
     #endregion
 
-
+    #region - Update Actions -
     // ----------------------------------------------------------------------
     // Name : UpdateCalls
     // Desc : This method manage all data tha need to be updated
@@ -118,6 +122,7 @@ public class FPS_Controller : MonoBehaviour
         _isGrounded     = controller.isGrounded;
         _inAir          = !_isGrounded;
     }
+    #endregion
 
     #region - Look Handler -
     // ----------------------------------------------------------------------
@@ -145,9 +150,7 @@ public class FPS_Controller : MonoBehaviour
     // ----------------------------------------------------------------------
     private void MoveHandler()
     {
-        float speedValue = 0;
-        if (_isCrouching) speedValue = _crouchSpeed;
-        else speedValue = _isSprinting && !_isCrouching ? _sprintSpeed : _walkSpeed;
+        float speedValue = _isSprinting ? (_isCrouching ? _crouchSpeed : _sprintSpeed) : _walkSpeed;
 
         _moveInput = new Vector2(inputManager.Move.y * speedValue, inputManager.Move.x * speedValue);
 
@@ -174,12 +177,22 @@ public class FPS_Controller : MonoBehaviour
     #region - Crouch System -
     // ----------------------------------------------------------------------
     // Name : CrouchHandler
-    // Desc : This method handle the crouch system.
+    // Desc : This method handle the crouch system input an action limits.
     // ----------------------------------------------------------------------
     private void CrouchHandler()
     {
         if (_isGrounded && !_duringCrouch) if (inputManager.crouching) StartCoroutine(CrouchAction());
     }
+
+    // ----------------------------------------------------------------------
+    // Name : CrouchAction
+    // Desc : This method alternate the crouch  state, changing the
+    //        collider height and center  using an Lerp function to
+    //        transit gradually between the values, also the method
+    //        makes an simple check, to see if the player is trying
+    //        stand up and if have  anything up of  the player, and
+    //        if has, the stand is canceled.
+    // ----------------------------------------------------------------------
     private IEnumerator CrouchAction()
     {
         if (_isCrouching && Physics.Raycast(bodyCamera.transform.position, Vector3.up, 1.5f, crouchUpLayer)) yield break;
@@ -210,6 +223,10 @@ public class FPS_Controller : MonoBehaviour
     #endregion
 
     #region - HeadBob System -
+    // ----------------------------------------------------------------------
+    // Name : HeadBobHandler
+    // Desc : This method manages the headbob movment system.
+    // ----------------------------------------------------------------------
     private void HeadBobHandler()
     {
         _timer += Time.deltaTime * (_isCrouching ? crouchBobSpeed : isSprinting ? sprintBobSpeed : walkBobSpeed);
