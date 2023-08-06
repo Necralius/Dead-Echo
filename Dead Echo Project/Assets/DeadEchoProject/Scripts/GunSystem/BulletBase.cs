@@ -1,45 +1,58 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class BulletBase : MonoBehaviour
 {
-    private float speed;
-    private float gravity;
-    private Vector3 startPosition;
-    private Vector3 startForward;
+    private float _bulletSpeed;
+    private float _bulletGravity;
+    private Vector3 _startPosition;
+    private Vector3 _startForward;
 
-    private bool isInitialized = false;
-    private float startTime = -1;
+    private bool _isInitialized = false;
+    private float _startTime = -1;
 
-    public void Initialize(Transform startPoint, float speed, float gravity)
+    private float _bulletLifeTime = 15f;
+    private float _deactiveTimer = 0;
+    private LayerMask _collisionLayerMask;
+
+    Func<Vector3, string> hitInteraction;
+
+    public void Initialize(Transform startPoint, float speed, float gravity, float bulletLifeTime, LayerMask collisionLayerMask)
     {
-        startPosition = startPoint.position;
-        startForward = startPoint.forward;
+        _startPosition = startPoint.position;
+        _startForward = startPoint.forward;
 
-        this.speed = speed;
-        this.gravity = gravity;
-        isInitialized = true;
+        this._bulletSpeed = speed;
+        this._bulletGravity = gravity;
+        this._bulletLifeTime = bulletLifeTime;
+        this._collisionLayerMask = collisionLayerMask;
+        _isInitialized = true;
     }
 
     private Vector3 FindPointOnParabola(float time)
     {
-        Vector3 point = startPosition + (startForward * speed * time);
-        Vector3 gravityVec = Vector3.down * gravity * time * time;
+        Vector3 point = _startPosition + (_startForward * _bulletSpeed * time);
+        Vector3 gravityVec = Vector3.down * _bulletGravity * time * time;
         return point + gravityVec;
     }
     private bool CastRayBetweenPoints(Vector3 startPoint, Vector3 endPoint, out RaycastHit hit)
     {
-        return Physics.Raycast(startPoint, endPoint - startPoint, out hit, (endPoint - startPoint).magnitude);
+        return Physics.Raycast(startPoint, endPoint - startPoint, out hit, (endPoint - startPoint).magnitude, _collisionLayerMask);
     }
 
+    // ----------------------------------------------------------------------
+    // Name : FixedUpdate
+    // Desc : 
+    // ----------------------------------------------------------------------
     private void FixedUpdate()
     {
-        if (!isInitialized) return;
-        if (startTime < 0) startTime = Time.time;
+        if (!_isInitialized) return;
+        if (_startTime < 0) _startTime = Time.time;
 
         RaycastHit hit;
-        float currentTime = Time.time - startTime;
+        float currentTime = Time.time - _startTime;
         float prevTime = currentTime - Time.fixedDeltaTime;
         float nextTime = currentTime + Time.fixedDeltaTime;
 
@@ -55,18 +68,31 @@ public class BulletBase : MonoBehaviour
         if (CastRayBetweenPoints(currentPoint, nextPoint, out hit)) OnHit(hit);
     }
 
+    // ----------------------------------------------------------------------
+    // Name : Update
+    // Desc : Called every frame, this method manages the bullet movment
+    //        and deactivation time.
+    // ----------------------------------------------------------------------
     private void Update()
     {
-        if (!isInitialized || startTime < 0) return;
+        if (!_isInitialized || _startTime < 0) return;
+        if (_deactiveTimer >= _bulletLifeTime) gameObject.SetActive(false);
 
-        float currentTime = Time.time - startTime;
+        float currentTime = Time.time - _startTime;
         Vector3 currentPoint = FindPointOnParabola(currentTime);
         transform.position = currentPoint;
+
+        _deactiveTimer += Time.deltaTime;
     }
 
+    // ----------------------------------------------------------------------
+    // Name : OnHit
+    // Desc : This method notify the bullet hit an executes the storaged
+    //        function to represent an bullet impact interaction.
+    // ----------------------------------------------------------------------
     public virtual void OnHit(RaycastHit hit)
     {
-        //Debug.Log("Hit!!");
+        if (hitInteraction != null) hitInteraction(hit.point);
         gameObject.SetActive(false);
     }
 

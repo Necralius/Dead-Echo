@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static NekraByte.FPS_Utility;
 
 public class ObjectPooler : MonoBehaviour
 {

@@ -11,11 +11,15 @@ public class AutomaticRifle : GunBase
             _shootPoint.transform.position,
             _shootPoint.transform.rotation).GetComponent<BulletBase>();
 
-        bullet.Initialize(_shootPoint, bulletSpeed, _bulletGravity);
+        bullet.Initialize(_shootPoint, gunDataConteiner.gunBulletSettings._bulletSpeed, 
+            gunDataConteiner.gunBulletSettings._bulletGravity, 
+            gunDataConteiner.gunBulletSettings._bulletLifeTime, 
+            gunDataConteiner.gunBulletSettings._collisionMask);
+
         recoilAsset.RecoilFire();
         magAmmo--;
 
-        yield return new WaitForSeconds(rateOfFire);
+        yield return new WaitForSeconds(gunDataConteiner.gunData.rateOfFire);
 
         isShooting = false;
     }

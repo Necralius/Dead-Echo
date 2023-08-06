@@ -243,6 +243,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54196bf63de0f1c47b66c4e26f7308bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponSwayObject: {fileID: 134548269321808954}
   equippedGun: {fileID: 3372103529801983734}
   armsAnimator: {fileID: 4154569383673543779}
   aimHolder: {fileID: 8992763447973379435}
@@ -279,6 +280,8 @@ MonoBehaviour:
   _isGrounded: 0
   _inAir: 0
   _changingWeapon: 0
+  _moveInput: {x: 0, y: 0}
+  _lookInput: {x: 0, y: 0}
 --- !u!1 &3064058465245959294
 GameObject:
   m_ObjectHideFlags: 0
@@ -587,6 +590,21 @@ PrefabInstance:
       propertyPath: cameraObject
       value: 
       objectReference: {fileID: 3064058465245959294}
+    - target: {fileID: 7067269749314989094, guid: 9266be8f4317bac41955532627f3dcfa,
+        type: 3}
+      propertyPath: swayScale
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 7067269749314989094, guid: 9266be8f4317bac41955532627f3dcfa,
+        type: 3}
+      propertyPath: gunDataConteiner.gunData.shootType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7067269749314989094, guid: 9266be8f4317bac41955532627f3dcfa,
+        type: 3}
+      propertyPath: gunDataConteiner.gunBulletSettings._collisionMask.m_Bits
+      value: 17
+      objectReference: {fileID: 0}
     - target: {fileID: 8207943422056945224, guid: 9266be8f4317bac41955532627f3dcfa,
         type: 3}
       propertyPath: m_LocalPosition.x

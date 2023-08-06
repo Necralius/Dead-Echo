@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static NekraByte.FPS_Utility;
 
 [RequireComponent(typeof(Animator))]
 public abstract class GunBase : MonoBehaviour
@@ -9,14 +10,12 @@ public abstract class GunBase : MonoBehaviour
     protected Animator animator;
     protected FPS_Controller playerController;
     protected InputManager inputManager;
+    [SerializeField] protected GunDataConteiner gunDataConteiner = new();
+    private GameObject weaponSwayObject;
     protected GunProceduralRecoil recoilAsset => GetComponent<GunProceduralRecoil>();
     private Transform aimHolder => playerController.aimHolder;
     #endregion
 
-    [Header("Gun Settings"), Tooltip("Gun aspects settings")]
-    [SerializeField] protected Vector2 shootDamageRange = new(10f,25f);
-    [SerializeField, Range(0.01f, 3f)] protected float rateOfFire = 0.6f;
-    [SerializeField, Range(5f, 1000f)] protected float bulletSpeed = 30;
 
     [Header("Gun Ammo"), Tooltip("Gun ammo quantity settings")]
     [SerializeField, Range(0, 500)] protected int bagMaxAmmo = 200;
@@ -26,9 +25,10 @@ public abstract class GunBase : MonoBehaviour
     [SerializeField] protected int magAmmo = 31;
 
     [Header("Gun State"), Tooltip("Gun current states")]
-    [SerializeField] protected bool isReloading;
-    [SerializeField] protected bool isShooting;
-    [SerializeField] protected bool isAiming;
+    [SerializeField] protected bool isReloading     = false;
+    [SerializeField] protected bool isShooting      = false;
+    [SerializeField] protected bool hasSway         = true;
+    public bool                     isAiming        = false;
 
     [Header("Gun Shoo System")]
     [SerializeField] protected Transform _shootPoint = null;
@@ -42,18 +42,21 @@ public abstract class GunBase : MonoBehaviour
     private Vector3 aimTargetPos;
     [SerializeField, Range(1, 20)] private float aimSpeed;
     [SerializeField] private float aimOffset;
-    [SerializeField] private float aimReloadOffset;  
+    [SerializeField] private float aimReloadOffset;
 
+    #region - Animation Hashes -
     private int _isWalkingHash      = Animator.StringToHash("isWalking");
     private int _isRunningHash      = Animator.StringToHash("isRunning");
     private int _isReloadingHash    = Animator.StringToHash("isReloading");
     private int _reloadFactor       = Animator.StringToHash("ReloadFactor");
+    #endregion
 
     protected virtual void Start()
     {
         playerController    = GetComponentInParent<FPS_Controller>();
         inputManager        = InputManager.Instance;
         animator            = GetComponent<Animator>();
+        weaponSwayObject = playerController.weaponSwayObject;
         recoilAsset.cameraObject = playerController.cameraObject;
     }
     
@@ -68,16 +71,18 @@ public abstract class GunBase : MonoBehaviour
             recoilAsset.isAiming = isAiming;
 
             if (!isReloading && inputManager.reload && !(magAmmo == magMaxAmmo) && bagAmmo > 0) Reload();
-            if ((!isShooting && magAmmo > 0 && !isReloading) && inputManager.shooting) StartCoroutine(Shoot());
+            if (!isShooting && magAmmo > 0 && !isReloading && inputManager.shooting) StartCoroutine(Shoot());
 
             Aim();
         }
 
         playerController.armsAnimator.SetBool(_isWalkingHash, playerController._isWalking);
         playerController.armsAnimator.SetBool(_isRunningHash, playerController.isSprinting);
+
+        //NOTE: On override, always mantain the base code using the base.Update(); -> Otherwise, every systems of the gun base will be broken!!
     }
     protected abstract IEnumerator Shoot();
-    protected virtual void Aim()
+    private void Aim()
     {
         if (isAiming)
         {
@@ -90,6 +95,8 @@ public abstract class GunBase : MonoBehaviour
 
         aimHolder.transform.localPosition = Vector3.Lerp(aimHolder.transform.localPosition, aimTargetPos, aimSpeed * Time.deltaTime);
     }
+
+    #region - Reload Behavior -
     protected virtual void Reload()
     {
         isReloading = true;
@@ -116,8 +123,7 @@ public abstract class GunBase : MonoBehaviour
             magAmmo = magMaxAmmo;
             bagAmmo -= quantityNeeded;
         }
-
         isReloading = false;
     }
-
+    #endregion
 }

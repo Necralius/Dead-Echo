@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using static NekraByte.FPS_Utility;
 
 public class FPS_Controller : MonoBehaviour
 {
@@ -9,17 +10,24 @@ public class FPS_Controller : MonoBehaviour
     public static FPS_Controller Instance;
     #endregion
 
-    #region - Dependencies -
+    #region - Controller Dependencies -
     private CharacterController controller  => GetComponent<CharacterController>();
-    private Animator bodyAnimator           => GetComponent<Animator>();
     private Transform bodyCamera            => GetComponentInChildren<Camera>().transform.parent;
     public GameObject cameraObject          => GetComponentInChildren<Camera>().gameObject;
     private InputManager inputManager       => InputManager.Instance != null ? InputManager.Instance : null;
     #endregion
+
+    #region - Gun System Dependencies -
     [Header("Gun System Dependencies")]
+    public GameObject weaponSwayObject;
+    public GameObject idleSwayObject;
+
     public GunBase equippedGun;
+
     public Animator armsAnimator;
     public Transform aimHolder;
+    public SwayEffectors gunSwayEffectors = new SwayEffectors();
+    #endregion
 
     #region - Player Data Settings -
     [Header("Player Data Settings")]
@@ -70,19 +78,62 @@ public class FPS_Controller : MonoBehaviour
     public bool _isGrounded     = true;
     public bool _inAir          = false;
     public bool _changingWeapon = false;
+    private bool _walkingBackwards = false;
     #endregion
 
     #region - Private Data -
-    private float _rotationX         = 0;
-    private Vector2 _moveInput       = Vector2.zero;
-    private Vector3 _moveDirection   = Vector3.zero;
+    private float _rotationX                        = 0;
+    private Vector3 _moveDirection                  = Vector3.zero;
+    [HideInInspector] public Vector2 _moveInput     = Vector2.zero;
+    [HideInInspector] public Vector2 _lookInput     = Vector2.zero;
     #endregion
 
     #region - Public Data -
     public bool isSprinting { get => _isSprinting; }
     #endregion
 
-    // ---------------------------- Methods ----------------------------
+    #region - Gun Sway System -
+    [Space, Header("Weapon Sway System")]
+    [Header("Position Sway")]
+    [SerializeField] private float swayAmount = 0.01f;
+    [SerializeField] private float maxAmount = 0.06f;
+    [SerializeField] private float smoothAmount = 6f;
+
+    private Vector3 initialPosition;
+
+    [Header("Rotation Sway")]
+    [SerializeField] private float rotationSwayAmount = 4f;
+    [SerializeField] private float maxRotationSwayAmount = 5f;
+    [SerializeField] private float smoothRotationAmount = 12f;
+
+    private Quaternion initialRotation;
+
+    [SerializeField] private bool swayOnX = true;
+    [SerializeField] private bool swayOnY = true;
+    [SerializeField] private bool swayOnZ = true;
+
+    [Header("Movment Sway")]
+    [SerializeField] private float movmentSwayXAmount = 0.05f;
+    [SerializeField] private float movmentSwayYAmount = 0.05f;
+
+    [SerializeField] private float movmentSwaySmooth = 6f;
+    [SerializeField] private float maxMovmentSwayAmount = 0.5f;
+
+    [Header("Breathing Weapon Sway")]
+    [SerializeField] private float swayAmountA = 4;
+    [SerializeField] private float swayAmountB = 2;
+
+    [SerializeField] private float swayScale = 600;
+    [SerializeField] private float aimSwayScale = 6000;
+
+    [SerializeField] private float swayLerpSpeed = 14f;
+
+    [HideInInspector] public float swayTime;
+    [SerializeField] private float swaySpeed;
+    [HideInInspector] public Vector3 swayPosition;
+    #endregion
+
+    // ---------------------------- Methods ----------------------------//
 
     #region - BuiltIn Methods -
     private void Awake()
@@ -116,11 +167,14 @@ public class FPS_Controller : MonoBehaviour
     // ----------------------------------------------------------------------
     private void UpdateCalls()
     {
-        _isMoving       = controller.velocity != Vector3.zero;
-        _isSprinting    = inputManager.sprint;
-        _isWalking      = _isMoving;
-        _isGrounded     = controller.isGrounded;
-        _inAir          = !_isGrounded;
+        _isMoving       =   controller.velocity != Vector3.zero;
+        _isSprinting    =   inputManager.sprint && _isMoving && !_walkingBackwards;
+        _isWalking      =   _isMoving;
+        _isGrounded     =   controller.isGrounded;
+        _inAir          =   !_isGrounded;
+        _lookInput      =   inputManager.Look;
+
+        CalculateWeaponSway();
     }
     #endregion
 
@@ -134,12 +188,12 @@ public class FPS_Controller : MonoBehaviour
         //First the method get the Y vector look input and multiplies it for the Y vector sensitivity,
         //later this value is clamped under an certain limit represented as two variables (UpperLookLimit and LowerLookLimit).
 
-        _rotationX -= inputManager.Look.y * _yLookSensitivity / 100;
+        _rotationX -= _lookInput.y * _yLookSensitivity / 100;
         _rotationX = Mathf.Clamp(_rotationX, -_upperLookLimit, _lowerLookLimit);
         bodyCamera.transform.localRotation = Quaternion.Euler(_rotationX, 0, 0);
 
         //Also, the method handles the X rotation, appling it only in the body.
-        transform.rotation *= Quaternion.Euler(0,inputManager.Look.x * _xLookSensitivity / 100, 0);
+        transform.rotation *= Quaternion.Euler(0, _lookInput.x * _xLookSensitivity / 100, 0);
     }
     #endregion
 
@@ -151,6 +205,9 @@ public class FPS_Controller : MonoBehaviour
     private void MoveHandler()
     {
         float speedValue = _isSprinting ? (_isCrouching ? _crouchSpeed : _sprintSpeed) : _walkSpeed;
+
+        _walkingBackwards = inputManager.Move.y == -1;
+        if (_walkingBackwards) speedValue = _walkSpeed;
 
         _moveInput = new Vector2(inputManager.Move.y * speedValue, inputManager.Move.x * speedValue);
 
@@ -229,10 +286,78 @@ public class FPS_Controller : MonoBehaviour
     // ----------------------------------------------------------------------
     private void HeadBobHandler()
     {
+        if (!_isMoving) return;
         _timer += Time.deltaTime * (_isCrouching ? crouchBobSpeed : isSprinting ? sprintBobSpeed : walkBobSpeed);
         bodyCamera.transform.localPosition = new Vector3(bodyCamera.transform.localPosition.x,
             defaultYPost + Mathf.Sin(_timer) * (_isCrouching ? crouchBobAmount : isSprinting ? sprintBobAmount : walkBobAmount)
             , bodyCamera.transform.localPosition.z);
     }
+    #endregion
+
+    #region - Weapon Sway Calculations -
+    private void CalculateWeaponSway()
+    {
+        #region - Aim Effectors -
+        //This statements change all the sway mechanics values whether or not the player is aiming
+        float calcSwayAmount = equippedGun.isAiming ? swayAmount / gunSwayEffectors.lookSwayEffector : swayAmount;
+        float calcMaxAmount = equippedGun.isAiming ? maxAmount / gunSwayEffectors.maxLoookSwayAmountEffector : maxAmount;
+        float calcMovmentSwayXAmount = equippedGun.isAiming ? movmentSwayXAmount / gunSwayEffectors.xMovmentSwayEffector : movmentSwayXAmount;
+        float calcMovmentSwayYAmount = equippedGun.isAiming ? movmentSwayYAmount / gunSwayEffectors.yMovmentSwayEffector : movmentSwayYAmount;
+        float calcMaxMovmentSwayAmount = equippedGun.isAiming ? maxMovmentSwayAmount / gunSwayEffectors.maxMovmentSwayEffector : maxMovmentSwayAmount;
+        float calcRotationSwayAmount = equippedGun.isAiming ? rotationSwayAmount / gunSwayEffectors.rotationaSwayEffector : rotationSwayAmount;
+        float calcMaxRotationSwayAmount = equippedGun.isAiming ? maxRotationSwayAmount / gunSwayEffectors.maxRotationSwayAmountEffector : maxRotationSwayAmount;
+        #endregion
+
+        #region - Weapon Position Sway Calculations -
+        //This statements represent the weapon look movment sway calculations 
+        float lookInputX = -_lookInput.x * calcSwayAmount;
+        float lookInputY = -_lookInput.y * calcSwayAmount;
+
+        lookInputX = Mathf.Clamp(lookInputX, -calcMaxAmount, calcMaxAmount);
+        lookInputY = Mathf.Clamp(lookInputY, -calcMaxAmount, calcMaxAmount);
+
+        Vector3 finalPosition = new Vector3(lookInputX, lookInputY, 0);
+        weaponSwayObject.transform.localPosition = Vector3.Lerp(weaponSwayObject.transform.localPosition, finalPosition + initialPosition, smoothAmount * Time.deltaTime);
+        #endregion
+
+        #region - Movment Sway Calculations -
+        //This statementes represent the weapon sway based on the player movment
+
+        float movmentInputX = _moveInput.x * calcMovmentSwayXAmount;
+        float movmentInputY = _moveInput.y * calcMovmentSwayYAmount;
+
+        movmentInputX = Mathf.Clamp(movmentInputX, -calcMaxMovmentSwayAmount, calcMaxMovmentSwayAmount);
+        movmentInputY = Mathf.Clamp(movmentInputY, -calcMaxMovmentSwayAmount, calcMaxMovmentSwayAmount);
+
+        Vector3 movmentSwayFinalPosition = new Vector3(movmentInputY, movmentInputX, 0);
+
+        weaponSwayObject.transform.localPosition = Vector3.Lerp(weaponSwayObject.transform.localPosition, movmentSwayFinalPosition + initialPosition, movmentSwaySmooth * Time.deltaTime);
+        #endregion
+
+        #region - Weapon Rotation Sway Calculations -
+        //This statementes represent the weapon rotational sway calculations
+
+        float rotationX = Mathf.Clamp(_lookInput.y * calcRotationSwayAmount, -calcMaxRotationSwayAmount, calcMaxRotationSwayAmount);
+        float rotationY = Mathf.Clamp(_lookInput.x * calcRotationSwayAmount, -calcMaxRotationSwayAmount, calcMaxRotationSwayAmount);
+
+        Quaternion finalRotation = Quaternion.Euler(new Vector3(swayOnX ? -rotationX : 0f, swayOnY ? -rotationY : 0f, swayOnZ ? -rotationY : 0f));
+
+        weaponSwayObject.transform.localRotation = Quaternion.Slerp(weaponSwayObject.transform.localRotation, finalRotation * initialRotation, smoothRotationAmount * Time.deltaTime);
+        #endregion
+
+        #region - Breathing Idle Sway -
+        //This statements use the LissajousCurve calculation to make an breathing idle procedural animation
+        Vector3 targetPosition = LissajousCurve(swayTime, swayAmountA, swayAmountB) / (equippedGun.isAiming ? aimSwayScale : swayScale);
+
+        swayPosition = Vector3.Lerp(swayPosition, targetPosition, Time.smoothDeltaTime * swayLerpSpeed);
+
+        idleSwayObject.transform.localPosition = swayPosition;
+
+        swayTime += Time.deltaTime;
+
+        if (swayTime > 6.3f) swayTime = 0;
+        #endregion
+    }
+    private Vector3 LissajousCurve(float Time, float A, float B) => new Vector3(Mathf.Sin(Time), A * Mathf.Sin(B * Time + Mathf.PI));//This method return an calculation that is used to make an procedural horizontal and vertical wave that represent an breathing idle animation
     #endregion
 }
