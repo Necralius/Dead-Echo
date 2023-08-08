@@ -273,7 +273,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4024227519819116445}
+  - {fileID: 6103403281803690846}
   m_Father: {fileID: 9126103343276444929}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &426228515774656841
@@ -827,7 +827,7 @@ Transform:
   - {fileID: 3289991493838738511}
   - {fileID: 9026354617637439133}
   - {fileID: 4130981557896977545}
-  m_Father: {fileID: 3246102947474845323}
+  m_Father: {fileID: 6103403281803690846}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &3206951557761753017
 Animator:
@@ -863,14 +863,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07f5d6adb76e56740872f42844d23264, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gunDataConteiner:
+  _playerController: {fileID: 0}
+  _gunDataConteiner:
     gunData:
       shootType: 2
       gunMode: 0
       rateOfFire: 0.1
     gunBulletSettings:
       shootDamageRange: {x: 10, y: 25}
-      _bulletSpeed: 100
+      _bulletSpeed: 1000
       _bulletGravity: 2
       _bulletSpread: 2
       _bulletLifeTime: 10
@@ -885,23 +886,25 @@ MonoBehaviour:
       EmptyMagClip: {fileID: 0}
       ChangeGunModeClip: {fileID: 0}
       BoltActionClip: {fileID: 0}
-  bagMaxAmmo: 200
-  magMaxAmmo: 31
-  bagAmmo: 200
-  magAmmo: 20
-  isReloading: 0
-  isShooting: 0
-  hasSway: 1
-  isAiming: 0
+  _bagMaxAmmo: 200
+  _magMaxAmmo: 31
+  _bagAmmo: 60
+  _magAmmo: 31
+  _isEquiped: 0
+  _isReloading: 0
+  _isShooting: 0
+  _canShoot: 1
+  _isAiming: 0
   _shootPoint: {fileID: 4130981557896977545}
-  bulletTag: RifleBullet
+  _bulletTag: RifleBullet
   _bulletSpeed: 1000
   _bulletGravity: 0.1
-  defaultPosition: {x: 0, y: 0, z: 0}
-  aimPosition: {x: -0.0681, y: 0.056, z: -0.323}
-  aimSpeed: 10
-  aimOffset: 0
-  aimReloadOffset: 0.2
+  _defaultPosition: {x: 0, y: 0, z: 0}
+  _aimPosition: {x: -0.068, y: 0.056, z: -0.32}
+  _aimSpeed: 10
+  _aimOffset: 0
+  _aimReloadOffset: 0.2
+  gunModes: 
 --- !u!114 &8540348518518250308
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -915,9 +918,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraObject: {fileID: 833172167119773900}
-  recoilX: -3
-  recoilY: 3
-  recoilZ: 2
+  recoilX: 2
+  recoilY: 1
+  recoilZ: 1
   snappiness: 6
   returnSpeed: 20
   RecoilReduct: 1
@@ -1711,6 +1714,38 @@ Transform:
   - {fileID: 7631666296975836475}
   m_Father: {fileID: 3563081590796331785}
   m_LocalEulerAnglesHint: {x: 34.56093, y: 95.379326, z: -135.13661}
+--- !u!1 &3644507612046686693
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6103403281803690846}
+  m_Layer: 11
+  m_Name: RecoilHolder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6103403281803690846
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3644507612046686693}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4024227519819116445}
+  m_Father: {fileID: 3246102947474845323}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3693440045972004000
 GameObject:
   m_ObjectHideFlags: 0
@@ -3388,19 +3423,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54196bf63de0f1c47b66c4e26f7308bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  aimHolder: {fileID: 3246102947474845323}
+  armsAnimator: {fileID: 5007440927255289384}
+  recoilHolder: {fileID: 3644507612046686693}
   weaponSwayObject: {fileID: 2803063961065135608}
   idleSwayObject: {fileID: 4114436444354716579}
   equippedGun: {fileID: 3207360767026790421}
-  armsAnimator: {fileID: 5007440927255289384}
-  aimHolder: {fileID: 3246102947474845323}
-  gunSwayEffectors:
-    lookSwayEffector: 10
-    maxLoookSwayAmountEffector: 5
-    xMovmentSwayEffector: 10
-    yMovmentSwayEffector: 10
-    maxMovmentSwayEffector: 5
-    rotationaSwayEffector: 5
-    maxRotationSwayAmountEffector: 5
+  gunsInHand: []
+  txt_Ammo: {fileID: 0}
+  txt_gunState: {fileID: 0}
   _walkSpeed: 4
   _sprintSpeed: 8
   _crouchSpeed: 2
@@ -3436,27 +3467,33 @@ MonoBehaviour:
   _changingWeapon: 0
   _moveInput: {x: 0, y: 0}
   _lookInput: {x: 0, y: 0}
-  swayAmount: 0.05
-  maxAmount: 0.09
-  smoothAmount: 1
-  rotationSwayAmount: 4
+  gunSwayEffectors:
+    lookSwayEffector: 10
+    maxLoookSwayAmountEffector: 5
+    xMovmentSwayEffector: 10
+    yMovmentSwayEffector: 10
+    maxMovmentSwayEffector: 5
+    rotationaSwayEffector: 5
+    maxRotationSwayAmountEffector: 5
+  swayAmount: 0.1
+  maxAmount: 0.4
+  smoothAmount: 0.1
+  rotationSwayAmount: 5
   maxRotationSwayAmount: 5
-  smoothRotationAmount: 12
-  swayOnX: 1
+  smoothRotationAmount: 20
+  swayOnX: 0
   swayOnY: 1
   swayOnZ: 1
   movmentSwayXAmount: 0.015
   movmentSwayYAmount: 0.01
-  movmentSwaySmooth: 6
+  movmentSwaySmooth: 2
   maxMovmentSwayAmount: 0.5
   swayAmountA: 4
   swayAmountB: 2
   swayScale: 600
   aimSwayScale: 6000
   swayLerpSpeed: 14
-  swayTime: 4.1023884
   swaySpeed: 0
-  swayPosition: {x: -0.0012882502, y: -0.0064788945, z: 0}
 --- !u!1 &6748606036012702361
 GameObject:
   m_ObjectHideFlags: 0

@@ -31,10 +31,13 @@ namespace NekraByte
             }
             public enum ShootType
             {
-                Shotgun,
-                Sniper,
-                Rifle,
-                Pistol
+                Auto_Shotgun,
+                Semi_Shotgun,
+                Auto_Rifle,
+                Semi_Rifle,
+                Semi_Pistol,
+                Auto_Pistol,
+                Sniper
             }
         }
         #endregion

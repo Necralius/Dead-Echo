@@ -98,6 +98,33 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ChangeGunMode"",
+                    ""type"": ""Button"",
+                    ""id"": ""62d6a029-ca79-490d-b5a9-9cfaed9680ff"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PrimaryGun"",
+                    ""type"": ""Button"",
+                    ""id"": ""bf3ba2e1-5351-421a-8f39-4a7894e0105d"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SecondaryGun"",
+                    ""type"": ""Button"",
+                    ""id"": ""e2787042-9cf5-4ad1-870d-00826d51bac7"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -232,6 +259,39 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
                     ""action"": ""CrouchAction"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a1cc373f-2eb8-4b61-a613-8005ab0c6b94"",
+                    ""path"": ""<Keyboard>/t"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeGunMode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""80bfcb6d-a9a7-44de-afc8-6c678e32c34e"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PrimaryGun"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3159b0d3-2639-4326-9bd8-214f682b220e"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SecondaryGun"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -248,6 +308,9 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
         m_PC_Map_AimAction = m_PC_Map.FindAction("AimAction", throwIfNotFound: true);
         m_PC_Map_JumpAction = m_PC_Map.FindAction("JumpAction", throwIfNotFound: true);
         m_PC_Map_CrouchAction = m_PC_Map.FindAction("CrouchAction", throwIfNotFound: true);
+        m_PC_Map_ChangeGunMode = m_PC_Map.FindAction("ChangeGunMode", throwIfNotFound: true);
+        m_PC_Map_PrimaryGun = m_PC_Map.FindAction("PrimaryGun", throwIfNotFound: true);
+        m_PC_Map_SecondaryGun = m_PC_Map.FindAction("SecondaryGun", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -317,6 +380,9 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
     private readonly InputAction m_PC_Map_AimAction;
     private readonly InputAction m_PC_Map_JumpAction;
     private readonly InputAction m_PC_Map_CrouchAction;
+    private readonly InputAction m_PC_Map_ChangeGunMode;
+    private readonly InputAction m_PC_Map_PrimaryGun;
+    private readonly InputAction m_PC_Map_SecondaryGun;
     public struct PC_MapActions
     {
         private @InputMaps m_Wrapper;
@@ -329,6 +395,9 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
         public InputAction @AimAction => m_Wrapper.m_PC_Map_AimAction;
         public InputAction @JumpAction => m_Wrapper.m_PC_Map_JumpAction;
         public InputAction @CrouchAction => m_Wrapper.m_PC_Map_CrouchAction;
+        public InputAction @ChangeGunMode => m_Wrapper.m_PC_Map_ChangeGunMode;
+        public InputAction @PrimaryGun => m_Wrapper.m_PC_Map_PrimaryGun;
+        public InputAction @SecondaryGun => m_Wrapper.m_PC_Map_SecondaryGun;
         public InputActionMap Get() { return m_Wrapper.m_PC_Map; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -362,6 +431,15 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
             @CrouchAction.started += instance.OnCrouchAction;
             @CrouchAction.performed += instance.OnCrouchAction;
             @CrouchAction.canceled += instance.OnCrouchAction;
+            @ChangeGunMode.started += instance.OnChangeGunMode;
+            @ChangeGunMode.performed += instance.OnChangeGunMode;
+            @ChangeGunMode.canceled += instance.OnChangeGunMode;
+            @PrimaryGun.started += instance.OnPrimaryGun;
+            @PrimaryGun.performed += instance.OnPrimaryGun;
+            @PrimaryGun.canceled += instance.OnPrimaryGun;
+            @SecondaryGun.started += instance.OnSecondaryGun;
+            @SecondaryGun.performed += instance.OnSecondaryGun;
+            @SecondaryGun.canceled += instance.OnSecondaryGun;
         }
 
         private void UnregisterCallbacks(IPC_MapActions instance)
@@ -390,6 +468,15 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
             @CrouchAction.started -= instance.OnCrouchAction;
             @CrouchAction.performed -= instance.OnCrouchAction;
             @CrouchAction.canceled -= instance.OnCrouchAction;
+            @ChangeGunMode.started -= instance.OnChangeGunMode;
+            @ChangeGunMode.performed -= instance.OnChangeGunMode;
+            @ChangeGunMode.canceled -= instance.OnChangeGunMode;
+            @PrimaryGun.started -= instance.OnPrimaryGun;
+            @PrimaryGun.performed -= instance.OnPrimaryGun;
+            @PrimaryGun.canceled -= instance.OnPrimaryGun;
+            @SecondaryGun.started -= instance.OnSecondaryGun;
+            @SecondaryGun.performed -= instance.OnSecondaryGun;
+            @SecondaryGun.canceled -= instance.OnSecondaryGun;
         }
 
         public void RemoveCallbacks(IPC_MapActions instance)
@@ -417,5 +504,8 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
         void OnAimAction(InputAction.CallbackContext context);
         void OnJumpAction(InputAction.CallbackContext context);
         void OnCrouchAction(InputAction.CallbackContext context);
+        void OnChangeGunMode(InputAction.CallbackContext context);
+        void OnPrimaryGun(InputAction.CallbackContext context);
+        void OnSecondaryGun(InputAction.CallbackContext context);
     }
 }

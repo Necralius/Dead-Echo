@@ -28,18 +28,26 @@ public class InputManager : MonoBehaviour
     public bool aiming;
     public bool jumping;
     public bool crouching;
+    public bool changingGunMode;
 
     //Private Data
-    private InputActionMap currentMap;
+    public InputActionMap currentMap;
 
+    //Movment Actions
     private InputAction moveAction;
     private InputAction lookAction;
-    private InputAction reloadAction;
-    private InputAction shootAction;
-    private InputAction aimAction;
     private InputAction jumpAction;
-    private InputAction sprintAction;
     private InputAction crouchAction;
+    public InputAction sprintAction;
+
+    //Gun Behavior Actions
+    public InputAction reloadAction;
+    public InputAction shootAction;
+    private InputAction aimAction;
+    public InputAction gunModeAction;
+
+    public InputAction primaryGun;
+    public InputAction secondaryGun;
     #endregion
 
     // ---------------------------- Methods ----------------------------
@@ -57,14 +65,22 @@ public class InputManager : MonoBehaviour
         else Instance = this;
 
         currentMap      = playerInput.currentActionMap;
+
+        //Movment Actions
         moveAction      = currentMap.FindAction("Move");
         lookAction      = currentMap.FindAction("Look");
         sprintAction    = currentMap.FindAction("SprintAction");
+        jumpAction      = currentMap.FindAction("JumpAction");
+        crouchAction    = currentMap.FindAction("CrouchAction");
+
+        //Gun Behavior Actions
         reloadAction    = currentMap.FindAction("ReloadAction");
         shootAction     = currentMap.FindAction("ShootAction");
         aimAction       = currentMap.FindAction("AimAction");
-        jumpAction      = currentMap.FindAction("JumpAction");
-        crouchAction    = currentMap.FindAction("CrouchAction");
+        gunModeAction   = currentMap.FindAction("ChangeGunMode");
+
+        primaryGun      = currentMap.FindAction("PrimaryGun");
+        secondaryGun    = currentMap.FindAction("SecondaryGun"); 
 
         moveAction.performed    += onMove;
         lookAction.performed    += onLook;
@@ -73,7 +89,8 @@ public class InputManager : MonoBehaviour
         shootAction.performed   += onShoot;
         aimAction.performed     += onAim;
         jumpAction.performed    += onJump;
-        crouchAction.performed  += onCrouch; 
+        crouchAction.performed  += onCrouch;
+        gunModeAction.performed += onModeChanged;
 
         moveAction.canceled     += onMove;
         lookAction.canceled     += onLook;
@@ -83,17 +100,19 @@ public class InputManager : MonoBehaviour
         aimAction.canceled      += onAim;
         jumpAction.canceled     += onJump;
         crouchAction.canceled   += onCrouch;
+        gunModeAction.canceled  += onModeChanged;
     }
     #endregion
 
     #region - Input Gethering -
-    private void onMove(InputAction.CallbackContext context)    => Move         = context.ReadValue<Vector2>();
-    private void onLook(InputAction.CallbackContext context)    => Look         = context.ReadValue<Vector2>();
-    private void onSprint(InputAction.CallbackContext context)  => sprint       = context.ReadValueAsButton();
-    private void onReload(InputAction.CallbackContext context)  => reload       = context.ReadValueAsButton();
-    private void onShoot(InputAction.CallbackContext context)   => shooting     = context.ReadValueAsButton();
-    private void onAim(InputAction.CallbackContext context)     => aiming       = context.ReadValueAsButton();
-    private void onJump(InputAction.CallbackContext context)    => jumping      = context.ReadValueAsButton();
-    private void onCrouch(InputAction.CallbackContext context)  => crouching    = context.ReadValueAsButton();
+    private void onMove(InputAction.CallbackContext context)        => Move             = context.ReadValue<Vector2>();
+    private void onLook(InputAction.CallbackContext context)        => Look             = context.ReadValue<Vector2>();
+    private void onSprint(InputAction.CallbackContext context)      => sprint           = context.ReadValueAsButton();
+    private void onReload(InputAction.CallbackContext context)      => reload           = context.ReadValueAsButton();
+    private void onShoot(InputAction.CallbackContext context)       => shooting         = context.ReadValueAsButton();
+    private void onAim(InputAction.CallbackContext context)         => aiming           = context.ReadValueAsButton();
+    private void onJump(InputAction.CallbackContext context)        => jumping          = context.ReadValueAsButton();
+    private void onCrouch(InputAction.CallbackContext context)      => crouching        = context.ReadValueAsButton();
+    private void onModeChanged(InputAction.CallbackContext context) => changingGunMode  = context.ReadValueAsButton();
     #endregion
 }

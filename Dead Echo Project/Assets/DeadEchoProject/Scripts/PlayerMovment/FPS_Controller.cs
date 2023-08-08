@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 using static NekraByte.FPS_Utility;
@@ -17,16 +18,25 @@ public class FPS_Controller : MonoBehaviour
     private InputManager inputManager       => InputManager.Instance != null ? InputManager.Instance : null;
     #endregion
 
-    #region - Gun System Dependencies -
+    #region - Gun System -
     [Header("Gun System Dependencies")]
+    public Transform aimHolder;
+    public Animator armsAnimator;
+    public GameObject recoilHolder;
+
+    [Header("Weapon Sway")]
     public GameObject weaponSwayObject;
     public GameObject idleSwayObject;
 
+    [Header("Gun System")]
     public GunBase equippedGun;
+    public List<GunBase> gunsInHand;
+    #endregion
 
-    public Animator armsAnimator;
-    public Transform aimHolder;
-    public SwayEffectors gunSwayEffectors = new SwayEffectors();
+    #region - UI Elements -
+    [Header("UI Elements")]
+    public TextMeshProUGUI txt_Ammo;
+    public TextMeshProUGUI txt_gunState;
     #endregion
 
     #region - Player Data Settings -
@@ -53,14 +63,14 @@ public class FPS_Controller : MonoBehaviour
 
     #region - HeadBob System -
     [Header("HeadBob Settings")]
-    [SerializeField] private float walkBobSpeed = 14f;
-    [SerializeField] private float walkBobAmount = 0.05f;
+    [SerializeField, Range(0, 100)] private float walkBobSpeed = 14f;
+    [SerializeField, Range(0, 100)] private float walkBobAmount = 0.05f;
 
-    [SerializeField] private float sprintBobSpeed = 18f;
-    [SerializeField] private float sprintBobAmount = 0.11f;
+    [SerializeField, Range(0, 100)] private float sprintBobSpeed = 18f;
+    [SerializeField, Range(0, 100)] private float sprintBobAmount = 0.11f;
 
-    [SerializeField] private float crouchBobSpeed = 8f;
-    [SerializeField] private float crouchBobAmount = 0.025f;
+    [SerializeField, Range(0, 100)] private float crouchBobSpeed = 8f;
+    [SerializeField, Range(0, 100)] private float crouchBobAmount = 0.025f;
 
     private float defaultYPost = 0;
     private float _timer;
@@ -68,17 +78,17 @@ public class FPS_Controller : MonoBehaviour
 
     #region - Player State -
     [Header("Player State")]
-    public bool _canMove        = true;
-    public bool _isWalking      = false;
-    public bool _isSprinting    = false;
-    public bool _isCrouching    = false;
-    public bool _canCrouch      = false;
-    public bool _duringCrouch   = false;
-    public bool _isMoving       = false;
-    public bool _isGrounded     = true;
-    public bool _inAir          = false;
-    public bool _changingWeapon = false;
-    private bool _walkingBackwards = false;
+    public bool _canMove            = true;
+    public bool _isWalking          = false;
+    public bool _isSprinting        = false;
+    public bool _isCrouching        = false;
+    public bool _canCrouch          = false;
+    public bool _duringCrouch       = false;
+    public bool _isMoving           = false;
+    public bool _isGrounded         = true;
+    public bool _inAir              = false;
+    public bool _changingWeapon     = false;
+    private bool _walkingBackwards  = false;
     #endregion
 
     #region - Private Data -
@@ -88,23 +98,22 @@ public class FPS_Controller : MonoBehaviour
     [HideInInspector] public Vector2 _lookInput     = Vector2.zero;
     #endregion
 
-    #region - Public Data -
-    public bool isSprinting { get => _isSprinting; }
-    #endregion
-
     #region - Gun Sway System -
+    [Header("Gun Sway Data")]
+    public SwayEffectors gunSwayEffectors = new SwayEffectors();
+
     [Space, Header("Weapon Sway System")]
     [Header("Position Sway")]
-    [SerializeField] private float swayAmount = 0.01f;
-    [SerializeField] private float maxAmount = 0.06f;
-    [SerializeField] private float smoothAmount = 6f;
+    [SerializeField, Range(0, 10)] private float swayAmount = 0.01f;
+    [SerializeField, Range(0, 10)] private float maxAmount = 0.06f;
+    [SerializeField, Range(0, 100)] private float smoothAmount = 6f;
 
     private Vector3 initialPosition;
 
     [Header("Rotation Sway")]
-    [SerializeField] private float rotationSwayAmount = 4f;
-    [SerializeField] private float maxRotationSwayAmount = 5f;
-    [SerializeField] private float smoothRotationAmount = 12f;
+    [SerializeField, Range(0, 100)] private float rotationSwayAmount = 4f;
+    [SerializeField, Range(0, 100)] private float maxRotationSwayAmount = 5f;
+    [SerializeField, Range(0, 100)] private float smoothRotationAmount = 12f;
 
     private Quaternion initialRotation;
 
@@ -113,24 +122,24 @@ public class FPS_Controller : MonoBehaviour
     [SerializeField] private bool swayOnZ = true;
 
     [Header("Movment Sway")]
-    [SerializeField] private float movmentSwayXAmount = 0.05f;
-    [SerializeField] private float movmentSwayYAmount = 0.05f;
+    [SerializeField, Range(0, 10)] private float movmentSwayXAmount = 0.05f;
+    [SerializeField, Range(0, 10)] private float movmentSwayYAmount = 0.05f;
 
-    [SerializeField] private float movmentSwaySmooth = 6f;
-    [SerializeField] private float maxMovmentSwayAmount = 0.5f;
+    [SerializeField, Range(0, 10)] private float movmentSwaySmooth = 6f;
+    [SerializeField, Range(0, 10)] private float maxMovmentSwayAmount = 0.5f;
 
     [Header("Breathing Weapon Sway")]
-    [SerializeField] private float swayAmountA = 4;
-    [SerializeField] private float swayAmountB = 2;
+    [SerializeField, Range(0, 100)] private float swayAmountA = 4;
+    [SerializeField, Range(0, 100)] private float swayAmountB = 2;
 
-    [SerializeField] private float swayScale = 600;
-    [SerializeField] private float aimSwayScale = 6000;
+    [SerializeField, Range(0, 10000)] private float swayScale = 600;
+    [SerializeField, Range(0, 10000)] private float aimSwayScale = 6000;
 
-    [SerializeField] private float swayLerpSpeed = 14f;
+    [SerializeField, Range(0, 100)] private float swayLerpSpeed = 14f;
 
-    [HideInInspector] public float swayTime;
-    [SerializeField] private float swaySpeed;
-    [HideInInspector] public Vector3 swayPosition;
+    private float swayTime;
+    [SerializeField, Range(0, 100)] private float swaySpeed;
+    private Vector3 swayPosition;
     #endregion
 
     // ---------------------------- Methods ----------------------------//
@@ -174,7 +183,7 @@ public class FPS_Controller : MonoBehaviour
         _inAir          =   !_isGrounded;
         _lookInput      =   inputManager.Look;
 
-        CalculateWeaponSway();
+        if (equippedGun != null) CalculateWeaponSway();
     }
     #endregion
 
@@ -287,9 +296,9 @@ public class FPS_Controller : MonoBehaviour
     private void HeadBobHandler()
     {
         if (!_isMoving) return;
-        _timer += Time.deltaTime * (_isCrouching ? crouchBobSpeed : isSprinting ? sprintBobSpeed : walkBobSpeed);
+        _timer += Time.deltaTime * (_isCrouching ? crouchBobSpeed : _isSprinting ? sprintBobSpeed : walkBobSpeed);
         bodyCamera.transform.localPosition = new Vector3(bodyCamera.transform.localPosition.x,
-            defaultYPost + Mathf.Sin(_timer) * (_isCrouching ? crouchBobAmount : isSprinting ? sprintBobAmount : walkBobAmount)
+            defaultYPost + Mathf.Sin(_timer) * (_isCrouching ? crouchBobAmount : _isSprinting ? sprintBobAmount : walkBobAmount)
             , bodyCamera.transform.localPosition.z);
     }
     #endregion
@@ -299,13 +308,13 @@ public class FPS_Controller : MonoBehaviour
     {
         #region - Aim Effectors -
         //This statements change all the sway mechanics values whether or not the player is aiming
-        float calcSwayAmount = equippedGun.isAiming ? swayAmount / gunSwayEffectors.lookSwayEffector : swayAmount;
-        float calcMaxAmount = equippedGun.isAiming ? maxAmount / gunSwayEffectors.maxLoookSwayAmountEffector : maxAmount;
-        float calcMovmentSwayXAmount = equippedGun.isAiming ? movmentSwayXAmount / gunSwayEffectors.xMovmentSwayEffector : movmentSwayXAmount;
-        float calcMovmentSwayYAmount = equippedGun.isAiming ? movmentSwayYAmount / gunSwayEffectors.yMovmentSwayEffector : movmentSwayYAmount;
-        float calcMaxMovmentSwayAmount = equippedGun.isAiming ? maxMovmentSwayAmount / gunSwayEffectors.maxMovmentSwayEffector : maxMovmentSwayAmount;
-        float calcRotationSwayAmount = equippedGun.isAiming ? rotationSwayAmount / gunSwayEffectors.rotationaSwayEffector : rotationSwayAmount;
-        float calcMaxRotationSwayAmount = equippedGun.isAiming ? maxRotationSwayAmount / gunSwayEffectors.maxRotationSwayAmountEffector : maxRotationSwayAmount;
+        float calcSwayAmount = equippedGun._isAiming ? swayAmount / gunSwayEffectors.lookSwayEffector : swayAmount;
+        float calcMaxAmount = equippedGun._isAiming ? maxAmount / gunSwayEffectors.maxLoookSwayAmountEffector : maxAmount;
+        float calcMovmentSwayXAmount = equippedGun._isAiming ? movmentSwayXAmount / gunSwayEffectors.xMovmentSwayEffector : movmentSwayXAmount;
+        float calcMovmentSwayYAmount = equippedGun._isAiming ? movmentSwayYAmount / gunSwayEffectors.yMovmentSwayEffector : movmentSwayYAmount;
+        float calcMaxMovmentSwayAmount = equippedGun._isAiming ? maxMovmentSwayAmount / gunSwayEffectors.maxMovmentSwayEffector : maxMovmentSwayAmount;
+        float calcRotationSwayAmount = equippedGun._isAiming ? rotationSwayAmount / gunSwayEffectors.rotationaSwayEffector : rotationSwayAmount;
+        float calcMaxRotationSwayAmount = equippedGun._isAiming ? maxRotationSwayAmount / gunSwayEffectors.maxRotationSwayAmountEffector : maxRotationSwayAmount;
         #endregion
 
         #region - Weapon Position Sway Calculations -
@@ -347,7 +356,7 @@ public class FPS_Controller : MonoBehaviour
 
         #region - Breathing Idle Sway -
         //This statements use the LissajousCurve calculation to make an breathing idle procedural animation
-        Vector3 targetPosition = LissajousCurve(swayTime, swayAmountA, swayAmountB) / (equippedGun.isAiming ? aimSwayScale : swayScale);
+        Vector3 targetPosition = LissajousCurve(swayTime, swayAmountA, swayAmountB) / (equippedGun._isAiming ? aimSwayScale : swayScale);
 
         swayPosition = Vector3.Lerp(swayPosition, targetPosition, Time.smoothDeltaTime * swayLerpSpeed);
 
