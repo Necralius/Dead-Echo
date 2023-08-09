@@ -142,6 +142,17 @@ public class FPS_Controller : MonoBehaviour
     private Vector3 swayPosition;
     #endregion
 
+    #region - Audio System -
+    [Header("Gun Public Sounds")]
+    public AudioClip gunShootJam;
+    public AudioClip aimClip;
+    public AudioClip changeGunMode;
+    #endregion
+
+    #region - Gun Change System -
+    private int gunIndex = 0;
+    #endregion
+
     // ---------------------------- Methods ----------------------------//
 
     #region - BuiltIn Methods -
@@ -164,6 +175,9 @@ public class FPS_Controller : MonoBehaviour
 
             if (_isMoving && _isGrounded) HeadBobHandler();
             UpdateCalls();
+
+            if (inputManager.primaryGun.WasPressedThisFrame() && !_changingWeapon) EquipGun(0);
+            if (inputManager.secondaryGun.WasPressedThisFrame() && !_changingWeapon) EquipGun(1);
         }
     }
     #endregion
@@ -369,4 +383,20 @@ public class FPS_Controller : MonoBehaviour
     }
     private Vector3 LissajousCurve(float Time, float A, float B) => new Vector3(Mathf.Sin(Time), A * Mathf.Sin(B * Time + Mathf.PI));//This method return an calculation that is used to make an procedural horizontal and vertical wave that represent an breathing idle animation
     #endregion
+
+    private void EquipGun(int gunIndex)
+    {
+        if (gunsInHand[gunIndex].gameObject.activeInHierarchy || equippedGun._isReloading) return;
+        this.gunIndex = gunIndex;
+        _changingWeapon = true;
+
+        if (gunIndex == 0) gunsInHand[1].GunHolst();//Selecting the gun and holsting it
+        else gunsInHand[0].GunHolst();
+
+        equippedGun = gunsInHand[gunIndex];
+    }
+    public void StartEquippedGun()
+    {
+        equippedGun.gameObject.SetActive(true);
+    }
 }

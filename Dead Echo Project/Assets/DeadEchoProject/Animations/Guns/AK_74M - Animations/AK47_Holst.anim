@@ -335,7 +335,7 @@ AnimationClip:
   m_HasGenericRootTransform: 1
   m_HasMotionFloatCurves: 0
   m_Events:
-  - time: 0.33333334
+  - time: 0.36666667
     functionName: EndHolst
     data: 
     objectReferenceParameter: {fileID: 0}

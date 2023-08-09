@@ -48,11 +48,12 @@ namespace NekraByte
         {
             [Header("Gun Settings"), Tooltip("Gun aspects settings")]
             public Vector2 shootDamageRange                      = new(10f, 25f);
-            [Range(1, 5000)]    public float _bulletSpeed        = 100f;
-            [Range(1, 50)]      public float _bulletGravity      = 2f;
-            [Range(1, 10)]      public float _bulletSpread       = 2f;
-            [Range(1, 15)]      public float _bulletLifeTime     = 10f;
-            public LayerMask                 _collisionMask;
+            [SerializeField]    public string   _bulletTag = "RifleBullet";
+            [Range(1, 5000)]    public float    _bulletSpeed        = 500f;
+            [Range(1, 50)]      public float    _bulletGravity      = 2f;
+            [Range(1, 10)]      public float    _bulletSpread       = 1f;
+            [Range(1, 15)]      public float    _bulletLifeTime     = 10f;
+            public LayerMask _collisionMask => LayerMask.GetMask("Default", "Water");
         }
         #endregion
 
@@ -64,8 +65,8 @@ namespace NekraByte
             public AudioClip AimClip;
             public AudioClip DrawClip;
             public AudioClip ReloadClip;
-            public AudioClip EmptyMagClip;
-            public AudioClip ChangeGunModeClip;
+            public AudioClip ReloadClipVar1;
+            public AudioClip FullReloadClip;
             public AudioClip BoltActionClip;
         }
         #endregion
