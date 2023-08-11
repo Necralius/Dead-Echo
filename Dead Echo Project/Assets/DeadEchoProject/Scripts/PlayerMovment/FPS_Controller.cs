@@ -1,3 +1,4 @@
+using NekraliusDevelopmentStudio;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -20,44 +21,47 @@ public class FPS_Controller : MonoBehaviour
 
     #region - Gun System -
     [Header("Gun System Dependencies")]
-    public Transform aimHolder;
-    public Animator armsAnimator;
-    public GameObject recoilHolder;
+    public Transform    aimHolder;
+    public Animator     armsAnimator;
+    public GameObject   recoilHolder;
+    public GameObject   shootPoint;
 
     [Header("Weapon Sway")]
     public GameObject weaponSwayObject;
     public GameObject idleSwayObject;
 
     [Header("Gun System")]
-    public GunBase equippedGun;
-    public List<GunBase> gunsInHand;
+    public GunBase          equippedGun;
+    public List<GunBase>    gunsInHand;
     #endregion
 
     #region - UI Elements -
     [Header("UI Elements")]
-    public TextMeshProUGUI txt_Ammo;
+    public TextMeshProUGUI txt_magAmmo;
+    public TextMeshProUGUI txt_bagAmmo;
     public TextMeshProUGUI txt_gunState;
     #endregion
 
     #region - Player Data Settings -
-    [Header("Player Data Settings")]
+    [Header("Player Movmennt Settings")]
     [SerializeField, Range(1, 10)] private float _walkSpeed          = 4f;
     [SerializeField, Range(1, 30)] private float _sprintSpeed        = 8f;
     [SerializeField, Range(1, 30)] private float _crouchSpeed        = 2f;
     [SerializeField, Range(1, 50)] private float _jumpForce          = 4f;
     [SerializeField, Range(1, 100)] private float _playerGravity     = 30f;
 
+    [Header("Controller Settings Data")]
     [SerializeField, Range(1, 10)]  private float _xLookSensitivity  = 2f;
     [SerializeField, Range(1, 10)]  private float _yLookSensitivity  = 2f;
     [SerializeField, Range(1, 100)] private float _upperLookLimit    = 80f;
     [SerializeField, Range(1, 100)] private float _lowerLookLimit    = 80f;
 
     [Header("Crouch Settings")]
-    [SerializeField] private Vector3 _crouchingCenter   = new Vector3(0, 0.5f, 0);
-    [SerializeField] private Vector3 _standingCenter    = new Vector3(0, 0, 0);
-    [SerializeField, Range(0.1f, 2f)] private float _crouchHeight        = 0.5f;
-    [SerializeField, Range(0.1f, 2f)] private float _standingHeight      = 2f;
-    [SerializeField] private float _timeToCrouch        = 0.25f;
+    [SerializeField] private Vector3 _crouchingCenter               = new Vector3(0, 0.5f, 0);
+    [SerializeField] private Vector3 _standingCenter                = new Vector3(0, 0, 0);
+    [SerializeField, Range(0.1f, 2f)] private float _crouchHeight   = 0.5f;
+    [SerializeField, Range(0.1f, 2f)] private float _standingHeight = 2f;
+    [SerializeField] private float _timeToCrouch                    = 0.25f;
     [SerializeField] private LayerMask crouchUpLayer;
     #endregion
 
@@ -98,22 +102,33 @@ public class FPS_Controller : MonoBehaviour
     [HideInInspector] public Vector2 _lookInput     = Vector2.zero;
     #endregion
 
+    #region - Audio System -
+    [Header("Gun Public Sounds")]
+    public AudioClip gunShootJam;
+    public AudioClip aimClip;
+    public AudioClip changeGunMode;
+    #endregion
+
+    #region - Gun Change System -
+    private int gunIndex = 0;
+    #endregion
+
     #region - Gun Sway System -
     [Header("Gun Sway Data")]
     public SwayEffectors gunSwayEffectors = new SwayEffectors();
 
     [Space, Header("Weapon Sway System")]
     [Header("Position Sway")]
-    [SerializeField, Range(0, 10)] private float swayAmount = 0.01f;
-    [SerializeField, Range(0, 10)] private float maxAmount = 0.06f;
-    [SerializeField, Range(0, 100)] private float smoothAmount = 6f;
+    [SerializeField, Range(0, 10)] private float swayAmount     = 0.01f;
+    [SerializeField, Range(0, 10)] private float maxAmount      = 0.06f;
+    [SerializeField, Range(0, 100)] private float smoothAmount  = 6f;
 
     private Vector3 initialPosition;
 
     [Header("Rotation Sway")]
-    [SerializeField, Range(0, 100)] private float rotationSwayAmount = 4f;
-    [SerializeField, Range(0, 100)] private float maxRotationSwayAmount = 5f;
-    [SerializeField, Range(0, 100)] private float smoothRotationAmount = 12f;
+    [SerializeField, Range(0, 100)] private float rotationSwayAmount        = 4f;
+    [SerializeField, Range(0, 100)] private float maxRotationSwayAmount     = 5f;
+    [SerializeField, Range(0, 100)] private float smoothRotationAmount      = 12f;
 
     private Quaternion initialRotation;
 
@@ -125,14 +140,14 @@ public class FPS_Controller : MonoBehaviour
     [SerializeField, Range(0, 10)] private float movmentSwayXAmount = 0.05f;
     [SerializeField, Range(0, 10)] private float movmentSwayYAmount = 0.05f;
 
-    [SerializeField, Range(0, 10)] private float movmentSwaySmooth = 6f;
-    [SerializeField, Range(0, 10)] private float maxMovmentSwayAmount = 0.5f;
+    [SerializeField, Range(0, 10)] private float movmentSwaySmooth      = 6f;
+    [SerializeField, Range(0, 10)] private float maxMovmentSwayAmount   = 0.5f;
 
     [Header("Breathing Weapon Sway")]
     [SerializeField, Range(0, 100)] private float swayAmountA = 4;
     [SerializeField, Range(0, 100)] private float swayAmountB = 2;
 
-    [SerializeField, Range(0, 10000)] private float swayScale = 600;
+    [SerializeField, Range(0, 10000)] private float swayScale    = 600;
     [SerializeField, Range(0, 10000)] private float aimSwayScale = 6000;
 
     [SerializeField, Range(0, 100)] private float swayLerpSpeed = 14f;
@@ -140,18 +155,7 @@ public class FPS_Controller : MonoBehaviour
     private float swayTime;
     [SerializeField, Range(0, 100)] private float swaySpeed;
     private Vector3 swayPosition;
-    #endregion
-
-    #region - Audio System -
-    [Header("Gun Public Sounds")]
-    public AudioClip gunShootJam;
-    public AudioClip aimClip;
-    public AudioClip changeGunMode;
-    #endregion
-
-    #region - Gun Change System -
-    private int gunIndex = 0;
-    #endregion
+    #endregion  
 
     // ---------------------------- Methods ----------------------------//
 
@@ -198,6 +202,8 @@ public class FPS_Controller : MonoBehaviour
         _lookInput      =   inputManager.Look;
 
         if (equippedGun != null) CalculateWeaponSway();
+
+        ReticleManager.Instance.DataReceiver(this);
     }
     #endregion
 
@@ -384,10 +390,14 @@ public class FPS_Controller : MonoBehaviour
     private Vector3 LissajousCurve(float Time, float A, float B) => new Vector3(Mathf.Sin(Time), A * Mathf.Sin(B * Time + Mathf.PI));//This method return an calculation that is used to make an procedural horizontal and vertical wave that represent an breathing idle animation
     #endregion
 
-    private void EquipGun(int gunIndex)
+    private void EquipGun(int gunToEquip)
     {
-        if (gunsInHand[gunIndex].gameObject.activeInHierarchy || equippedGun._isReloading) return;
-        this.gunIndex = gunIndex;
+        gunIndex = gunToEquip;
+
+        if (gunsInHand[gunIndex].gameObject.activeInHierarchy || 
+            equippedGun._isReloading || 
+            _changingWeapon) return;
+
         _changingWeapon = true;
 
         if (gunIndex == 0) gunsInHand[1].GunHolst();//Selecting the gun and holsting it
@@ -395,8 +405,5 @@ public class FPS_Controller : MonoBehaviour
 
         equippedGun = gunsInHand[gunIndex];
     }
-    public void StartEquippedGun()
-    {
-        equippedGun.gameObject.SetActive(true);
-    }
+    public void EquipCurrentGun() => equippedGun.DrawGun();
 }

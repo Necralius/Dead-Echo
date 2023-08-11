@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: e20f357d1b1f74748ae95607f2fd9cc7
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Nexus FPS
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 718b5aac5d85ae04192c42855b881093, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

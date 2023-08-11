@@ -5,11 +5,22 @@ using static NekraByte.FPS_Utility;
 
 public class Pistol : GunBase
 {
-
-    private void OnValidate()
+    protected override IEnumerator Shoot()
     {
-        _gunDataConteiner.gunData.shootType = GunData.ShootType.Semi_Pistol;
-    }
+        if (_isShooting || !_canShoot) yield return null;
 
+        _isShooting = true;
+        _canShoot = false;
+
+        BulletBase bullet = ObjectPooler.Instance.SpawnFromPool(_gunDataConteiner.gunBulletSettings._bulletTag,
+            _playerController.shootPoint.transform.position,
+            _playerController.shootPoint.transform.rotation).GetComponent<BulletBase>();
+
+        bullet.Initialize(_playerController.shootPoint.transform, _gunDataConteiner.gunBulletSettings._bulletSpeed,
+            _gunDataConteiner.gunBulletSettings._bulletGravity,
+            _gunDataConteiner.gunBulletSettings._bulletLifeTime,
+            _gunDataConteiner.gunBulletSettings._collisionMask);
+        StartCoroutine(base.Shoot());
+    }
 
 }

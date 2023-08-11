@@ -1,10 +1,13 @@
 using System;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NekraByte
 {
-    public class FPS_Utility
-    {    
+    public static class FPS_Utility
+    {       
+        #region - Pool Model -
         [Serializable]
         public struct Pool
         {
@@ -12,12 +15,14 @@ namespace NekraByte
             public int poolSize;
             public GameObject prefab;
         }
+        #endregion
 
         #region - Gun Data Model -
         [Serializable]
         public class GunData
         {
             [Header("Gun Aspects")]
+            [SerializeField] private string gunName = "GunName";
             public ShootType shootType;
             public GunMode gunMode;
 
@@ -53,7 +58,7 @@ namespace NekraByte
             [Range(1, 50)]      public float    _bulletGravity      = 2f;
             [Range(1, 10)]      public float    _bulletSpread       = 1f;
             [Range(1, 15)]      public float    _bulletLifeTime     = 10f;
-            public LayerMask _collisionMask => LayerMask.GetMask("Default", "Water");
+            public LayerMask _collisionMask;
         }
         #endregion
 
@@ -64,6 +69,7 @@ namespace NekraByte
             public AudioClip ShootClip;
             public AudioClip AimClip;
             public AudioClip DrawClip;
+            public AudioClip HolstClip;
             public AudioClip ReloadClip;
             public AudioClip ReloadClipVar1;
             public AudioClip FullReloadClip;
@@ -86,13 +92,27 @@ namespace NekraByte
         }
         #endregion
 
-        #region - Gun Data Main Conteiner -
-        [Serializable]
-        public class GunDataConteiner
+        #region - Gun Data Main Conteiner -       
+        [CreateAssetMenu(menuName = "NekraByte/FPS_Utility/Guns/New Gun Data", fileName = "New Gun Data")]
+        public class GunDataConteiner : ScriptableObject
         {
             public GunData          gunData               = new GunData();
             public BulletSettings   gunBulletSettings     = new BulletSettings();
             public AudioAsset       gunAudioAsset         = new AudioAsset();
+        }
+        #endregion
+
+        #region - Reticle Model -
+        public enum ReticleState
+        {
+            Walking,
+            Spriting,
+            Crouching,
+            Shooting,
+            Aiming,
+            Reloading,
+            InAir,
+            Idle
         }
         #endregion
     }

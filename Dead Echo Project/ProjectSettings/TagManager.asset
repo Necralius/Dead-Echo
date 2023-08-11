@@ -35,12 +35,12 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Concrete
+  - Flesh
+  - Dirt
+  - Glass
+  - Metal
+  - Wood
   m_SortingLayers:
   - name: Default
     uniqueID: 0

@@ -24,10 +24,10 @@ public class BulletBase : MonoBehaviour
         _startPosition = startPoint.position;
         _startForward = startPoint.forward;
 
-        this._bulletSpeed = speed;
-        this._bulletGravity = gravity;
-        this._bulletLifeTime = bulletLifeTime;
-        this._collisionLayerMask = collisionLayerMask;
+        _bulletSpeed = speed;
+        _bulletGravity = gravity;
+        _bulletLifeTime = bulletLifeTime;
+        _collisionLayerMask = collisionLayerMask;
         _isInitialized = true;
     }
 
@@ -93,7 +93,10 @@ public class BulletBase : MonoBehaviour
     public virtual void OnHit(RaycastHit hit)
     {
         if (hitInteraction != null) hitInteraction(hit.point);
+
+        ObjectPooler.Instance.SpawnFromPool(LayerMask.LayerToName(hit.collider.gameObject.layer) + "Hit", hit.point + hit.normal * 0.001f, Quaternion.LookRotation(hit.normal));
+        ObjectPooler.Instance.SpawnFromPool(LayerMask.LayerToName(hit.collider.gameObject.layer) + "Decal", hit.point + hit.normal * 0.001f, Quaternion.LookRotation(hit.normal));
+        
         gameObject.SetActive(false);
     }
-
 }

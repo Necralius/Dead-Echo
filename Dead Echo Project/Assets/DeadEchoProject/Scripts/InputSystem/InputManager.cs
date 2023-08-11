@@ -43,7 +43,7 @@ public class InputManager : MonoBehaviour
     //Gun Behavior Actions
     public InputAction reloadAction;
     public InputAction shootAction;
-    private InputAction aimAction;
+    public InputAction aimAction;
     public InputAction gunModeAction;
 
     public InputAction primaryGun;

@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using static NekraByte.FPS_Utility;
 using static NekraByte.FPS_Utility.GunData;
+using static UnityEngine.InputSystem.InputSettings;
 using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Animator))]
@@ -15,7 +16,7 @@ public abstract class GunBase : MonoBehaviour
     protected Animator _animator;
     [HideInInspector] public FPS_Controller _playerController;
     protected InputManager _inputManager;
-    [SerializeField] protected GunDataConteiner _gunDataConteiner = new();
+    [SerializeField] protected GunDataConteiner _gunDataConteiner;
     protected GunProceduralRecoil _recoilAsset => GetComponent<GunProceduralRecoil>();
     private Transform _aimHolder => _playerController.aimHolder;
     #endregion
@@ -31,16 +32,11 @@ public abstract class GunBase : MonoBehaviour
 
     #region - Gun State -
     [Header("Gun State"), Tooltip("Gun current states")]
-    [SerializeField] protected bool _isShooting      = false;
-    [SerializeField] protected bool _canShoot        = true;
-    public bool                     _isEquiped       = false;
+    [SerializeField] bool           _isEquiped       = false;
     public bool                     _isReloading     = false;
+    public bool                     _isShooting      = false;
     public bool                     _isAiming        = false;
-    #endregion
-
-    #region - Gun Shoot System -
-    [Header("Gun Shoot System")]
-    [SerializeField] protected Transform _shootPoint = null;    
+    public bool                     _canShoot        = true;
     #endregion
 
     #region - Aim System -
@@ -68,6 +64,12 @@ public abstract class GunBase : MonoBehaviour
     int gunModeIndex = 0;
     #endregion
 
+    public ParticleSystem muzzleFlash;
+
+    #region - UI System -
+    [SerializeField] private float ammoAddSize = 2f;
+    #endregion
+
     //----------------------------------- Methods -----------------------------------//
 
     #region - BuiltIn Methods -
@@ -82,7 +84,7 @@ public abstract class GunBase : MonoBehaviour
         _playerController           = GetComponentInParent<FPS_Controller>();
         _inputManager               = InputManager.Instance;
         _animator                   = GetComponent<Animator>();
-        _recoilAsset.cameraObject   = _playerController.cameraObject;
+        _recoilAsset.cameraObject   = _playerController.cameraObject;       
 
         switch (_gunDataConteiner.gunData.shootType)
         {
@@ -182,6 +184,7 @@ public abstract class GunBase : MonoBehaviour
                 if (_inputManager.gunModeAction.WasPressedThisFrame()) ChangeGunMode();
             }
         }
+        if (_inputManager.aimAction.WasPressedThisFrame()) SS_Aim();
         Aim(); //-> This statement calls the aim position calculation method.
 
         //The below statements set the animations on the main arms animator controler.
@@ -202,7 +205,6 @@ public abstract class GunBase : MonoBehaviour
     protected virtual IEnumerator Shoot()
     {
         SS_Shoot();
-        UI_Update();
         
         if (_gunDataConteiner.gunData.shootType == ShootType.Semi_Shotgun ||
             _gunDataConteiner.gunData.shootType == ShootType.Semi_Pistol ||
@@ -210,6 +212,8 @@ public abstract class GunBase : MonoBehaviour
 
         _recoilAsset.RecoilFire();
         _magAmmo--;
+        muzzleFlash.Emit(1);
+        UI_Update();
 
         yield return new WaitForSeconds(_gunDataConteiner.gunData.rateOfFire);
 
@@ -227,11 +231,7 @@ public abstract class GunBase : MonoBehaviour
     private void Aim()
     {
         if (_playerController._isSprinting) _aimTargetPos = _defaultPosition;
-        else if (_isAiming)
-        {
-            SS_Aim();
-            _aimTargetPos = new Vector3(_aimPosition.x, _aimPosition.y, _aimPosition.z + (_isReloading ? _aimReloadOffset : _aimOffset));
-        }
+        else if (_isAiming) _aimTargetPos = new Vector3(_aimPosition.x, _aimPosition.y, _aimPosition.z + (_isReloading ? _aimReloadOffset : _aimOffset));
         else _aimTargetPos = _defaultPosition;
 
         _aimHolder.transform.localPosition = Vector3.Lerp(_aimHolder.transform.localPosition, _aimTargetPos, _aimSpeed * Time.deltaTime);
@@ -299,8 +299,11 @@ public abstract class GunBase : MonoBehaviour
     public void UI_Update()
     {
         if (!_isEquiped) return;
-        _playerController.txt_Ammo.text = $"{_magAmmo}/{_bagAmmo}";
-        _playerController.txt_gunState.text = _gunDataConteiner.gunData.gunMode.ToString();
+        _playerController.txt_magAmmo.text = ($"{_magAmmo}");
+        _playerController.txt_bagAmmo.text = ($"/{_bagAmmo}");
+        //_playerController.txt_gunState.text = (_gunDataConteiner.gunData.gunMode.ToString());
+
+        UI_Manager.Instance.UpdateMode(_gunDataConteiner.gunData.gunMode, gunModes);
     }
     #endregion
 
@@ -322,7 +325,7 @@ public abstract class GunBase : MonoBehaviour
         _gunDataConteiner.gunData.gunMode = gunModes[gunModeIndex];
 
         UI_Update(); // -> Updates the gun UI.
-        SS_ChangeGunMode(); // -> Trigger the method sound.
+        SS_ChangeGunMode(); // -> Trigger the method sound.        
     }
     #endregion
 
@@ -336,8 +339,8 @@ public abstract class GunBase : MonoBehaviour
     }
     private void SS_Aim()
     {
-        if (ValidateClip(_playerController.aimClip))
-            AudioSystem.Instance.PlayGunClip(_playerController.changeGunMode);
+        if (ValidateClip(_gunDataConteiner.gunAudioAsset.AimClip))
+            AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.AimClip);
     }
     protected void SS_Shoot()
     {
@@ -350,28 +353,30 @@ public abstract class GunBase : MonoBehaviour
         {
             case 0:
 
-                if (ValidateClip(_gunDataConteiner.gunAudioAsset.ReloadClip)) return;
-                else AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.ReloadClip);
+                if (ValidateClip(_gunDataConteiner.gunAudioAsset.ReloadClip)) 
+                    AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.ReloadClip);
                 break;
             case 1:
 
-                if (ValidateClip(_gunDataConteiner.gunAudioAsset.ReloadClipVar1)) return;
-                else AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.ReloadClipVar1);
+                if (ValidateClip(_gunDataConteiner.gunAudioAsset.ReloadClipVar1)) 
+                    AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.ReloadClipVar1);
                 break;
             case 2:
 
-                if (ValidateClip(_gunDataConteiner.gunAudioAsset.FullReloadClip)) return;
-                else AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.FullReloadClip);
+                if (ValidateClip(_gunDataConteiner.gunAudioAsset.FullReloadClip)) 
+                    AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.FullReloadClip);
                 break;
         }
     }
     private void SS_GunAwake()
     {
-
+        if (ValidateClip(_gunDataConteiner.gunAudioAsset.DrawClip)) 
+            AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.DrawClip);   
     }
     private void SS_GunHolst()
     {
-
+        if (ValidateClip(_gunDataConteiner.gunAudioAsset.HolstClip)) 
+            AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.HolstClip);
     }
     private void SS_GunShootJam()
     {
@@ -381,21 +386,27 @@ public abstract class GunBase : MonoBehaviour
     private bool ValidateClip(AudioClip clip) => !clip.Equals(null);
     #endregion
 
-    public void EndDraw()
+    #region - Inventory Guns Change -
+    public void DrawGun()
     {
+        gameObject.SetActive(true);
         _isEquiped = true;
         _canShoot = true;
+        SS_GunAwake();
+        UI_Update();
     }
     public void GunHolst()
     {
+        _animator.SetTrigger(_holstWeaponHash);
         _isEquiped = false;
         _canShoot = false;
-        _animator.SetTrigger(_holstWeaponHash);
+        SS_GunHolst();
     }
     public void EndHolst()
     {
         gameObject.SetActive(false);
         _playerController._changingWeapon = false;
-        _playerController.StartEquippedGun();
+        _playerController.EquipCurrentGun();
     }
+    #endregion
 }

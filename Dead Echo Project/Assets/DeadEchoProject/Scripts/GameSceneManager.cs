@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static NekraByte.FPS_Utility;
 
 public class GameSceneManager : MonoBehaviour
 {
@@ -22,7 +23,6 @@ public class GameSceneManager : MonoBehaviour
     
     //Public
     public ParticleSystem bloodParticles { get => _bloodParticles; }
-
     //Public Methods
 
     // ----------------------------------------------------------------------
