@@ -66,10 +66,6 @@ public abstract class GunBase : MonoBehaviour
 
     public ParticleSystem muzzleFlash;
 
-    #region - UI System -
-    [SerializeField] private float ammoAddSize = 2f;
-    #endregion
-
     //----------------------------------- Methods -----------------------------------//
 
     #region - BuiltIn Methods -
@@ -301,7 +297,6 @@ public abstract class GunBase : MonoBehaviour
         if (!_isEquiped) return;
         _playerController.txt_magAmmo.text = ($"{_magAmmo}");
         _playerController.txt_bagAmmo.text = ($"/{_bagAmmo}");
-        //_playerController.txt_gunState.text = (_gunDataConteiner.gunData.gunMode.ToString());
 
         UI_Manager.Instance.UpdateMode(_gunDataConteiner.gunData.gunMode, gunModes);
     }
@@ -390,9 +385,12 @@ public abstract class GunBase : MonoBehaviour
     public void DrawGun()
     {
         gameObject.SetActive(true);
+        SS_GunAwake();        
+    }
+    public void EndDraw()
+    {
         _isEquiped = true;
         _canShoot = true;
-        SS_GunAwake();
         UI_Update();
     }
     public void GunHolst()

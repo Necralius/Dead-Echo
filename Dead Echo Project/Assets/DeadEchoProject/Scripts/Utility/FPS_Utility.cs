@@ -75,22 +75,7 @@ namespace NekraByte
             public AudioClip FullReloadClip;
             public AudioClip BoltActionClip;
         }
-        #endregion
-
-        #region - Sway Effectors Data Model -
-        [Serializable]
-        public class SwayEffectors
-        {
-            [Header("Aiming Effectors")]
-            [Range(1, 100)] public float lookSwayEffector               = 10f;
-            [Range(1, 100)] public float maxLoookSwayAmountEffector     = 5f;
-            [Range(1, 100)] public float xMovmentSwayEffector           = 10f;
-            [Range(1, 100)] public float yMovmentSwayEffector           = 10f;
-            [Range(1, 100)] public float maxMovmentSwayEffector         = 5f;
-            [Range(1, 100)] public float rotationaSwayEffector          = 5f;
-            [Range(1, 100)] public float maxRotationSwayAmountEffector  = 5;
-        }
-        #endregion
+        #endregion     
 
         #region - Gun Data Main Conteiner -       
         [CreateAssetMenu(menuName = "NekraByte/FPS_Utility/Guns/New Gun Data", fileName = "New Gun Data")]
@@ -113,6 +98,67 @@ namespace NekraByte
             Reloading,
             InAir,
             Idle
+        }
+        #endregion
+
+        #region - Sway Data Model -
+        [Serializable]
+        public class SwayData
+        {
+            [Header("Weapon Sway Data")]
+            public SwayEffectors gunSwayEffectors = new SwayEffectors();
+
+            [Space, Header("Weapon Sway System")]
+            [Header("Position Sway")]
+            [Range(0, 10)] public float swayAmount = 0.01f;
+            [Range(0, 10)] public float maxAmount = 0.06f;
+            [Range(0, 100)] public float smoothAmount = 6f;
+
+            [HideInInspector] public Vector3 initialPosition;
+
+            [Header("Rotation Sway")]
+            [Range(0, 100)] public float rotationSwayAmount = 4f;
+            [Range(0, 100)] public float maxRotationSwayAmount = 5f;
+            [Range(0, 100)] public float smoothRotationAmount = 12f;
+
+            [HideInInspector] public Quaternion initialRotation;
+
+            public bool swayOnX = true;
+            public bool swayOnY = true;
+            public bool swayOnZ = true;
+
+            [Header("Movment Sway")]
+            [Range(0, 10)] public float movmentSwayXAmount = 0.05f;
+            [Range(0, 10)] public float movmentSwayYAmount = 0.05f;
+
+            [Range(0, 10)] public float movmentSwaySmooth = 6f;
+            [Range(0, 10)] public float maxMovmentSwayAmount = 0.5f;
+
+            [Header("Breathing Weapon Sway")]
+            [Range(0, 100)] public float swayAmountA = 4;
+            [Range(0, 100)] public float swayAmountB = 2;
+
+            [Range(0, 10000)] public float swayScale = 600;
+            [Range(0, 10000)] public float aimSwayScale = 6000;
+
+            [Range(0, 100)] public float swayLerpSpeed = 14f;
+
+            [HideInInspector] public float swayTime;
+            [HideInInspector] public Vector3 swayPosition;
+            #region - Sway Effectors Data Model -
+            [Serializable]
+            public class SwayEffectors
+            {
+                [Header("Aiming Effectors")]
+                [Range(1, 100)] public float lookSwayEffector = 10f;
+                [Range(1, 100)] public float maxLoookSwayAmountEffector = 5f;
+                [Range(1, 100)] public float xMovmentSwayEffector = 10f;
+                [Range(1, 100)] public float yMovmentSwayEffector = 10f;
+                [Range(1, 100)] public float maxMovmentSwayEffector = 5f;
+                [Range(1, 100)] public float rotationaSwayEffector = 5f;
+                [Range(1, 100)] public float maxRotationSwayAmountEffector = 5;
+            }
+            #endregion
         }
         #endregion
     }
