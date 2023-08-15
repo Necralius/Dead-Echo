@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Remington
+  m_EditorClassIdentifier: Assembly-CSharp:NekraByte:FPS_Utility/GunDataConteiner
+  gunData:
+    gunName: Remington
+    shootType: 1
+    gunMode: 1
+    rateOfFire: 0.4
+  gunBulletSettings:
+    shootDamageRange: {x: 10, y: 25}
+    _bulletTag: RifleBullet
+    _bulletSpeed: 500
+    _bulletGravity: 2
+    _bulletSpread: 0.1
+    _bulletLifeTime: 10
+    _collisionMask:
+      serializedVersion: 2
+      m_Bits: 4227861511
+  gunAudioAsset:
+    ShootClip: {fileID: 8300000, guid: 49182f7f6c11bda40bc100004a1a4f21, type: 3}
+    AimClip: {fileID: 8300000, guid: 6d18729c8b539aa4d800edeb0bd8dc1c, type: 3}
+    DrawClip: {fileID: 8300000, guid: ba2ef8b9083c04742b864552507d7b60, type: 3}
+    HolstClip: {fileID: 8300000, guid: ba2ef8b9083c04742b864552507d7b60, type: 3}
+    ReloadClip: {fileID: 8300000, guid: 614dd3f89ac464643bf6edb2294c2f78, type: 3}
+    ReloadClipVar1: {fileID: 8300000, guid: 5816412c6ef38924896bc3afa4a9aead, type: 3}
+    FullReloadClip: {fileID: 8300000, guid: 4a7d28223cfbf344dbd0da062bf8f4ca, type: 3}
+    BoltActionClip: {fileID: 8300000, guid: 9b17d107f19588d4b9b42349dcbbad21, type: 3}

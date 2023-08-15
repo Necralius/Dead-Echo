@@ -52,10 +52,10 @@ public abstract class GunBase : MonoBehaviour
     #region - Animation Hashes -
     private int _isWalkingHash      = Animator.StringToHash("isWalking");
     private int _isRunningHash      = Animator.StringToHash("isRunning");
-    private int _isReloadingHash    = Animator.StringToHash("isReloading");
-    private int _reloadFactor       = Animator.StringToHash("ReloadFactor");
-    private int _holstWeaponHash    = Animator.StringToHash("HolstWeapon");
-    private int _shootHash          = Animator.StringToHash("Shoot");
+    protected int _isReloadingHash    = Animator.StringToHash("isReloading");
+    protected int _reloadFactor       = Animator.StringToHash("ReloadFactor");
+    protected int _holstWeaponHash    = Animator.StringToHash("HolstWeapon");
+    protected int _shootHash          = Animator.StringToHash("Shoot");
     #endregion
 
     #region - Gun Mode System -
@@ -245,7 +245,7 @@ public abstract class GunBase : MonoBehaviour
     //        reload  animation  is  played, otherwise, one  of  two reload
     //        variations is randomly selected.
     // ----------------------------------------------------------------------
-    protected virtual void Reload()
+    public virtual void Reload()
     {
         _isReloading = true;
 
@@ -342,7 +342,7 @@ public abstract class GunBase : MonoBehaviour
         if (ValidateClip(_gunDataConteiner.gunAudioAsset.ShootClip)) 
             AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.ShootClip, Vector2.zero, Vector2.zero);
     }
-    private void SS_Reload(int reloadIndex)
+    protected void SS_Reload(int reloadIndex)
     {
         switch (reloadIndex)
         {
@@ -378,7 +378,7 @@ public abstract class GunBase : MonoBehaviour
         if (ValidateClip(_playerController.gunShootJam))
             AudioSystem.Instance.PlayGunClip(_playerController.gunShootJam);
     }
-    private bool ValidateClip(AudioClip clip) => !clip.Equals(null);
+    protected bool ValidateClip(AudioClip clip) => !clip.Equals(null);
     #endregion
 
     #region - Inventory Guns Change -

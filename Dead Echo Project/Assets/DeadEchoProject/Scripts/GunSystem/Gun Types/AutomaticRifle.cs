@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AutomaticRifle : GunBase
+public class AutomaticRifle : Mode_Auto
 {
     protected override IEnumerator Shoot()
     {

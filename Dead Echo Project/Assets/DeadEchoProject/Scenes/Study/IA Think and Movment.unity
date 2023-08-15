@@ -39,7 +39,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 3306.9033, g: 2891.7532, b: 2844.7114, a: 1}
+  m_IndirectSpecularColor: {r: 3404.6013, g: 3078.3296, b: 3429.2173, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -701,7 +701,7 @@ GameObject:
   - component: {fileID: 84932507}
   - component: {fileID: 84932506}
   - component: {fileID: 84932505}
-  m_Layer: 0
+  m_Layer: 26
   m_Name: Cube (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1157,7 +1157,7 @@ GameObject:
   - component: {fileID: 163612755}
   - component: {fileID: 163612754}
   - component: {fileID: 163612753}
-  m_Layer: 0
+  m_Layer: 26
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1256,7 +1256,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-22094
+  m_Name: pb_Mesh33924
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -2380,6 +2380,136 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &445187673
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 445187674}
+  - component: {fileID: 445187675}
+  m_Layer: 0
+  m_Name: RenderPasses
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &445187674
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 445187673}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -9.347121, y: -3.4702199, z: 11.667446}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &445187675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 445187673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26d6499a6bd256e47b859377446493a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsGlobal: 0
+  fadeRadius: 0
+  priority: 0
+  customPasses:
+  - rid: 7267572079961309186
+  - rid: 7267572079961309187
+  injectionPoint: 1
+  m_TargetCamera: {fileID: 578912779}
+  useTargetCamera: 1
+  references:
+    version: 2
+    RefIds:
+    - rid: 7267572079961309186
+      type: {class: DrawRenderersCustomPass, ns: UnityEngine.Rendering.HighDefinition,
+        asm: Unity.RenderPipelines.HighDefinition.Runtime}
+      data:
+        m_Name: Custom Pass
+        enabled: 1
+        targetColorBuffer: 0
+        targetDepthBuffer: 0
+        clearFlags: 0
+        passFoldout: 0
+        m_Version: 0
+        filterFoldout: 1
+        rendererFoldout: 1
+        renderQueueType: 10
+        layerMask:
+          serializedVersion: 2
+          m_Bits: 33554432
+        sortingCriteria: -1
+        overrideMode: 1
+        overrideMaterial: {fileID: 0}
+        overrideMaterialPassIndex: 0
+        overrideMaterialPassName: Forward
+        overrideShader: {fileID: 0}
+        overrideShaderPassIndex: 0
+        overrideShaderPassName: Forward
+        overrideDepthState: 1
+        depthCompareFunction: 8
+        depthWrite: 1
+        overrideStencil: 0
+        stencilReferenceValue: 64
+        stencilWriteMask: 192
+        stencilReadMask: 192
+        stencilCompareFunction: 8
+        stencilPassOperation: 0
+        stencilFailOperation: 0
+        stencilDepthFailOperation: 0
+        shaderPass: 0
+    - rid: 7267572079961309187
+      type: {class: DrawRenderersCustomPass, ns: UnityEngine.Rendering.HighDefinition,
+        asm: Unity.RenderPipelines.HighDefinition.Runtime}
+      data:
+        m_Name: Custom Pass
+        enabled: 1
+        targetColorBuffer: 0
+        targetDepthBuffer: 0
+        clearFlags: 0
+        passFoldout: 0
+        m_Version: 0
+        filterFoldout: 0
+        rendererFoldout: 0
+        renderQueueType: 10
+        layerMask:
+          serializedVersion: 2
+          m_Bits: 33554432
+        sortingCriteria: -1
+        overrideMode: 1
+        overrideMaterial: {fileID: 0}
+        overrideMaterialPassIndex: 0
+        overrideMaterialPassName: Forward
+        overrideShader: {fileID: 0}
+        overrideShaderPassIndex: 0
+        overrideShaderPassName: Forward
+        overrideDepthState: 1
+        depthCompareFunction: 4
+        depthWrite: 1
+        overrideStencil: 0
+        stencilReferenceValue: 64
+        stencilWriteMask: 192
+        stencilReadMask: 192
+        stencilCompareFunction: 8
+        stencilPassOperation: 0
+        stencilFailOperation: 0
+        stencilDepthFailOperation: 0
+        shaderPass: 0
 --- !u!144 &453934827
 CharacterJoint:
   m_ObjectHideFlags: 0
@@ -2965,6 +3095,12 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 577402746}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!20 &578912779 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 520116193634283014, guid: 4c84304824e6c284f9edda8c36c25de3,
+    type: 3}
+  m_PrefabInstance: {fileID: 4077680323897662753}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &644268630
 GameObject:
   m_ObjectHideFlags: 0
@@ -2980,7 +3116,7 @@ GameObject:
   - component: {fileID: 644268632}
   - component: {fileID: 644268631}
   - component: {fileID: 644268637}
-  m_Layer: 0
+  m_Layer: 26
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3352,7 +3488,7 @@ GameObject:
   - component: {fileID: 703103278}
   - component: {fileID: 703103277}
   - component: {fileID: 703103276}
-  m_Layer: 0
+  m_Layer: 26
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4710,7 +4846,7 @@ GameObject:
   - component: {fileID: 1155812469}
   - component: {fileID: 1155812468}
   - component: {fileID: 1155812467}
-  m_Layer: 0
+  m_Layer: 26
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6249,7 +6385,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1660025899}
-  m_Layer: 0
+  m_Layer: 26
   m_Name: Scenario
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7273,71 +7409,6 @@ PrefabInstance:
       propertyPath: txt_magAmmo
       value: 
       objectReference: {fileID: 1539733920}
-    - target: {fileID: 2834923429060783299, guid: 4c84304824e6c284f9edda8c36c25de3,
-        type: 3}
-      propertyPath: swayData.swayTime
-      value: 5.128777
-      objectReference: {fileID: 0}
-    - target: {fileID: 2834923429060783299, guid: 4c84304824e6c284f9edda8c36c25de3,
-        type: 3}
-      propertyPath: swayData.maxAmount
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 2834923429060783299, guid: 4c84304824e6c284f9edda8c36c25de3,
-        type: 3}
-      propertyPath: swayData.swayAmount
-      value: 0.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2834923429060783299, guid: 4c84304824e6c284f9edda8c36c25de3,
-        type: 3}
-      propertyPath: swayData.smoothAmount
-      value: 0.6
-      objectReference: {fileID: 0}
-    - target: {fileID: 2834923429060783299, guid: 4c84304824e6c284f9edda8c36c25de3,
-        type: 3}
-      propertyPath: swayData.swayPosition.x
-      value: -0.0015655803
-      objectReference: {fileID: 0}
-    - target: {fileID: 2834923429060783299, guid: 4c84304824e6c284f9edda8c36c25de3,
-        type: 3}
-      propertyPath: swayData.swayPosition.y
-      value: 0.0042116484
-      objectReference: {fileID: 0}
-    - target: {fileID: 2834923429060783299, guid: 4c84304824e6c284f9edda8c36c25de3,
-        type: 3}
-      propertyPath: swayData.movmentSwaySmooth
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 2834923429060783299, guid: 4c84304824e6c284f9edda8c36c25de3,
-        type: 3}
-      propertyPath: swayData.movmentSwayXAmount
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 2834923429060783299, guid: 4c84304824e6c284f9edda8c36c25de3,
-        type: 3}
-      propertyPath: swayData.movmentSwayYAmount
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 2834923429060783299, guid: 4c84304824e6c284f9edda8c36c25de3,
-        type: 3}
-      propertyPath: swayData.rotationSwayAmount
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 2834923429060783299, guid: 4c84304824e6c284f9edda8c36c25de3,
-        type: 3}
-      propertyPath: swayData.maxMovmentSwayAmount
-      value: 0.02
-      objectReference: {fileID: 0}
-    - target: {fileID: 2834923429060783299, guid: 4c84304824e6c284f9edda8c36c25de3,
-        type: 3}
-      propertyPath: swayData.smoothRotationAmount
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 2834923429060783299, guid: 4c84304824e6c284f9edda8c36c25de3,
-        type: 3}
-      propertyPath: swayData.maxRotationSwayAmount
-      value: 10
-      objectReference: {fileID: 0}
     - target: {fileID: 4615760628217743587, guid: 4c84304824e6c284f9edda8c36c25de3,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -7417,3 +7488,4 @@ SceneRoots:
   - {fileID: 567038200}
   - {fileID: 1284763248}
   - {fileID: 1660025899}
+  - {fileID: 445187674}

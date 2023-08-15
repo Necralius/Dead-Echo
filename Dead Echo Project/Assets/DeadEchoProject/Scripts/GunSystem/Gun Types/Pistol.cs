@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static NekraByte.FPS_Utility;
 
-public class Pistol : GunBase
+public class Pistol : Mode_Semi
 {
     protected override IEnumerator Shoot()
     {

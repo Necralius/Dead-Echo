@@ -52,11 +52,11 @@ namespace NekraByte
         public class BulletSettings
         {
             [Header("Gun Settings"), Tooltip("Gun aspects settings")]
-            public Vector2 shootDamageRange                      = new(10f, 25f);
-            [SerializeField]    public string   _bulletTag = "RifleBullet";
+            public Vector2 shootDamageRange                         = new(10f, 25f);
+            [SerializeField]    public string   _bulletTag          = "RifleBullet";
             [Range(1, 5000)]    public float    _bulletSpeed        = 500f;
-            [Range(1, 50)]      public float    _bulletGravity      = 2f;
-            [Range(1, 10)]      public float    _bulletSpread       = 1f;
+            [Range(1f, 50)]     public float    _bulletGravity      = 2f;
+            [Range(0.001f, 10)] public float    _bulletSpread       = 1f;
             [Range(1, 15)]      public float    _bulletLifeTime     = 10f;
             public LayerMask _collisionMask;
         }

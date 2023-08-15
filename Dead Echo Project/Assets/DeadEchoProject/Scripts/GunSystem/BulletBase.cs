@@ -16,6 +16,7 @@ public class BulletBase : MonoBehaviour
     private float _bulletLifeTime = 15f;
     private float _deactiveTimer = 0;
     private LayerMask _collisionLayerMask;
+    private Vector3 _dirVariation;
 
     Func<Vector3, string> hitInteraction;
 
@@ -23,6 +24,19 @@ public class BulletBase : MonoBehaviour
     {
         _startPosition = startPoint.position;
         _startForward = startPoint.forward;
+        _dirVariation = Vector3.zero;
+
+        _bulletSpeed = speed;
+        _bulletGravity = gravity;
+        _bulletLifeTime = bulletLifeTime;
+        _collisionLayerMask = collisionLayerMask;
+        _isInitialized = true;
+    }
+    public void Initialize(Transform startPoint, Vector3 dirVariation, float speed, float gravity, float bulletLifeTime, LayerMask collisionLayerMask)
+    {
+        _startPosition = startPoint.position;
+        _startForward = startPoint.forward;
+        _dirVariation = dirVariation;
 
         _bulletSpeed = speed;
         _bulletGravity = gravity;
@@ -33,7 +47,7 @@ public class BulletBase : MonoBehaviour
 
     private Vector3 FindPointOnParabola(float time)
     {
-        Vector3 point = _startPosition + (_startForward * _bulletSpeed * time);
+        Vector3 point = _startPosition + ((_startForward + _dirVariation) * _bulletSpeed * time);
         Vector3 gravityVec = Vector3.down * _bulletGravity * time * time;
         return point + gravityVec;
     }
