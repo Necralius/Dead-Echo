@@ -16,14 +16,15 @@ MonoBehaviour:
     gunName: Remington
     shootType: 1
     gunMode: 1
-    rateOfFire: 0.4
+    rateOfFire: 1
   gunBulletSettings:
     shootDamageRange: {x: 10, y: 25}
     _bulletTag: RifleBullet
-    _bulletSpeed: 500
-    _bulletGravity: 2
-    _bulletSpread: 0.1
-    _bulletLifeTime: 10
+    _bulletSpeed: 100
+    _bulletGravity: 3
+    _bulletSpread: 0.2
+    _bulletLifeTime: 2
+    _bulletsPerShoot: 6
     _collisionMask:
       serializedVersion: 2
       m_Bits: 4227861511

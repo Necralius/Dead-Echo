@@ -58,6 +58,7 @@ namespace NekraByte
             [Range(1f, 50)]     public float    _bulletGravity      = 2f;
             [Range(0.001f, 10)] public float    _bulletSpread       = 1f;
             [Range(1, 15)]      public float    _bulletLifeTime     = 10f;
+            [Range(1, 10)]      public int      _bulletsPerShoot    = 1;
             public LayerMask _collisionMask;
         }
         #endregion

@@ -129,6 +129,7 @@ public class FPS_Controller : MonoBehaviour
     #region - BuiltIn Methods -
     private void Awake()
     {
+        Instance = this;
         Cursor.lockState = CursorLockMode.Locked;
     }
     private void Start()

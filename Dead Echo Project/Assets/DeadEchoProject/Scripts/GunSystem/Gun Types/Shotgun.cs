@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Shotgun : Mode_Semi
 {
-    public int bulletsPerShoot = 4;
     private int endReloadHash = Animator.StringToHash("EndReload");
 
     protected override IEnumerator Shoot()
@@ -14,16 +13,15 @@ public class Shotgun : Mode_Semi
         _isShooting = true;
         _canShoot = false;
 
-        for (int i = 0; i < _gunDataConteiner.gunBulletSettings._bulletSpread; i++)
-        {
-            float bulletSpread = _gunDataConteiner.gunBulletSettings._bulletSpread;
-            Vector3 dirVariation = new Vector3(Random.Range(-bulletSpread, bulletSpread), Random.Range(-bulletSpread, bulletSpread), Random.Range(-bulletSpread, bulletSpread));
-
+        for (int i = 0; i < _gunDataConteiner.gunBulletSettings._bulletsPerShoot; i++)
+        {            
             BulletBase bullet = ObjectPooler.Instance.SpawnFromPool(_gunDataConteiner.gunBulletSettings._bulletTag,
                 _playerController.shootPoint.transform.position,
                 _playerController.shootPoint.transform.rotation).GetComponent<BulletBase>();
 
-            bullet.Initialize(_playerController.shootPoint.transform, dirVariation, _gunDataConteiner.gunBulletSettings._bulletSpeed,
+            bullet.Initialize(_playerController.shootPoint.transform, 
+                _gunDataConteiner.gunBulletSettings._bulletSpread, 
+                _gunDataConteiner.gunBulletSettings._bulletSpeed,
                 _gunDataConteiner.gunBulletSettings._bulletGravity,
                 _gunDataConteiner.gunBulletSettings._bulletLifeTime,
                 _gunDataConteiner.gunBulletSettings._collisionMask);

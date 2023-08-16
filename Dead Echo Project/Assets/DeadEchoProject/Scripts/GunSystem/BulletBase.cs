@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class BulletBase : MonoBehaviour
 {
@@ -16,15 +17,20 @@ public class BulletBase : MonoBehaviour
     private float _bulletLifeTime = 15f;
     private float _deactiveTimer = 0;
     private LayerMask _collisionLayerMask;
-    private Vector3 _dirVariation;
+    private Vector3 _direction = Vector3.zero;
 
     Func<Vector3, string> hitInteraction;
 
-    public void Initialize(Transform startPoint, float speed, float gravity, float bulletLifeTime, LayerMask collisionLayerMask)
+    public void Initialize(Transform startPoint, float spread, float speed, float gravity, float bulletLifeTime, LayerMask collisionLayerMask)
     {
+        _direction = Vector3.zero;
         _startPosition = startPoint.position;
-        _startForward = startPoint.forward;
-        _dirVariation = Vector3.zero;
+
+        float x = Random.Range(-spread, spread);
+        float y = Random.Range(-spread, spread);
+        _direction = FPS_Controller.Instance.cameraObject.transform.forward + new Vector3(x, y, 0);
+
+        _startForward = startPoint.forward + _direction;
 
         _bulletSpeed = speed;
         _bulletGravity = gravity;
@@ -32,22 +38,22 @@ public class BulletBase : MonoBehaviour
         _collisionLayerMask = collisionLayerMask;
         _isInitialized = true;
     }
-    public void Initialize(Transform startPoint, Vector3 dirVariation, float speed, float gravity, float bulletLifeTime, LayerMask collisionLayerMask)
+    private void ResetBullet()
     {
-        _startPosition = startPoint.position;
-        _startForward = startPoint.forward;
-        _dirVariation = dirVariation;
-
-        _bulletSpeed = speed;
-        _bulletGravity = gravity;
-        _bulletLifeTime = bulletLifeTime;
-        _collisionLayerMask = collisionLayerMask;
-        _isInitialized = true;
+        _startPosition = Vector3.zero;
+        _startForward = Vector3.zero;
+        
+        _direction = Vector3.zero;
+        _bulletSpeed = 0f;
+        _bulletGravity = 0f;
+        _bulletLifeTime = 0f;
+        _collisionLayerMask = LayerMask.NameToLayer("Default");
+        _isInitialized = false;
     }
 
     private Vector3 FindPointOnParabola(float time)
     {
-        Vector3 point = _startPosition + ((_startForward + _dirVariation) * _bulletSpeed * time);
+        Vector3 point = _startPosition + (_startForward * _bulletSpeed * time);
         Vector3 gravityVec = Vector3.down * _bulletGravity * time * time;
         return point + gravityVec;
     }
@@ -110,6 +116,7 @@ public class BulletBase : MonoBehaviour
 
         ObjectPooler.Instance.SpawnFromPool(LayerMask.LayerToName(hit.collider.gameObject.layer) + "Hit", hit.point + hit.normal * 0.001f, Quaternion.LookRotation(hit.normal));
         ObjectPooler.Instance.SpawnFromPool(LayerMask.LayerToName(hit.collider.gameObject.layer) + "Decal", hit.point + hit.normal * 0.001f, Quaternion.LookRotation(hit.normal));
+        ResetBullet();
         
         gameObject.SetActive(false);
     }

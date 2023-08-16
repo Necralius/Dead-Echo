@@ -22,7 +22,7 @@ MonoBehaviour:
     _bulletTag: RifleBullet
     _bulletSpeed: 1000
     _bulletGravity: 1
-    _bulletSpread: 1
+    _bulletSpread: 0.001
     _bulletLifeTime: 10
     _collisionMask:
       serializedVersion: 2

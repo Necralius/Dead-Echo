@@ -15,7 +15,9 @@ public class AutomaticRifle : Mode_Auto
             _playerController.shootPoint.transform.position,
             _playerController.shootPoint.transform.rotation).GetComponent<BulletBase>();
 
-        bullet.Initialize(_playerController.shootPoint.transform, _gunDataConteiner.gunBulletSettings._bulletSpeed, 
+        bullet.Initialize(_playerController.shootPoint.transform, 
+            _gunDataConteiner.gunBulletSettings._bulletSpread,
+            _gunDataConteiner.gunBulletSettings._bulletSpeed, 
             _gunDataConteiner.gunBulletSettings._bulletGravity, 
             _gunDataConteiner.gunBulletSettings._bulletLifeTime, 
             _gunDataConteiner.gunBulletSettings._collisionMask);
