@@ -125,6 +125,15 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ThrowRockAction"",
+                    ""type"": ""Button"",
+                    ""id"": ""01046a71-1f9d-4bd2-8d5b-be4a618e9520"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -292,6 +301,17 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
                     ""action"": ""SecondaryGun"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6b5577c7-2a41-4522-b89e-e8b4853b2882"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ThrowRockAction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -311,6 +331,7 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
         m_PC_Map_ChangeGunMode = m_PC_Map.FindAction("ChangeGunMode", throwIfNotFound: true);
         m_PC_Map_PrimaryGun = m_PC_Map.FindAction("PrimaryGun", throwIfNotFound: true);
         m_PC_Map_SecondaryGun = m_PC_Map.FindAction("SecondaryGun", throwIfNotFound: true);
+        m_PC_Map_ThrowRockAction = m_PC_Map.FindAction("ThrowRockAction", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -383,6 +404,7 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
     private readonly InputAction m_PC_Map_ChangeGunMode;
     private readonly InputAction m_PC_Map_PrimaryGun;
     private readonly InputAction m_PC_Map_SecondaryGun;
+    private readonly InputAction m_PC_Map_ThrowRockAction;
     public struct PC_MapActions
     {
         private @InputMaps m_Wrapper;
@@ -398,6 +420,7 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
         public InputAction @ChangeGunMode => m_Wrapper.m_PC_Map_ChangeGunMode;
         public InputAction @PrimaryGun => m_Wrapper.m_PC_Map_PrimaryGun;
         public InputAction @SecondaryGun => m_Wrapper.m_PC_Map_SecondaryGun;
+        public InputAction @ThrowRockAction => m_Wrapper.m_PC_Map_ThrowRockAction;
         public InputActionMap Get() { return m_Wrapper.m_PC_Map; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -440,6 +463,9 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
             @SecondaryGun.started += instance.OnSecondaryGun;
             @SecondaryGun.performed += instance.OnSecondaryGun;
             @SecondaryGun.canceled += instance.OnSecondaryGun;
+            @ThrowRockAction.started += instance.OnThrowRockAction;
+            @ThrowRockAction.performed += instance.OnThrowRockAction;
+            @ThrowRockAction.canceled += instance.OnThrowRockAction;
         }
 
         private void UnregisterCallbacks(IPC_MapActions instance)
@@ -477,6 +503,9 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
             @SecondaryGun.started -= instance.OnSecondaryGun;
             @SecondaryGun.performed -= instance.OnSecondaryGun;
             @SecondaryGun.canceled -= instance.OnSecondaryGun;
+            @ThrowRockAction.started -= instance.OnThrowRockAction;
+            @ThrowRockAction.performed -= instance.OnThrowRockAction;
+            @ThrowRockAction.canceled -= instance.OnThrowRockAction;
         }
 
         public void RemoveCallbacks(IPC_MapActions instance)
@@ -507,5 +536,6 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
         void OnChangeGunMode(InputAction.CallbackContext context);
         void OnPrimaryGun(InputAction.CallbackContext context);
         void OnSecondaryGun(InputAction.CallbackContext context);
+        void OnThrowRockAction(InputAction.CallbackContext context);
     }
 }

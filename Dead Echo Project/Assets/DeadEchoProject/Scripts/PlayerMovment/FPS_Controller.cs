@@ -89,6 +89,7 @@ public class FPS_Controller : MonoBehaviour
     public bool _inAir              = false;
     public bool _changingWeapon     = false;
     private bool _walkingBackwards  = false;
+    public bool _isThrowingRock    = false;
     #endregion
 
     #region - Private Data -
@@ -124,6 +125,11 @@ public class FPS_Controller : MonoBehaviour
     public float HealthValue { get { return healthValue; } set { healthValue = value; } }
     #endregion
 
+    #region - Animation Hashes -
+    private int rockThrowingHash    = Animator.StringToHash("ThrowRock");
+    private int rockThrowCancelHash = Animator.StringToHash("CancelThrowRock");
+    #endregion
+
     // ---------------------------- Methods ----------------------------//
 
     #region - BuiltIn Methods -
@@ -151,6 +157,18 @@ public class FPS_Controller : MonoBehaviour
 
             if (inputManager.primaryGun.WasPressedThisFrame() && !_changingWeapon) EquipGun(0);
             if (inputManager.secondaryGun.WasPressedThisFrame() && !_changingWeapon) EquipGun(1);
+
+            if (!equippedGun._isReloading && !_isSprinting)
+            {
+                if (inputManager.throwRockAction.WasPressedThisFrame()) StartThrowing();
+                if (_isThrowingRock)
+                {
+                    if (inputManager.throwRockAction.WasReleasedThisFrame()) ThrowRock();
+
+                    if (inputManager.aimAction.WasPressedThisFrame() || 
+                        inputManager.reloadAction.WasPressedThisFrame()) CancelThrowRock();
+                }
+            }
         }
     }
     #endregion
@@ -377,5 +395,25 @@ public class FPS_Controller : MonoBehaviour
         equippedGun = gunsInHand[gunIndex];
     }
     public void EquipCurrentGun() => equippedGun.DrawGun();
+    #endregion
+
+    #region - Throw Rock State -
+    private void StartThrowing()
+    {
+        equippedGun._animator.SetBool(rockThrowingHash, true);
+        _isThrowingRock = true;
+    }
+    public void ThrowRock()
+    {
+
+        //TODO -> Get object from pool and set on position, activate the throw interaction with gravity.
+        _isThrowingRock = false;
+        equippedGun._animator.SetBool(rockThrowingHash, false);
+    }
+    private void CancelThrowRock()
+    {
+        equippedGun._animator.SetTrigger(rockThrowCancelHash);
+        _isThrowingRock = false;
+    }
     #endregion
 }

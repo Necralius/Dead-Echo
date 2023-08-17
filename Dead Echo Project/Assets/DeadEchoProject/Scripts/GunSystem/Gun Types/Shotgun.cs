@@ -5,7 +5,18 @@ using UnityEngine;
 public class Shotgun : Mode_Semi
 {
     private int endReloadHash = Animator.StringToHash("EndReload");
+    private int cancelReloadHash = Animator.StringToHash("CancelReload");
 
+    protected override void Update()
+    {
+        if (_isReloading && _inputManager.shootAction.WasPressedThisFrame())
+        {
+            _animator.SetTrigger(cancelReloadHash);
+            _isReloading = false;
+            UI_Update();
+        }
+        base.Update();
+    }
     protected override IEnumerator Shoot()
     {
         if (_isShooting || !_canShoot) yield return null;
@@ -29,7 +40,7 @@ public class Shotgun : Mode_Semi
             StartCoroutine(base.Shoot());
     }
 
-    public override void Reload()
+    protected override void Reload()
     {
         _isReloading = true;
         SS_Reload();

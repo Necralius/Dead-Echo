@@ -29,6 +29,7 @@ public class InputManager : MonoBehaviour
     public bool jumping;
     public bool crouching;
     public bool changingGunMode;
+    public bool isHoldingRock;
 
     //Private Data
     public InputActionMap currentMap;
@@ -45,6 +46,7 @@ public class InputManager : MonoBehaviour
     public InputAction shootAction;
     public InputAction aimAction;
     public InputAction gunModeAction;
+    public InputAction throwRockAction;
 
     public InputAction primaryGun;
     public InputAction secondaryGun;
@@ -72,6 +74,7 @@ public class InputManager : MonoBehaviour
         sprintAction    = currentMap.FindAction("SprintAction");
         jumpAction      = currentMap.FindAction("JumpAction");
         crouchAction    = currentMap.FindAction("CrouchAction");
+        throwRockAction = currentMap.FindAction("ThrowRockAction");
 
         //Gun Behavior Actions
         reloadAction    = currentMap.FindAction("ReloadAction");
@@ -82,25 +85,27 @@ public class InputManager : MonoBehaviour
         primaryGun      = currentMap.FindAction("PrimaryGun");
         secondaryGun    = currentMap.FindAction("SecondaryGun"); 
 
-        moveAction.performed    += onMove;
-        lookAction.performed    += onLook;
-        sprintAction.performed  += onSprint;
-        reloadAction.performed  += onReload;
-        shootAction.performed   += onShoot;
-        aimAction.performed     += onAim;
-        jumpAction.performed    += onJump;
-        crouchAction.performed  += onCrouch;
-        gunModeAction.performed += onModeChanged;
+        moveAction.performed        += onMove;
+        lookAction.performed        += onLook;
+        sprintAction.performed      += onSprint;
+        reloadAction.performed      += onReload;
+        shootAction.performed       += onShoot;
+        aimAction.performed         += onAim;
+        jumpAction.performed        += onJump;
+        crouchAction.performed      += onCrouch;
+        gunModeAction.performed     += onModeChanged;
+        throwRockAction.performed   += onThrowRocked;
 
-        moveAction.canceled     += onMove;
-        lookAction.canceled     += onLook;
-        sprintAction.canceled   += onSprint;
-        reloadAction.canceled   += onReload;
-        shootAction.canceled    += onShoot;
-        aimAction.canceled      += onAim;
-        jumpAction.canceled     += onJump;
-        crouchAction.canceled   += onCrouch;
-        gunModeAction.canceled  += onModeChanged;
+        moveAction.canceled         += onMove;
+        lookAction.canceled         += onLook;
+        sprintAction.canceled       += onSprint;
+        reloadAction.canceled       += onReload;
+        shootAction.canceled        += onShoot;
+        aimAction.canceled          += onAim;
+        jumpAction.canceled         += onJump;
+        crouchAction.canceled       += onCrouch;
+        gunModeAction.canceled      += onModeChanged;
+        throwRockAction.canceled    += onThrowRocked;
     }
     #endregion
 
@@ -114,5 +119,6 @@ public class InputManager : MonoBehaviour
     private void onJump(InputAction.CallbackContext context)        => jumping          = context.ReadValueAsButton();
     private void onCrouch(InputAction.CallbackContext context)      => crouching        = context.ReadValueAsButton();
     private void onModeChanged(InputAction.CallbackContext context) => changingGunMode  = context.ReadValueAsButton();
+    private void onThrowRocked(InputAction.CallbackContext context) => isHoldingRock    = context.ReadValueAsButton();
     #endregion
 }

@@ -13,12 +13,12 @@ using Random = UnityEngine.Random;
 public abstract class GunBase : MonoBehaviour
 {
     #region - Dependencies -
-    protected Animator _animator;
-    [HideInInspector] public FPS_Controller _playerController;
-    protected InputManager _inputManager;
-    [SerializeField] protected GunDataConteiner _gunDataConteiner;
-    protected GunProceduralRecoil _recoilAsset => GetComponent<GunProceduralRecoil>();
-    private Transform _aimHolder => _playerController.aimHolder;
+    [HideInInspector] public    Animator                _animator;
+    [HideInInspector] public    FPS_Controller          _playerController;
+    [SerializeField] protected  GunDataConteiner        _gunDataConteiner;
+    protected                   InputManager            _inputManager;
+    protected                   GunProceduralRecoil     _recoilAsset => GetComponent<GunProceduralRecoil>();
+    private                     Transform               _aimHolder => _playerController.aimHolder;
     #endregion
 
     #region - Ammo System Data -
@@ -50,12 +50,12 @@ public abstract class GunBase : MonoBehaviour
     #endregion
 
     #region - Animation Hashes -
-    private int _isWalkingHash      = Animator.StringToHash("isWalking");
-    private int _isRunningHash      = Animator.StringToHash("isRunning");
-    protected int _isReloadingHash    = Animator.StringToHash("isReloading");
-    protected int _reloadFactor       = Animator.StringToHash("ReloadFactor");
-    protected int _holstWeaponHash    = Animator.StringToHash("HolstWeapon");
-    protected int _shootHash          = Animator.StringToHash("Shoot");
+    private     int _isWalkingHash      = Animator.StringToHash("isWalking");
+    private     int _isRunningHash      = Animator.StringToHash("isRunning");
+    protected   int _isReloadingHash    = Animator.StringToHash("isReloading");
+    protected   int _reloadFactor       = Animator.StringToHash("ReloadFactor");
+    protected   int _holstWeaponHash    = Animator.StringToHash("HolstWeapon");
+    protected   int _shootHash          = Animator.StringToHash("Shoot");
     #endregion
 
     #region - Gun Mode System -
@@ -141,6 +141,7 @@ public abstract class GunBase : MonoBehaviour
             _isAiming = _inputManager.aiming;
             _recoilAsset.isAiming = _isAiming;
 
+            if (_playerController._isThrowingRock) return;
             /* The below statements verifies if the player triggered the reload button
              * and if is not reloading, if the current mag ammo is different  from its
              * maximum and if has any ammo in the inventory.
@@ -245,7 +246,7 @@ public abstract class GunBase : MonoBehaviour
     //        reload  animation  is  played, otherwise, one  of  two reload
     //        variations is randomly selected.
     // ----------------------------------------------------------------------
-    public virtual void Reload()
+    protected virtual void Reload()
     {
         _isReloading = true;
 
@@ -405,6 +406,13 @@ public abstract class GunBase : MonoBehaviour
         gameObject.SetActive(false);
         _playerController._changingWeapon = false;
         _playerController.EquipCurrentGun();
+    }
+    #endregion
+
+    #region - Throw Rock System -
+    public void ThrowRock()
+    {
+        Debug.Log("Rock Throwed!");
     }
     #endregion
 }
