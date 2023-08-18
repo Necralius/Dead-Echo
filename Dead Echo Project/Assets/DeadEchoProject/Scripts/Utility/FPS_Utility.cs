@@ -22,7 +22,7 @@ namespace NekraByte
         public class GunData
         {
             [Header("Gun Aspects")]
-            [SerializeField] private string gunName = "GunName";
+            public string gunName = "GunName";
             public ShootType shootType;
             public GunMode gunMode;
 

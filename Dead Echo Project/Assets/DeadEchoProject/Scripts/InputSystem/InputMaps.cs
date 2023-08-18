@@ -272,7 +272,7 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""a1cc373f-2eb8-4b61-a613-8005ab0c6b94"",
-                    ""path"": ""<Keyboard>/t"",
+                    ""path"": ""<Keyboard>/b"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -305,7 +305,7 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""6b5577c7-2a41-4522-b89e-e8b4853b2882"",
-                    ""path"": ""<Keyboard>/f"",
+                    ""path"": ""<Keyboard>/t"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

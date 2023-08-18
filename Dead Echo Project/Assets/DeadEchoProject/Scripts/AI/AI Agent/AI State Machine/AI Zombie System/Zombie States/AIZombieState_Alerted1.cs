@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class AIZombieState_Alerted1 : AIZombieState
 {
@@ -84,7 +85,7 @@ public class AIZombieState_Alerted1 : AIZombieState
         if ((_zombieStateMachine.targetType == AITargetType.Audio || _zombieStateMachine.targetType == AITargetType.Visual_Light) && !_zombieStateMachine.isTargetReached)
         {
             angle = FindSignedAngle(_zombieStateMachine.transform.forward,
-                                            _zombieStateMachine.targetPosition - _zombieStateMachine.transform.position);
+                                            _zombieStateMachine.targetPosition - _zombieStateMachine.transform.position);       
 
             if (_zombieStateMachine.targetType == AITargetType.Audio && Mathf.Abs(angle) < _threatAngleThreshold) return AIStateType.Pursuit;
 

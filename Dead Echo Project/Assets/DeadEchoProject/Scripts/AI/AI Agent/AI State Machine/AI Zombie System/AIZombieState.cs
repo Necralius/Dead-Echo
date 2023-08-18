@@ -48,7 +48,9 @@ public abstract class AIZombieState : AIState
             }
             else if (other.CompareTag("Flash Light") && curType != AITargetType.Visual_Player)
             {
-                BoxCollider flashlightTrigger = (BoxCollider)other;
+                if (!other.GetComponent<BoxCollider>()) return;
+
+                BoxCollider flashlightTrigger = other.GetComponent<BoxCollider>();
                 float distanceToThreat = Vector3.Distance(_zombieStateMachine.sensorPosition, flashlightTrigger.transform.position);
                 float zSize = flashlightTrigger.size.z * flashlightTrigger.transform.lossyScale.z;
 
@@ -61,7 +63,9 @@ public abstract class AIZombieState : AIState
             }
             else if (other.CompareTag("AI Sound Emitter"))
             {
-                SphereCollider soundTrigger = (SphereCollider) other;
+                if (!other.GetComponent<SphereCollider>()) return;
+
+                SphereCollider soundTrigger = other.GetComponent<SphereCollider>();
                 if (soundTrigger == null) return;
 
                 Vector3 agentSensorPosition = _zombieStateMachine.sensorPosition;

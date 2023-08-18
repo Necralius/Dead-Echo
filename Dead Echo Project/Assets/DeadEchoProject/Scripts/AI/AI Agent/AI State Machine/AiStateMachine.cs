@@ -100,8 +100,8 @@ public abstract class AiStateMachine : MonoBehaviour
         }
     }
     public bool useRootPosition { get => _rootPositionRefCount > 0;  }
-    public bool useRootRotation { get => _rootRotationRefCount > 0;  }   
-    public AITargetType targetType {  get => _target.type;  }
+    public bool useRootRotation { get => _rootRotationRefCount > 0;  }
+    public AITargetType targetType { get => _target.type; }
     public Vector3 targetPosition { get => _target.position;  }
     public int targetColliderID { get => _target.collider ? _target.collider.GetInstanceID() : -1; }
 

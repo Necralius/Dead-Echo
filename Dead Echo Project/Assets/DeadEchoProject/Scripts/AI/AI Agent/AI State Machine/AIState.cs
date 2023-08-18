@@ -32,18 +32,24 @@ public abstract class AIState : MonoBehaviour
     // ----------------------------------------------------------------------
     public static void ConvertSphereColliderToWorldSpace(SphereCollider col, out Vector3 pos, out float radius)
     {
+        // Default Values
         pos = Vector3.zero;
-        radius = 0f;
+        radius = 0.0f;
 
-        if (col == null) return;
-        //Calculate world space position of shpere center
+        // If no valid sphere collider return
+        if (col == null)
+            return;
+
+        // Calculate world space position of sphere center
         pos = col.transform.position;
         pos.x += col.center.x * col.transform.lossyScale.x;
         pos.y += col.center.y * col.transform.lossyScale.y;
         pos.z += col.center.z * col.transform.lossyScale.z;
 
-        //Calculate world space radius of sphere
-        radius = Mathf.Max(col.radius * col.transform.lossyScale.x, col.radius * col.transform.lossyScale.y);
+        // Calculate world space radius of sphere
+        radius = Mathf.Max(col.radius * col.transform.lossyScale.x,
+                            col.radius * col.transform.lossyScale.y);
+
         radius = Mathf.Max(radius, col.radius * col.transform.lossyScale.z);
     }
 
@@ -53,7 +59,8 @@ public abstract class AIState : MonoBehaviour
     // ----------------------------------------------------------------------
     public static float FindSignedAngle(Vector3 fromVector, Vector3 toVector)
     {
-        if (fromVector == toVector) return 0f;
+        if (fromVector == toVector)
+            return 0.0f;
 
         float angle = Vector3.Angle(fromVector, toVector);
         Vector3 cross = Vector3.Cross(fromVector, toVector);

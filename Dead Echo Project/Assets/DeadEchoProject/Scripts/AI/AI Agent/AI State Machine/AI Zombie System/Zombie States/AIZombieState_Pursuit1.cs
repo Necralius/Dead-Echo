@@ -58,8 +58,10 @@ public class AIZombieState_Pursuit1 : AIZombieState
         }
 
         if (_zombieStateMachine.navAgent.isPathStale ||
-            (!_zombieStateMachine.navAgent.hasPath && !_zombieStateMachine.navAgent.pathPending) ||
-            _zombieStateMachine.navAgent.pathStatus != NavMeshPathStatus.PathComplete) return AIStateType.Alerted;
+            (!_zombieStateMachine.navAgent.hasPath && 
+            !_zombieStateMachine.navAgent.pathPending) ||
+            _zombieStateMachine.navAgent.pathStatus != 
+            NavMeshPathStatus.PathComplete) return AIStateType.Alerted;
 
         if (_zombieStateMachine.navAgent.pathPending) _zombieStateMachine.speed = 0;
         else

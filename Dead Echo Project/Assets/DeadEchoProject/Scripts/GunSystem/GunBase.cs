@@ -19,6 +19,8 @@ public abstract class GunBase : MonoBehaviour
     protected                   InputManager            _inputManager;
     protected                   GunProceduralRecoil     _recoilAsset => GetComponent<GunProceduralRecoil>();
     private                     Transform               _aimHolder => _playerController.aimHolder;
+    public                      ParticleSystem          _muzzleFlash;
+    public                      Transform               _rockThrowPosition;
     #endregion
 
     #region - Ammo System Data -
@@ -64,7 +66,6 @@ public abstract class GunBase : MonoBehaviour
     int gunModeIndex = 0;
     #endregion
 
-    public ParticleSystem muzzleFlash;
 
     //----------------------------------- Methods -----------------------------------//
 
@@ -141,7 +142,7 @@ public abstract class GunBase : MonoBehaviour
             _isAiming = _inputManager.aiming;
             _recoilAsset.isAiming = _isAiming;
 
-            if (_playerController._isThrowingRock) return;
+            if (_playerController._isThrowingObject) return;
             /* The below statements verifies if the player triggered the reload button
              * and if is not reloading, if the current mag ammo is different  from its
              * maximum and if has any ammo in the inventory.
@@ -209,7 +210,7 @@ public abstract class GunBase : MonoBehaviour
 
         _recoilAsset.RecoilFire();
         _magAmmo--;
-        muzzleFlash.Emit(1);
+        _muzzleFlash.Emit(1);
         UI_Update();
 
         yield return new WaitForSeconds(_gunDataConteiner.gunData.rateOfFire);
@@ -298,6 +299,7 @@ public abstract class GunBase : MonoBehaviour
         if (!_isEquiped) return;
         _playerController.txt_magAmmo.text = ($"{_magAmmo}");
         _playerController.txt_bagAmmo.text = ($"/{_bagAmmo}");
+        _playerController.txt_GunName.text = _gunDataConteiner.gunData.gunName;
 
         UI_Manager.Instance.UpdateMode(_gunDataConteiner.gunData.gunMode, gunModes);
     }
@@ -412,7 +414,17 @@ public abstract class GunBase : MonoBehaviour
     #region - Throw Rock System -
     public void ThrowRock()
     {
-        Debug.Log("Rock Throwed!");
+        GameObject rock = ObjectPooler.Instance.SpawnFromPool("Rock", _rockThrowPosition.position, _rockThrowPosition.rotation);
+        if (rock.GetComponent<Rigidbody>())
+        {
+            Rigidbody rb = rock.GetComponent<Rigidbody>();
+            Vector3 forceToAdd = _playerController.cameraObject.transform.forward *
+                _playerController.objectThrowForce +
+                transform.up *
+                _playerController.objectThrowUpForce;
+
+            rb.AddForce(forceToAdd, ForceMode.Impulse);
+        }
     }
     #endregion
 }

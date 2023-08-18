@@ -2,7 +2,6 @@ using NekraliusDevelopmentStudio;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using static NekraByte.FPS_Utility;
 
@@ -36,6 +35,7 @@ public class FPS_Controller : MonoBehaviour
     [Header("UI Elements")]
     public TextMeshProUGUI txt_magAmmo;
     public TextMeshProUGUI txt_bagAmmo;
+    public TextMeshProUGUI txt_GunName;
     #endregion
 
     #region - Player Data Settings -
@@ -88,8 +88,8 @@ public class FPS_Controller : MonoBehaviour
     public bool _isGrounded         = true;
     public bool _inAir              = false;
     public bool _changingWeapon     = false;
+    public bool _isThrowingObject    = false;
     private bool _walkingBackwards  = false;
-    public bool _isThrowingRock    = false;
     #endregion
 
     #region - Private Data -
@@ -126,8 +126,15 @@ public class FPS_Controller : MonoBehaviour
     #endregion
 
     #region - Animation Hashes -
-    private int rockThrowingHash    = Animator.StringToHash("ThrowRock");
-    private int rockThrowCancelHash = Animator.StringToHash("CancelThrowRock");
+    private int objectThrowingHash    = Animator.StringToHash("ThrowObject");
+    private int objectThrowCancelHash = Animator.StringToHash("ObjectThrowCancel");
+    private int objectInstantThrow  = Animator.StringToHash("ObjectInstantThrow");
+    #endregion
+
+    #region - Rock Throwing System -
+    [Header("Rock Throwing Forces")]
+    public float objectThrowForce = 5f;
+    public float objectThrowUpForce = 5f;
     #endregion
 
     // ---------------------------- Methods ----------------------------//
@@ -161,7 +168,7 @@ public class FPS_Controller : MonoBehaviour
             if (!equippedGun._isReloading && !_isSprinting)
             {
                 if (inputManager.throwRockAction.WasPressedThisFrame()) StartThrowing();
-                if (_isThrowingRock)
+                if (_isThrowingObject)
                 {
                     if (inputManager.throwRockAction.WasReleasedThisFrame()) ThrowRock();
 
@@ -400,20 +407,19 @@ public class FPS_Controller : MonoBehaviour
     #region - Throw Rock State -
     private void StartThrowing()
     {
-        equippedGun._animator.SetBool(rockThrowingHash, true);
-        _isThrowingRock = true;
+        equippedGun._animator.SetBool(objectThrowingHash, true);
+        _isThrowingObject = true;
     }
     public void ThrowRock()
     {
-
         //TODO -> Get object from pool and set on position, activate the throw interaction with gravity.
-        _isThrowingRock = false;
-        equippedGun._animator.SetBool(rockThrowingHash, false);
+        equippedGun._animator.SetBool(objectThrowingHash, false);
+        _isThrowingObject = false;
     }
     private void CancelThrowRock()
     {
-        equippedGun._animator.SetTrigger(rockThrowCancelHash);
-        _isThrowingRock = false;
+        equippedGun._animator.SetTrigger(objectThrowCancelHash);
+        _isThrowingObject = false;
     }
     #endregion
 }
