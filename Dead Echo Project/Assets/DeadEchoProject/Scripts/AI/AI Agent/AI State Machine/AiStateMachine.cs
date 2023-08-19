@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public enum AIStateType { None, Idle, Alerted, Patrol, Attack, Feeding, Pursuit, Dead }
-public enum AITargetType { None, Waypoint, Visual_Player, Visual_Light, Visual_Food, Audio }
-public enum AITriggerEventType { Enter, Stay, Exit}
+public enum AIStateType         { None, Idle, Alerted, Patrol, Attack, Feeding, Pursuit, Dead }
+public enum AITargetType        { None, Waypoint, Visual_Player, Visual_Light, Visual_Food, Audio }
+public enum AITriggerEventType  { Enter, Stay, Exit}
 
 // ------------------------------------------------------------------------
 // Class    :  AITarget
@@ -12,72 +12,72 @@ public enum AITriggerEventType { Enter, Stay, Exit}
 // ------------------------------------------------------------------------
 public struct AITarget
 {
-    private AITargetType _type;
-    private Collider _collider;
-    private Vector3 _position;
-    private float _distance;
-    private float _time;
+    private AITargetType    _type;
+    private Collider        _collider;
+    private Vector3         _position;
+    private float           _distance;
+    private float           _time;
 
-    public AITargetType type { get { return _type; } }
-    public Collider collider { get { return _collider; } }
-    public Vector3 position { get { return _position; } }
-    public float distance { get { return _distance; } set { _distance = value; } }
-    public float time { get { return _time; } }
+    public AITargetType type    { get => _type;      }
+    public Collider collider    { get => _collider;  }
+    public Vector3 position     { get => _position;  }
+    public float distance       { get => _distance; set => _distance = value;  }
+    public float time           { get => _time;      }
 
     public void Set(AITargetType targetType, Collider targetCollider, Vector3 targetPosition, float targetDistance)
     {
-        _type = targetType;
-        _collider = targetCollider;
-        _position = targetPosition;
-        _distance = targetDistance;
-        _time = Time.time;
+        _type       = targetType;
+        _collider   = targetCollider;
+        _position   = targetPosition;
+        _distance   = targetDistance;
+        _time       = Time.time;
     }
     public void Clear()
     {
-        _type = AITargetType.None;
-        _collider = null;
-        _position = Vector3.zero;
-        _distance = Mathf.Infinity;
-        _time = 0.0f;
+        _type       = AITargetType.None;
+        _collider   = null;
+        _position   = Vector3.zero;
+        _distance   = Mathf.Infinity;
+        _time       = 0.0f;
     }
 }
 
 public abstract class AiStateMachine : MonoBehaviour
 {
     //Public
-    public AITarget  VisualThreat = new AITarget();
-    public AITarget AudioThreat = new AITarget();
+    public AITarget  VisualThreat   = new AITarget();
+    public AITarget AudioThreat     = new AITarget();
 
     //Protected
-    protected AIState _currentState;
-    protected Dictionary<AIStateType, AIState> _states = new Dictionary<AIStateType, AIState>();
-    protected AITarget _target = new AITarget();
-    protected int _rootPositionRefCount = 0;
-    protected int _rootRotationRefCount = 0;
-    protected bool _isTargetReached = false;
+    protected AIState                           _currentState;
+    protected Dictionary<AIStateType, AIState>  _states                 = new Dictionary<AIStateType, AIState>();
+    protected AITarget                          _target                 = new AITarget();
+    protected int                               _rootPositionRefCount   = 0;
+    protected int                               _rootRotationRefCount   = 0;
+    protected bool                              _isTargetReached        = false;
 
     //Protected Inspector Assigned
-    [SerializeField] protected AIStateType _currentStateType = AIStateType.Idle;
-    [SerializeField] protected SphereCollider _targetTrigger = null;
-    [SerializeField] protected SphereCollider _sensorTrigger = null;
-    [SerializeField, Range(0, 15)] protected float _stoppingDistance = 1.0f;
+    [SerializeField] protected AIStateType          _currentStateType   = AIStateType.Idle;
+    [SerializeField] protected SphereCollider       _targetTrigger      = null;
+    [SerializeField] protected SphereCollider       _sensorTrigger      = null;
+    [SerializeField, Range(0, 15)] protected float  _stoppingDistance   = 1.0f;
 
-    [SerializeField] protected WaypointNetwork _waypointNetwork = null;
-    [SerializeField] protected bool _randomPatrol = false;
-    [SerializeField] protected int _currentWaypoint = -1;
+    [SerializeField] protected WaypointNetwork  _waypointNetwork = null;
+    [SerializeField] protected bool             _randomPatrol = false;
+    [SerializeField] protected int              _currentWaypoint = -1;
 
     //Component Cache
-    protected Animator _animator = null;
-    protected NavMeshAgent _navAgent = null;
-    protected Collider _collider = null;
-    protected Transform _transform = null;
+    protected Animator      _animator   = null;
+    protected NavMeshAgent  _navAgent   = null;
+    protected Collider      _collider   = null;
+    protected Transform     _transform  = null;
 
     //Public properties
-    public bool isTargetReached { get =>_isTargetReached; }
-    public bool inMeleeRange { get; set; }
-    public Animator animator { get => _animator; }
-    public NavMeshAgent navAgent { get => _navAgent; }  
-    public Vector3 sensorPosition
+    public bool             isTargetReached { get =>_isTargetReached; }
+    public bool             inMeleeRange    { get; set; }
+    public Animator         animator        { get => _animator; }
+    public NavMeshAgent     navAgent        { get => _navAgent; }  
+    public Vector3          sensorPosition
     {
         get
         {

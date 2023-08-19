@@ -30,6 +30,7 @@ public class InputManager : MonoBehaviour
     public bool crouching;
     public bool changingGunMode;
     public bool isHoldingRock;
+    public bool flashlightActive;
 
     //Private Data
     public InputActionMap currentMap;
@@ -47,6 +48,8 @@ public class InputManager : MonoBehaviour
     public InputAction aimAction;
     public InputAction gunModeAction;
     public InputAction throwRockAction;
+
+    public InputAction flashLightAction;
 
     public InputAction primaryGun;
     public InputAction secondaryGun;
@@ -69,21 +72,23 @@ public class InputManager : MonoBehaviour
         currentMap      = playerInput.currentActionMap;
 
         //Movment Actions
-        moveAction      = currentMap.FindAction("Move");
-        lookAction      = currentMap.FindAction("Look");
-        sprintAction    = currentMap.FindAction("SprintAction");
-        jumpAction      = currentMap.FindAction("JumpAction");
-        crouchAction    = currentMap.FindAction("CrouchAction");
-        throwRockAction = currentMap.FindAction("ThrowRockAction");
+        moveAction          = currentMap.FindAction("Move");
+        lookAction          = currentMap.FindAction("Look");
+        sprintAction        = currentMap.FindAction("SprintAction");
+        jumpAction          = currentMap.FindAction("JumpAction");
+        crouchAction        = currentMap.FindAction("CrouchAction");
+        throwRockAction     = currentMap.FindAction("ThrowRockAction");
 
         //Gun Behavior Actions
-        reloadAction    = currentMap.FindAction("ReloadAction");
-        shootAction     = currentMap.FindAction("ShootAction");
-        aimAction       = currentMap.FindAction("AimAction");
-        gunModeAction   = currentMap.FindAction("ChangeGunMode");
+        reloadAction        = currentMap.FindAction("ReloadAction");
+        shootAction         = currentMap.FindAction("ShootAction");
+        aimAction           = currentMap.FindAction("AimAction");
+        gunModeAction       = currentMap.FindAction("ChangeGunMode");
 
-        primaryGun      = currentMap.FindAction("PrimaryGun");
-        secondaryGun    = currentMap.FindAction("SecondaryGun"); 
+        flashLightAction    = currentMap.FindAction("FlashLightAction");
+
+        primaryGun          = currentMap.FindAction("PrimaryGun");
+        secondaryGun        = currentMap.FindAction("SecondaryGun"); 
 
         moveAction.performed        += onMove;
         lookAction.performed        += onLook;
@@ -95,6 +100,7 @@ public class InputManager : MonoBehaviour
         crouchAction.performed      += onCrouch;
         gunModeAction.performed     += onModeChanged;
         throwRockAction.performed   += onThrowRocked;
+        flashLightAction.performed  += onFlashlight;
 
         moveAction.canceled         += onMove;
         lookAction.canceled         += onLook;
@@ -106,6 +112,7 @@ public class InputManager : MonoBehaviour
         crouchAction.canceled       += onCrouch;
         gunModeAction.canceled      += onModeChanged;
         throwRockAction.canceled    += onThrowRocked;
+        flashLightAction.canceled   += onFlashlight;
     }
     #endregion
 
@@ -120,5 +127,6 @@ public class InputManager : MonoBehaviour
     private void onCrouch(InputAction.CallbackContext context)      => crouching        = context.ReadValueAsButton();
     private void onModeChanged(InputAction.CallbackContext context) => changingGunMode  = context.ReadValueAsButton();
     private void onThrowRocked(InputAction.CallbackContext context) => isHoldingRock    = context.ReadValueAsButton();
+    private void onFlashlight(InputAction.CallbackContext context)  => flashlightActive = context.ReadValueAsButton();
     #endregion
 }

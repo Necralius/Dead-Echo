@@ -1530,9 +1530,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2656012778308125767}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.031, y: 0.693, z: 0.824}
-  m_LocalScale: {x: 0.06658807, y: 0.076381445, z: 0.2934}
+  m_LocalRotation: {x: -0, y: -0, z: 0.0000000018203536, w: 1}
+  m_LocalPosition: {x: 0.04, y: 0.61, z: 1.12}
+  m_LocalScale: {x: 0.066588074, y: 0.07638145, z: 0.2934}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5581829729557083721}
@@ -1602,7 +1602,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -1621,7 +1621,7 @@ Light:
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 41896.133
-  m_Range: 12.77
+  m_Range: 19.791456
   m_SpotAngle: 64
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -2164,6 +2164,74 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7697209881903680828}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3822845940388274405
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2722520310188757844}
+  - component: {fileID: 8112373656661393955}
+  - component: {fileID: 7893491333872722589}
+  m_Layer: 9
+  m_Name: Melee Zone Trigger
+  m_TagString: Melee Zone
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2722520310188757844
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3822845940388274405}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4615760628217743587}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &8112373656661393955
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3822845940388274405}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.8
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &7893491333872722589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3822845940388274405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4eadb996c2f8f64597723dd6f12a10e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3874597334196941643
 GameObject:
   m_ObjectHideFlags: 0
@@ -3722,6 +3790,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5581829729557083721}
+  - {fileID: 2722520310188757844}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4263279600281329461
@@ -3823,29 +3892,30 @@ MonoBehaviour:
   txt_magAmmo: {fileID: 0}
   txt_bagAmmo: {fileID: 0}
   txt_GunName: {fileID: 0}
-  _walkSpeed: 4
-  _sprintSpeed: 8
-  _crouchSpeed: 2
-  _jumpForce: 10
-  _playerGravity: 30
-  _xLookSensitivity: 1.5
-  _yLookSensitivity: 1.5
-  _upperLookLimit: 80
-  _lowerLookLimit: 80
-  _crouchingCenter: {x: 0, y: 0.5, z: 0}
-  _standingCenter: {x: 0, y: 0, z: 0}
-  _crouchHeight: 0.5
-  _standingHeight: 2
-  _timeToCrouch: 0.25
-  crouchUpLayer:
-    serializedVersion: 2
-    m_Bits: 30519
-  walkBobSpeed: 14
-  walkBobAmount: 0.05
-  sprintBobSpeed: 18
-  sprintBobAmount: 0.1
-  crouchBobSpeed: 8
-  crouchBobAmount: 0.025
+  playerData:
+    _walkSpeed: 4
+    _sprintSpeed: 8
+    _crouchSpeed: 2
+    _jumpForce: 4
+    _playerGravity: 30
+    _xLookSensitivity: 2
+    _yLookSensitivity: 2
+    _upperLookLimit: 80
+    _lowerLookLimit: 80
+    _crouchHeight: 0.5
+    _standingHeight: 2
+    _timeToCrouch: 0.25
+    _crouchUpLayer:
+      serializedVersion: 2
+      m_Bits: 0
+    _crouchingCenter: {x: 0, y: 0.5, z: 0}
+    _standingCenter: {x: 0, y: 0, z: 0}
+    walkBobSpeed: 14
+    walkBobAmount: 0.05
+    sprintBobSpeed: 18
+    sprintBobAmount: 0.11
+    crouchBobSpeed: 8
+    crouchBobAmount: 0.025
   _canMove: 1
   _isWalking: 0
   _isSprinting: 0
@@ -3857,11 +3927,12 @@ MonoBehaviour:
   _inAir: 0
   _changingWeapon: 0
   _isThrowingObject: 0
+  _flashlightActive: 0
   _moveInput: {x: 0, y: 0}
   _lookInput: {x: 0, y: 0}
   gunShootJam: {fileID: 8300000, guid: bf88a3d6f1a793745bca5263a2f8d632, type: 3}
-  aimClip: {fileID: 0}
   changeGunMode: {fileID: 8300000, guid: bb68c15c2b84ff943880d31f4da04df1, type: 3}
+  flashlightSound: {fileID: 0}
   weaponSwayObject: {fileID: 2803063961065135608}
   idleSwayObject: {fileID: 4114436444354716579}
   swayData:
@@ -3898,6 +3969,7 @@ MonoBehaviour:
   healthValue: 100
   objectThrowForce: 5
   objectThrowUpForce: 5
+  flashLight: {fileID: 2656012778308125767}
 --- !u!208 &7951933382287842502
 NavMeshObstacle:
   m_ObjectHideFlags: 0

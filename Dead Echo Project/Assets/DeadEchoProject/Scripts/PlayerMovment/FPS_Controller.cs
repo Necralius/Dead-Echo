@@ -38,39 +38,9 @@ public class FPS_Controller : MonoBehaviour
     public TextMeshProUGUI txt_GunName;
     #endregion
 
-    #region - Player Data Settings -
-    [Header("Player Movmennt Settings")]
-    [SerializeField, Range(0.01f, 10f)] private float _walkSpeed          = 4f;
-    [SerializeField, Range(0.01f, 30f)] private float _sprintSpeed        = 8f;
-    [SerializeField, Range(0.01f, 30f)] private float _crouchSpeed        = 2f;
-    [SerializeField, Range(0.01f, 50f)] private float _jumpForce          = 4f;
-    [SerializeField, Range(0.01f, 100f)] private float _playerGravity     = 30f;
-
-    [Header("Controller Settings Data")]
-    [SerializeField, Range(0.01f, 10f)]  private float _xLookSensitivity  = 2f;
-    [SerializeField, Range(0.01f, 10f)]  private float _yLookSensitivity  = 2f;
-    [SerializeField, Range(0.01f, 100f)] private float _upperLookLimit    = 80f;
-    [SerializeField, Range(0.01f, 100f)] private float _lowerLookLimit    = 80f;
-
-    [Header("Crouch Settings")]
-    [SerializeField] private Vector3 _crouchingCenter               = new Vector3(0, 0.5f, 0);
-    [SerializeField] private Vector3 _standingCenter                = new Vector3(0, 0, 0);
-    [SerializeField, Range(0.1f, 2f)] private float _crouchHeight   = 0.5f;
-    [SerializeField, Range(0.1f, 2f)] private float _standingHeight = 2f;
-    [SerializeField] private float _timeToCrouch                    = 0.25f;
-    [SerializeField] private LayerMask crouchUpLayer;
-    #endregion
-
-    #region - HeadBob System -
-    [Header("HeadBob Settings")]
-    [SerializeField, Range(0, 100)] private float walkBobSpeed      = 14f;
-    [SerializeField, Range(0, 100)] private float walkBobAmount     = 0.05f;
-
-    [SerializeField, Range(0, 100)] private float sprintBobSpeed    = 18f;
-    [SerializeField, Range(0, 100)] private float sprintBobAmount   = 0.11f;
-
-    [SerializeField, Range(0, 100)] private float crouchBobSpeed    = 8f;
-    [SerializeField, Range(0, 100)] private float crouchBobAmount   = 0.025f;
+    #region - Player Data -
+    [Header("Player Data")]
+    public PlayerMovmentData playerData;
 
     private float defaultYPost = 0;
     private float _timer;
@@ -78,18 +48,19 @@ public class FPS_Controller : MonoBehaviour
 
     #region - Player State -
     [Header("Player State")]
-    public bool _canMove            = true;
-    public bool _isWalking          = false;
-    public bool _isSprinting        = false;
-    public bool _isCrouching        = false;
-    public bool _canCrouch          = false;
-    public bool _duringCrouch       = false;
-    public bool _isMoving           = false;
-    public bool _isGrounded         = true;
-    public bool _inAir              = false;
-    public bool _changingWeapon     = false;
-    public bool _isThrowingObject    = false;
-    private bool _walkingBackwards  = false;
+    public      bool _canMove            = true;
+    public      bool _isWalking          = false;
+    public      bool _isSprinting        = false;
+    public      bool _isCrouching        = false;
+    public      bool _canCrouch          = false;
+    public      bool _duringCrouch       = false;
+    public      bool _isMoving           = false;
+    public      bool _isGrounded         = true;
+    public      bool _inAir              = false;
+    public      bool _changingWeapon     = false;
+    public      bool _isThrowingObject   = false;
+    public      bool _flashlightActive   = false;
+    private     bool _walkingBackwards   = false;
     #endregion
 
     #region - Private Data -
@@ -102,8 +73,8 @@ public class FPS_Controller : MonoBehaviour
     #region - Audio System -
     [Header("Gun Public Sounds")]
     public AudioClip gunShootJam;
-    public AudioClip aimClip;
     public AudioClip changeGunMode;
+    public AudioClip flashlightSound;
     #endregion
 
     #region - Gun Change System -
@@ -122,7 +93,7 @@ public class FPS_Controller : MonoBehaviour
 
     #region - Player Health -
     [SerializeField] private float healthValue;
-    public float HealthValue { get { return healthValue; } set { healthValue = value; } }
+    public float HealthValue { get => healthValue; set => healthValue = value; }
     #endregion
 
     #region - Animation Hashes -
@@ -135,6 +106,12 @@ public class FPS_Controller : MonoBehaviour
     [Header("Rock Throwing Forces")]
     public float objectThrowForce = 5f;
     public float objectThrowUpForce = 5f;
+    #endregion
+
+    #region - Flash Light System -
+    public GameObject flashLight;
+
+
     #endregion
 
     // ---------------------------- Methods ----------------------------//
@@ -176,6 +153,7 @@ public class FPS_Controller : MonoBehaviour
                         inputManager.reloadAction.WasPressedThisFrame()) CancelThrowRock();
                 }
             }
+            if (inputManager.flashLightAction.WasPressedThisFrame()) ChangeFlashlightState();
         }
     }
     #endregion
@@ -189,7 +167,7 @@ public class FPS_Controller : MonoBehaviour
     private void UpdateCalls()
     {
         _isMoving       =   controller.velocity != Vector3.zero;
-        _isSprinting    =   inputManager.sprint && _isMoving && !_walkingBackwards;
+        _isSprinting    =   inputManager.sprint && _isMoving && !_walkingBackwards && !_isCrouching;
         _isWalking      =   _isMoving;
         _isGrounded     =   controller.isGrounded;
         _inAir          =   !_isGrounded;
@@ -211,12 +189,12 @@ public class FPS_Controller : MonoBehaviour
         //First the method get the Y vector look input and multiplies it for the Y vector sensitivity,
         //later this value is clamped under an certain limit represented as two variables (UpperLookLimit and LowerLookLimit).
 
-        _rotationX -= _lookInput.y * _yLookSensitivity / 100;
-        _rotationX = Mathf.Clamp(_rotationX, -_upperLookLimit, _lowerLookLimit);
+        _rotationX -= _lookInput.y * playerData._yLookSensitivity / 100;
+        _rotationX = Mathf.Clamp(_rotationX, -playerData._upperLookLimit, playerData._lowerLookLimit);
         bodyCamera.transform.localRotation = Quaternion.Euler(_rotationX, 0, 0);
 
         //Also, the method handles the X rotation, appling it only in the body.
-        transform.rotation *= Quaternion.Euler(0, _lookInput.x * _xLookSensitivity / 100, 0);
+        transform.rotation *= Quaternion.Euler(0, _lookInput.x * playerData._xLookSensitivity / 100, 0);
     }
     #endregion
 
@@ -227,10 +205,10 @@ public class FPS_Controller : MonoBehaviour
     // ----------------------------------------------------------------------
     private void MoveHandler()
     {
-        float speedValue = _isSprinting ? _sprintSpeed : (_isCrouching ? _crouchSpeed : _walkSpeed);
+        float speedValue = _isSprinting ? playerData._sprintSpeed : (_isCrouching ? playerData._crouchSpeed : playerData._walkSpeed);
 
         _walkingBackwards = inputManager.Move.y == -1;
-        if (_walkingBackwards) speedValue = _isCrouching ? _crouchSpeed : _walkSpeed;
+        if (_walkingBackwards) speedValue = _isCrouching ? playerData._crouchSpeed : playerData._walkSpeed;
 
         _moveInput = new Vector2(inputManager.Move.y * speedValue, inputManager.Move.x * speedValue);
 
@@ -238,7 +216,7 @@ public class FPS_Controller : MonoBehaviour
         _moveDirection = (transform.TransformDirection(Vector3.forward) * _moveInput.x) + (transform.TransformDirection(Vector3.right) * _moveInput.y);
         _moveDirection.y = moveDirectionY;
 
-        if (!controller.isGrounded) _moveDirection.y -= _playerGravity * Time.deltaTime;
+        if (!controller.isGrounded) _moveDirection.y -= playerData._playerGravity * Time.deltaTime;
         controller.Move(_moveDirection * Time.deltaTime);
     }
     #endregion
@@ -250,7 +228,7 @@ public class FPS_Controller : MonoBehaviour
     // ----------------------------------------------------------------------
     private void JumpHandler()
     {
-        if (_isGrounded) if (inputManager.jumping) _moveDirection.y = _jumpForce;
+        if (_isGrounded) if (inputManager.jumping) _moveDirection.y = playerData._jumpForce;
     }
     #endregion
 
@@ -276,20 +254,20 @@ public class FPS_Controller : MonoBehaviour
     // ----------------------------------------------------------------------
     private IEnumerator CrouchAction()
     {
-        if (_isCrouching && Physics.Raycast(bodyCamera.transform.position, Vector3.up, 1.5f, crouchUpLayer)) yield break;
+        if (_isCrouching && Physics.Raycast(bodyCamera.transform.position, Vector3.up, 1.5f, playerData._crouchUpLayer)) yield break;
 
         _duringCrouch = true;
 
         float timeElapsed = 0;
-        float targetHeight = _isCrouching ? _standingHeight : _crouchHeight;
+        float targetHeight = _isCrouching ? playerData._standingHeight : playerData._crouchHeight;
         float currentHeight = controller.height;
-        Vector3 targetCenter = _isCrouching ? _standingCenter : _crouchingCenter;
+        Vector3 targetCenter = _isCrouching ? playerData._standingCenter : playerData._crouchingCenter;
         Vector3 currentCenter = controller.center;
 
-        while(timeElapsed < _timeToCrouch)
+        while(timeElapsed < playerData._timeToCrouch)
         {
-            controller.height = Mathf.Lerp(currentHeight, targetHeight, timeElapsed / _timeToCrouch);
-            controller.center = Vector3.Lerp(currentCenter, targetCenter, timeElapsed / _timeToCrouch);
+            controller.height = Mathf.Lerp(currentHeight, targetHeight, timeElapsed / playerData._timeToCrouch);
+            controller.center = Vector3.Lerp(currentCenter, targetCenter, timeElapsed / playerData._timeToCrouch);
             timeElapsed += Time.deltaTime;
             yield return null;
         }
@@ -311,9 +289,9 @@ public class FPS_Controller : MonoBehaviour
     private void HeadBobHandler()
     {
         if (!_isMoving) return;
-        _timer += Time.deltaTime * (_isCrouching ? crouchBobSpeed : _isSprinting ? sprintBobSpeed : walkBobSpeed);
+        _timer += Time.deltaTime * (_isCrouching ? playerData.crouchBobSpeed : _isSprinting ? playerData.sprintBobSpeed : playerData.walkBobSpeed);
         bodyCamera.transform.localPosition = new Vector3(bodyCamera.transform.localPosition.x,
-            defaultYPost + Mathf.Sin(_timer) * (_isCrouching ? crouchBobAmount : _isSprinting ? sprintBobAmount : walkBobAmount)
+            defaultYPost + Mathf.Sin(_timer) * (_isCrouching ? playerData.crouchBobAmount : _isSprinting ? playerData.sprintBobAmount : playerData.walkBobAmount)
             , bodyCamera.transform.localPosition.z);
     }
     #endregion
@@ -420,6 +398,28 @@ public class FPS_Controller : MonoBehaviour
     {
         equippedGun._animator.SetTrigger(objectThrowCancelHash);
         _isThrowingObject = false;
+    }
+    #endregion
+
+    #region - Sound System -
+    private void SS_Flashlight()
+    {
+        if (!flashlightSound.Equals(null)) AudioSystem.Instance.PlayGunClip(flashlightSound);
+    }
+    #endregion
+
+    #region - Flashlight System -
+    private void ChangeFlashlightState()
+    {
+        flashLight.SetActive(!flashLight.activeInHierarchy);
+        SS_Flashlight();
+    }
+    #endregion
+
+    #region - Damage System -
+    public void PlayerDamage(float value)
+    {
+        Debug.Log("Player suffered " + value.ToString() + " of damage.");
     }
     #endregion
 }

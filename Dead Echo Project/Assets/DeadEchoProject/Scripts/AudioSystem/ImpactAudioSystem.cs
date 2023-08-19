@@ -8,12 +8,14 @@ public class ImpactAudioSystem : MonoBehaviour
     private AudioSource source => GetComponent<AudioSource>();
     private SphereCollider col => GetComponent<SphereCollider>();
     #endregion
-    public float defaultColliderSize = 3f;
+    public float timeToDeactive         = 3f;
+
     #region - Data -
     [Header("Audio Data")]
     [SerializeField] private List<AudioClip> clips;
-    private float timeActive = 1f;
-    private float timer = 0f;
+    private float timeActive            = 1f;
+    private float timer                 = 0f;
+    private float destructionTimer      = 0f;
     #endregion
 
     private void OnValidate()
@@ -30,7 +32,8 @@ public class ImpactAudioSystem : MonoBehaviour
     {
         col.enabled = true;
         timer = 0;
-        source.PlayOneShot(clips[Random.Range(0, clips.Count)]);
+        destructionTimer = 0;
+        AudioSystem.Instance.PlayEffectSound(clips[Random.Range(0, clips.Count)], new Vector2(0.60f, 0.70f), new Vector2(0.95f, 1f), source);
     }
     // ----------------------------------------------------------------------
     // Name: Update
@@ -38,9 +41,13 @@ public class ImpactAudioSystem : MonoBehaviour
     // ----------------------------------------------------------------------
     private void Update()
     {
+        destructionTimer += Time.deltaTime;
+        if (destructionTimer >= timeToDeactive) gameObject.SetActive(false);
+
         if (timer >= timeActive)
         {
-            col.radius = defaultColliderSize;
+            col.enabled = false;
+            //col.radius = defaultColliderSize;
             return;
         }
         timer += Time.deltaTime;

@@ -162,5 +162,46 @@ namespace NekraByte
             #endregion
         }
         #endregion
+
+        #region - Player Movment Data Conteiner -
+        [Serializable]
+        public class PlayerMovmentData
+        {
+            #region - Player Data Settings -
+            [Header("Player Movmennt Settings")]
+            [Range(0.01f, 10f)]     public float _walkSpeed         = 4.0f;
+            [Range(0.01f, 30f)]     public float _sprintSpeed       = 8.0f;
+            [Range(0.01f, 30f)]     public float _crouchSpeed       = 2.0f;
+            [Range(0.01f, 50f)]     public float _jumpForce         = 4.0f;
+            [Range(0.01f, 100f)]    public float _playerGravity     = 30f;
+
+            [Header("Controller Settings Data")]
+            [Range(0.01f, 10f)]     public float _xLookSensitivity  = 2.0f;
+            [Range(0.01f, 10f)]     public float _yLookSensitivity  = 2.0f;
+            [Range(0.01f, 100f)]    public float _upperLookLimit    = 80f;
+            [Range(0.01f, 100f)]    public float _lowerLookLimit    = 80f;
+
+            [Header("Crouch Settings")]
+            [Range(0.1f, 2f)]       public float _crouchHeight      = 0.5f; 
+            [Range(0.1f, 2f)]       public float _standingHeight    = 2.0f;
+            public float                         _timeToCrouch      = 0.25f;
+            public LayerMask                     _crouchUpLayer;
+            public Vector3                       _crouchingCenter   = new Vector3(0, 0.5f, 0);
+            public Vector3                       _standingCenter    = new Vector3(0, 0, 0);
+            #endregion
+
+            #region - HeadBob System -
+            [Header("HeadBob Settings")]
+            [Range(0, 100)] public float walkBobSpeed       = 14.0f;
+            [Range(0, 100)] public float walkBobAmount      = 0.05f;
+
+            [Range(0, 100)] public float sprintBobSpeed     = 18.0f;
+            [Range(0, 100)] public float sprintBobAmount    = 0.11f;
+
+            [Range(0, 100)] public float crouchBobSpeed     = 8.000f;
+            [Range(0, 100)] public float crouchBobAmount    = 0.025f;
+            #endregion
+        }
+        #endregion
     }
 }

@@ -134,6 +134,15 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""FlashLightAction"",
+                    ""type"": ""Button"",
+                    ""id"": ""98563690-a0f4-47e8-856a-3a81017236b3"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -312,6 +321,17 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
                     ""action"": ""ThrowRockAction"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c1fe51f1-09d8-4d1b-905e-c837d0d15845"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FlashLightAction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -332,6 +352,7 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
         m_PC_Map_PrimaryGun = m_PC_Map.FindAction("PrimaryGun", throwIfNotFound: true);
         m_PC_Map_SecondaryGun = m_PC_Map.FindAction("SecondaryGun", throwIfNotFound: true);
         m_PC_Map_ThrowRockAction = m_PC_Map.FindAction("ThrowRockAction", throwIfNotFound: true);
+        m_PC_Map_FlashLightAction = m_PC_Map.FindAction("FlashLightAction", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -405,6 +426,7 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
     private readonly InputAction m_PC_Map_PrimaryGun;
     private readonly InputAction m_PC_Map_SecondaryGun;
     private readonly InputAction m_PC_Map_ThrowRockAction;
+    private readonly InputAction m_PC_Map_FlashLightAction;
     public struct PC_MapActions
     {
         private @InputMaps m_Wrapper;
@@ -421,6 +443,7 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
         public InputAction @PrimaryGun => m_Wrapper.m_PC_Map_PrimaryGun;
         public InputAction @SecondaryGun => m_Wrapper.m_PC_Map_SecondaryGun;
         public InputAction @ThrowRockAction => m_Wrapper.m_PC_Map_ThrowRockAction;
+        public InputAction @FlashLightAction => m_Wrapper.m_PC_Map_FlashLightAction;
         public InputActionMap Get() { return m_Wrapper.m_PC_Map; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -466,6 +489,9 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
             @ThrowRockAction.started += instance.OnThrowRockAction;
             @ThrowRockAction.performed += instance.OnThrowRockAction;
             @ThrowRockAction.canceled += instance.OnThrowRockAction;
+            @FlashLightAction.started += instance.OnFlashLightAction;
+            @FlashLightAction.performed += instance.OnFlashLightAction;
+            @FlashLightAction.canceled += instance.OnFlashLightAction;
         }
 
         private void UnregisterCallbacks(IPC_MapActions instance)
@@ -506,6 +532,9 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
             @ThrowRockAction.started -= instance.OnThrowRockAction;
             @ThrowRockAction.performed -= instance.OnThrowRockAction;
             @ThrowRockAction.canceled -= instance.OnThrowRockAction;
+            @FlashLightAction.started -= instance.OnFlashLightAction;
+            @FlashLightAction.performed -= instance.OnFlashLightAction;
+            @FlashLightAction.canceled -= instance.OnFlashLightAction;
         }
 
         public void RemoveCallbacks(IPC_MapActions instance)
@@ -537,5 +566,6 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
         void OnPrimaryGun(InputAction.CallbackContext context);
         void OnSecondaryGun(InputAction.CallbackContext context);
         void OnThrowRockAction(InputAction.CallbackContext context);
+        void OnFlashLightAction(InputAction.CallbackContext context);
     }
 }
