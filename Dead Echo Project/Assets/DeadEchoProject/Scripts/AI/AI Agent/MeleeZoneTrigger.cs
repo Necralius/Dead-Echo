@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class MeleeZoneTrigger : MonoBehaviour
 {
-
     private void OnTriggerEnter(Collider other)
     {
         AiStateMachine machine = GameSceneManager.instance.GetAIStateMachine(other.GetInstanceID());

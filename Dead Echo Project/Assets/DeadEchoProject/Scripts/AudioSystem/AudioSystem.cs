@@ -17,7 +17,6 @@ public class AudioSystem : MonoBehaviour
     public AudioMixer mainMixer;
     public AudioSource gunsSource;
     public AudioSource effectsSource;
-    public AudioSource zombiesSource;
     public AudioSource musicSource;
     
     public void PlayGunClip(AudioClip clip)
@@ -94,4 +93,8 @@ public class AudioSystem : MonoBehaviour
         source.pitch = Random.Range(pitchRange.x, pitchRange.y);
         source.PlayOneShot(clip);
     }
+
+    public AudioSource GetEffectsSource() => effectsSource;
+    public AudioSource GetGunSource() => gunsSource;
+    public AudioSource GetMusicSource() => musicSource;
 }

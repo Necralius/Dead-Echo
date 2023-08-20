@@ -27,13 +27,18 @@ public class UI_Manager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI lifeText;
     private Slider lifeSlider => playerSprite.GetComponent<Slider>();
 
+    public void UpdatePlayerState(FPS_Controller controller, CharacterManager manager)
+    {
+        playerSprite.GetComponent<Slider>().image.sprite = controller._isCrouching ? crouchSprite : standUpSprite;
+        lifeText.text           = lifeSlider.value.ToString() + "%";
+        lifeSlider.value        = manager._currentHealth;
+        lifeSlider.maxValue     = manager._maxHealth;
+    }
+
     public void UpdatePlayerState(FPS_Controller controller)
     {
         playerSprite.GetComponent<Slider>().image.sprite = controller._isCrouching ? crouchSprite : standUpSprite;
-        lifeSlider.value = controller.HealthValue;
-        lifeText.text = controller.HealthValue.ToString() + "%";
     }
-
     public void UpdateMode(GunMode gunMode, List<GunMode> allModes)
     {
         for (int i = 0; i < modes.Count; i++)

@@ -91,11 +91,6 @@ public class FPS_Controller : MonoBehaviour
 
     #endregion
 
-    #region - Player Health -
-    [SerializeField] private float healthValue;
-    public float HealthValue { get => healthValue; set => healthValue = value; }
-    #endregion
-
     #region - Animation Hashes -
     private int objectThrowingHash    = Animator.StringToHash("ThrowObject");
     private int objectThrowCancelHash = Animator.StringToHash("ObjectThrowCancel");
@@ -413,13 +408,6 @@ public class FPS_Controller : MonoBehaviour
     {
         flashLight.SetActive(!flashLight.activeInHierarchy);
         SS_Flashlight();
-    }
-    #endregion
-
-    #region - Damage System -
-    public void PlayerDamage(float value)
-    {
-        Debug.Log("Player suffered " + value.ToString() + " of damage.");
     }
     #endregion
 }

@@ -101,7 +101,7 @@ AnimatorStateTransition:
   - m_ConditionMode: 4
     m_ConditionEvent: Attack
     m_EventTreshold: 61
-  - m_ConditionMode: 1
+  - m_ConditionMode: 2
     m_ConditionEvent: Crawling
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
@@ -649,7 +649,7 @@ AnimatorStateTransition:
     m_EventTreshold: 20
   - m_ConditionMode: 4
     m_ConditionEvent: Attack
-    m_EventTreshold: 36
+    m_EventTreshold: 999
   - m_ConditionMode: 2
     m_ConditionEvent: Crawling
     m_EventTreshold: 0
@@ -1236,6 +1236,24 @@ AnimatorController:
     m_Controller: {fileID: 9100000}
   - m_Name: Seeking
     m_Type: 3
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: LeftHand
+    m_Type: 1
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: RightHand
+    m_Type: 1
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: Mouth
+    m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
@@ -1975,7 +1993,7 @@ AnimatorStateTransition:
   m_TransitionDuration: 0.25
   m_TransitionOffset: 0
   m_ExitTime: 0.90384614
-  m_HasExitTime: 0
+  m_HasExitTime: 1
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
@@ -2005,7 +2023,7 @@ AnimatorStateTransition:
   - m_ConditionMode: 3
     m_ConditionEvent: Attack
     m_EventTreshold: 35
-  - m_ConditionMode: 3
+  - m_ConditionMode: 4
     m_ConditionEvent: Attack
     m_EventTreshold: 51
   - m_ConditionMode: 2

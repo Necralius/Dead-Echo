@@ -2216,7 +2216,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.8
+  m_Radius: 0.61
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
@@ -3768,6 +3768,7 @@ GameObject:
   - component: {fileID: 6558115394251284647}
   - component: {fileID: 878036757471217344}
   - component: {fileID: 2834923429060783299}
+  - component: {fileID: 6411016105572946275}
   - component: {fileID: 7951933382287842502}
   m_Layer: 11
   m_Name: FirstPersonPlayer 0.3
@@ -3966,10 +3967,26 @@ MonoBehaviour:
     swayLerpSpeed: 14
     swayTime: 5.128777
     swayPosition: {x: -0.0015655803, y: 0.0042116484, z: 0}
-  healthValue: 100
   objectThrowForce: 5
   objectThrowUpForce: 5
   flashLight: {fileID: 2656012778308125767}
+--- !u!114 &6411016105572946275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6709367284264314706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6689f519fc5f1324eb1a0d641a586f00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _meleeTrigger: {fileID: 8112373656661393955}
+  _fpsCamera: {fileID: 520116193634283014}
+  _damageManager: {fileID: 0}
+  _currentHealth: 100
+  _maxHealth: 100
 --- !u!208 &7951933382287842502
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -3980,7 +3997,7 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.5, y: 1, z: 0.5}
+  m_Extents: {x: 0.25, y: 1, z: 0.25}
   m_MoveThreshold: 0.1
   m_Carve: 0
   m_CarveOnlyStationary: 1

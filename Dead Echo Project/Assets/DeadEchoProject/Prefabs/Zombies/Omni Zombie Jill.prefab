@@ -220,6 +220,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c93cb169a94ba9d4b94f2a319754b0ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _paramenter: Mouth
+  _bloodParticlesBurstAmount: 5
+  _damageAmount: 0.01
 --- !u!1 &7205197830733325187
 GameObject:
   m_ObjectHideFlags: 0
@@ -2923,6 +2926,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c93cb169a94ba9d4b94f2a319754b0ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _paramenter: RightHand
+  _bloodParticlesBurstAmount: 5
+  _damageAmount: 5
 --- !u!4 &8562548175988907191 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e9ad29c1cfdcd81439a03e5cc55cac69,
@@ -2968,6 +2974,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c93cb169a94ba9d4b94f2a319754b0ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _paramenter: LeftHand
+  _bloodParticlesBurstAmount: 5
+  _damageAmount: 5
 --- !u!1 &9052121587847562765 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: e9ad29c1cfdcd81439a03e5cc55cac69,
