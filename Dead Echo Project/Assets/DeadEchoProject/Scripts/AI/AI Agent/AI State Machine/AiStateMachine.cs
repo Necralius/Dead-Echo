@@ -1,6 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Android;
 
 public enum AIStateType         { None, Idle, Alerted, Patrol, Attack, Feeding, Pursuit, Dead }
 public enum AITargetType        { None, Waypoint, Visual_Player, Visual_Light, Visual_Food, Audio }
@@ -55,9 +58,12 @@ public abstract class AiStateMachine : MonoBehaviour
     protected int                               _rootPositionRefCount   = 0;
     protected int                               _rootRotationRefCount   = 0;
     protected bool                              _isTargetReached        = false;
+    protected List<Rigidbody>                   _bodyParts              = new List<Rigidbody>();
+    protected int                               _aiBodyPartLayer        = -1;
 
     //Protected Inspector Assigned
     [SerializeField] protected AIStateType          _currentStateType   = AIStateType.Idle;
+    [SerializeField] Transform                      _rootBone           = null;
     [SerializeField] protected SphereCollider       _targetTrigger      = null;
     [SerializeField] protected SphereCollider       _sensorTrigger      = null;
     [SerializeField, Range(0, 15)] protected float  _stoppingDistance   = 1.0f;
@@ -118,11 +124,30 @@ public abstract class AiStateMachine : MonoBehaviour
         _navAgent = GetComponent<NavMeshAgent>();
         _collider = GetComponent<Collider>();
 
+        //Get bodyPart correct layer
+        _aiBodyPartLayer = LayerMask.NameToLayer("AI Body Part");
+
+        //Check if has any valid GameSceneManager instance on the scene
         if (GameSceneManager.instance != null)
         {
             //Register State Machines with Scene Database
             if (_collider) GameSceneManager.instance.RegisterAIStateMachine(_collider.GetInstanceID(), this);
             if (_sensorTrigger) GameSceneManager.instance.RegisterAIStateMachine(_sensorTrigger.GetInstanceID(), this);
+        }
+
+        if (_rootBone != null)
+        {
+            Rigidbody[] bodies = _rootBone.GetComponentsInChildren<Rigidbody>();
+
+            foreach (Rigidbody bodyPart in bodies)
+            {
+                if (bodyPart != null && bodyPart.gameObject.layer == _aiBodyPartLayer)
+                {
+                    bodyPart.isKinematic = true;
+                    _bodyParts.Add(bodyPart);
+                    GameSceneManager.instance.RegisterAIStateMachine(bodyPart.GetInstanceID(), this);
+                }
+            }
         }
     }
 
@@ -345,5 +370,19 @@ public abstract class AiStateMachine : MonoBehaviour
     {
         _rootPositionRefCount += rootPosition;
         _rootRotationRefCount += rootRotation;
+    }
+
+    public virtual void TakeDamage(Vector3 position, Vector3 force, int damage, Rigidbody bodyPart, CharacterManager characterManager, int hitDirection)
+    {
+        if (GameSceneManager.instance != null && GameSceneManager.instance.bloodParticles != null)
+        {
+            ParticleSystem blood = GameSceneManager.instance.bloodParticles;
+            blood.transform.position = position;
+
+            var main = blood.main;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+
+            blood.Emit(60);
+        }
     }
 }

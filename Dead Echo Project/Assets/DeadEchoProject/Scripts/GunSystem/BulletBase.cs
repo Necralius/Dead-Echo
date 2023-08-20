@@ -1,27 +1,38 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class BulletBase : MonoBehaviour
 {
-    private float _bulletSpeed;
-    private float _bulletGravity;
-    private Vector3 _startPosition;
-    private Vector3 _startForward;
+    private float       _bulletSpeed;
+    private float       _bulletGravity;
+    private float       _bulletDamage = 10f;
+    private int         _bulletOriginCharManager;
+    private float       _bulletImpactForce = 30f;
+    private Vector3     _startPosition;
+    private Vector3     _startForward;
 
-    private bool _isInitialized = false;
-    private float _startTime = -1;
+    private bool        _isInitialized = false;
+    private float       _startTime = -1;
 
-    private float _bulletLifeTime = 15f;
-    private float _deactiveTimer = 0;
-    private LayerMask _collisionLayerMask;
-    private Vector3 _direction = Vector3.zero;
+    private float       _bulletLifeTime = 15f;
+    private float       _deactiveTimer = 0;
+    private LayerMask   _collisionLayerMask;
+    private Vector3     _direction = Vector3.zero;
 
-    Func<Vector3, string> hitInteraction;
+    Func<Vector3, string> _hitInteraction;
 
-    public void Initialize(Transform startPoint, float spread, float speed, float gravity, float bulletLifeTime, LayerMask collisionLayerMask)
+    public void Initialize(Transform startPoint, 
+        float spread, 
+        float speed, 
+        float gravity, 
+        float bulletLifeTime, 
+        LayerMask collisionLayerMask, 
+        float bulletDamage, 
+        float bulletImpactForce)
     {
         _direction = Vector3.zero;
         _startPosition = startPoint.position;
@@ -36,6 +47,9 @@ public class BulletBase : MonoBehaviour
         _bulletGravity = gravity;
         _bulletLifeTime = bulletLifeTime;
         _collisionLayerMask = collisionLayerMask;
+        _bulletImpactForce = bulletImpactForce;
+        _bulletDamage = bulletDamage;
+
         _isInitialized = true;
     }
     private void ResetBullet()
@@ -112,12 +126,21 @@ public class BulletBase : MonoBehaviour
     // ----------------------------------------------------------------------
     public virtual void OnHit(RaycastHit hit)
     {
-        if (hitInteraction != null) hitInteraction(hit.point);
+        if (_hitInteraction != null) _hitInteraction(hit.point);
 
         ObjectPooler.Instance.SpawnFromPool(LayerMask.LayerToName(hit.collider.gameObject.layer) + "Hit", hit.point + hit.normal * 0.001f, Quaternion.LookRotation(hit.normal));
         ObjectPooler.Instance.SpawnFromPool(LayerMask.LayerToName(hit.collider.gameObject.layer) + "Decal", hit.point + hit.normal * 0.001f, Quaternion.LookRotation(hit.normal));
         ResetBullet();
-        
+
+        if (hit.transform.gameObject.layer == LayerMask.NameToLayer("AI Body Part"))
+        {
+            AiStateMachine stateMachine = GameSceneManager.instance.GetAIStateMachine(hit.rigidbody.GetInstanceID());
+            if (stateMachine)
+            {
+                stateMachine.TakeDamage(hit.point, -hit.normal * _bulletImpactForce, (int)_bulletDamage, hit.rigidbody, CharacterManager.Instance, 0);
+            }
+        }
+
         gameObject.SetActive(false);
     }
 }

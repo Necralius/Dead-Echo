@@ -9,6 +9,9 @@ TagManager:
   - AI Food
   - Flash Light
   - Melee Zone
+  - Lower Body
+  - Upper Body
+  - Head
   layers:
   - Default
   - TransparentFX
@@ -17,14 +20,14 @@ TagManager:
   - Water
   - UI
   - 
-  - 
+  - AI Body Part
   - AI Entity
   - AI Entity Trigger
   - AI Trigger
   - Player
   - Visual Aggravator
   - Audio Aggravator
-  - AI Body Part
+  - 
   - 
   - 
   - 

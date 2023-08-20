@@ -30,7 +30,7 @@ public class UI_Manager : MonoBehaviour
     public void UpdatePlayerState(FPS_Controller controller, CharacterManager manager)
     {
         playerSprite.GetComponent<Slider>().image.sprite = controller._isCrouching ? crouchSprite : standUpSprite;
-        lifeText.text           = lifeSlider.value.ToString() + "%";
+        lifeText.text           = lifeSlider.value.ToString("F0") + "%";
         lifeSlider.value        = manager._currentHealth;
         lifeSlider.maxValue     = manager._maxHealth;
     }

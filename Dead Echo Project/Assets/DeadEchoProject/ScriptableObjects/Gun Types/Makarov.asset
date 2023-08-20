@@ -24,9 +24,12 @@ MonoBehaviour:
     _bulletGravity: 2
     _bulletSpread: 0.001
     _bulletLifeTime: 10
+    _bulletsPerShoot: 1
+    _bulletDamage: 15
+    _bulletImpactForce: 16
     _collisionMask:
       serializedVersion: 2
-      m_Bits: 4227858432
+      m_Bits: 4227858560
   gunAudioAsset:
     ShootClip: {fileID: 8300000, guid: a35582ee317f52647b24f967b35bd72f, type: 3}
     AimClip: {fileID: 8300000, guid: 7ca90acf69e44644e8410be881d87559, type: 3}

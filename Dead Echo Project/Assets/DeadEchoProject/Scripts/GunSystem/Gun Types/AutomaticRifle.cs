@@ -20,7 +20,9 @@ public class AutomaticRifle : Mode_Auto
             _gunDataConteiner.gunBulletSettings._bulletSpeed, 
             _gunDataConteiner.gunBulletSettings._bulletGravity, 
             _gunDataConteiner.gunBulletSettings._bulletLifeTime, 
-            _gunDataConteiner.gunBulletSettings._collisionMask);
+            _gunDataConteiner.gunBulletSettings._collisionMask,
+            _gunDataConteiner.gunBulletSettings._bulletDamage,
+            _gunDataConteiner.gunBulletSettings._bulletImpactForce);
         StartCoroutine(base.Shoot());
     }
 }

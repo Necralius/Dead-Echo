@@ -5,6 +5,11 @@ using UnityEngine.UI;
 
 public class CharacterManager : MonoBehaviour
 {
+    #region - Singleton Pattern -
+    public static CharacterManager Instance;
+    private void Awake() => Instance = this;
+    #endregion
+
     //Inspector assinged
     [Header("Dependencies")]
     [SerializeField] private CapsuleCollider            _meleeTrigger   = null;
@@ -31,7 +36,7 @@ public class CharacterManager : MonoBehaviour
 
         if (_gameSceneManager != null)
         {
-            PlayerInfo playerInfo = new PlayerInfo();
+            PlayerInfo playerInfo           = new PlayerInfo();
 
             playerInfo.camera               = _fpsCamera;
             playerInfo.characterManager     = this;
@@ -50,8 +55,8 @@ public class CharacterManager : MonoBehaviour
 
         if (_damageManager != null)
         {
-            _damageManager.minBloodAmount = (1.0f - (_currentHealth / 100f));
-            _damageManager.bloodAmount = Mathf.Min(_damageManager.minBloodAmount + 0.3f, 1f);
+            _damageManager.minBloodAmount   = (1.0f - (_currentHealth / 100f));
+            _damageManager.bloodAmount      = Mathf.Min(_damageManager.minBloodAmount + 0.3f, 1f);
         }
         if (_currentHealth <= (_maxHealth / 4)) _damageManager.SetCriticalHealth(true);
         else _damageManager.SetCriticalHealth(false);

@@ -15,6 +15,7 @@ public abstract class GunBase : MonoBehaviour
     #region - Dependencies -
     [HideInInspector] public    Animator                _animator;
     [HideInInspector] public    FPS_Controller          _playerController;
+    [HideInInspector] public    CharacterManager _characterManager;
     [SerializeField] protected  GunDataConteiner        _gunDataConteiner;
     protected                   InputManager            _inputManager;
     protected                   GunProceduralRecoil     _recoilAsset => GetComponent<GunProceduralRecoil>();

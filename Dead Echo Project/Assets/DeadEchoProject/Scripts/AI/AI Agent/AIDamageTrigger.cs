@@ -36,6 +36,9 @@ public class AIDamageTrigger : MonoBehaviour
                 system.transform.position = transform.position;
                 system.transform.rotation = Camera.main.transform.rotation;
 
+                var main = system.main;
+                main.simulationSpace = ParticleSystemSimulationSpace.World;
+
                 system.Emit(_bloodParticlesBurstAmount);
             }
 

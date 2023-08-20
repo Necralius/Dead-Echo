@@ -59,4 +59,36 @@ public class AIZombieStateMachine : AiStateMachine
 
         _satisfaction = Mathf.Max(0, _satisfaction - ((_depletionRate * Time.deltaTime)/ 100f) * Mathf.Pow(_speed, 3f));
     }
+    public override void TakeDamage(Vector3 position, Vector3 force, int damage, Rigidbody bodyPart, CharacterManager characterManager, int hitDirection)
+    {
+        if (GameSceneManager.instance != null && GameSceneManager.instance.bloodParticles != null)
+        {
+            ParticleSystem blood = GameSceneManager.instance.bloodParticles;
+            blood.transform.position = position;
+
+            var main = blood.main;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+
+            blood.Emit(60);
+        }
+
+        health -= damage;
+
+        float hitStrenght = force.magnitude;
+        bool shouldRagdoll = (hitStrenght > 15.0f);
+
+        if (health <= 0) shouldRagdoll = true;
+
+        if (shouldRagdoll)
+        {
+            if (_navAgent) _navAgent.enabled = false;
+            if (_animator) _animator.enabled = false;
+            if (_collider) _collider.enabled = false;
+
+            inMeleeRange = false;
+
+            foreach(Rigidbody body in _bodyParts) if (body) body.isKinematic = false;
+            if (hitStrenght > 15.0f) bodyPart.AddForce(force, ForceMode.Impulse);
+        }
+    }
 }
