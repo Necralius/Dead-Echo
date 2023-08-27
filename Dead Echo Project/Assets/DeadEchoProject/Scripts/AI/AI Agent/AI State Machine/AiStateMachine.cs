@@ -8,6 +8,7 @@ using UnityEngine.Android;
 public enum AIStateType         { None, Idle, Alerted, Patrol, Attack, Feeding, Pursuit, Dead }
 public enum AITargetType        { None, Waypoint, Visual_Player, Visual_Light, Visual_Food, Audio }
 public enum AITriggerEventType  { Enter, Stay, Exit}
+public enum AIBoneAligmentType  { XAxis, YAxis, ZAxis, XAxisInverted, YAxisInverted, ZAxisInverted }
 
 // ------------------------------------------------------------------------
 // Class    :  AITarget
@@ -53,24 +54,26 @@ public abstract class AiStateMachine : MonoBehaviour
 
     //Protected
     protected AIState                           _currentState;
-    protected Dictionary<AIStateType, AIState>  _states                 = new Dictionary<AIStateType, AIState>();
-    protected AITarget                          _target                 = new AITarget();
-    protected int                               _rootPositionRefCount   = 0;
-    protected int                               _rootRotationRefCount   = 0;
-    protected bool                              _isTargetReached        = false;
-    protected List<Rigidbody>                   _bodyParts              = new List<Rigidbody>();
-    protected int                               _aiBodyPartLayer        = -1;
+    protected Dictionary<AIStateType, AIState>  _states                         = new Dictionary<AIStateType, AIState>();
+    protected AITarget                          _target                         = new AITarget();
+    protected int                               _rootPositionRefCount           = 0;
+    protected int                               _rootRotationRefCount           = 0;
+    protected bool                              _isTargetReached                = false;
+    protected List<Rigidbody>                   _bodyParts                      = new List<Rigidbody>();
+    protected int                               _aiBodyPartLayer                = -1;
+    protected bool                              _cinematicEnabled               = false;
 
     //Protected Inspector Assigned
-    [SerializeField] protected AIStateType          _currentStateType   = AIStateType.Idle;
-    [SerializeField] Transform                      _rootBone           = null;
-    [SerializeField] protected SphereCollider       _targetTrigger      = null;
-    [SerializeField] protected SphereCollider       _sensorTrigger      = null;
-    [SerializeField, Range(0, 15)] protected float  _stoppingDistance   = 1.0f;
+    [SerializeField] protected AIStateType          _currentStateType           = AIStateType.Idle;
+    [SerializeField] protected Transform            _rootBone                   = null;
+    [SerializeField] protected AIBoneAligmentType   _rootBoneAligmentType       = AIBoneAligmentType.ZAxis;
+    [SerializeField] protected SphereCollider       _targetTrigger              = null;
+    [SerializeField] protected SphereCollider       _sensorTrigger              = null;
+    [SerializeField, Range(0, 15)] protected float  _stoppingDistance           = 1.0f;
 
-    [SerializeField] protected WaypointNetwork  _waypointNetwork = null;
-    [SerializeField] protected bool             _randomPatrol = false;
-    [SerializeField] protected int              _currentWaypoint = -1;
+    [SerializeField] protected WaypointNetwork  _waypointNetwork                = null;
+    [SerializeField] protected bool             _randomPatrol                   = false;
+    [SerializeField] protected int              _currentWaypoint                = -1;
 
     //Component Cache
     protected Animator      _animator   = null;
@@ -79,10 +82,10 @@ public abstract class AiStateMachine : MonoBehaviour
     protected Transform     _transform  = null;
 
     //Public properties
-    public bool             isTargetReached { get =>_isTargetReached; }
-    public bool             inMeleeRange    { get; set; }
-    public Animator         animator        { get => _animator; }
-    public NavMeshAgent     navAgent        { get => _navAgent; }  
+    public bool             isTargetReached { get =>_isTargetReached;   }
+    public bool             inMeleeRange    { get; set;                 }
+    public Animator         animator        { get => _animator;         }
+    public NavMeshAgent     navAgent        { get => _navAgent;         }  
     public Vector3          sensorPosition
     {
         get
@@ -105,12 +108,12 @@ public abstract class AiStateMachine : MonoBehaviour
             return Mathf.Max(radius, _sensorTrigger.radius * _sensorTrigger.transform.lossyScale.z);
         }
     }
-    public bool useRootPosition { get => _rootPositionRefCount > 0;  }
-    public bool useRootRotation { get => _rootRotationRefCount > 0;  }
-    public AITargetType targetType { get => _target.type; }
-    public Vector3 targetPosition { get => _target.position;  }
-    public int targetColliderID { get => _target.collider ? _target.collider.GetInstanceID() : -1; }
-
+    public bool useRootPosition     { get => _rootPositionRefCount > 0;                                 }
+    public bool useRootRotation     { get => _rootRotationRefCount > 0;                                 }
+    public AITargetType targetType  { get => _target.type;                                              }
+    public Vector3 targetPosition   { get => _target.position;                                          }
+    public int targetColliderID     { get => _target.collider ? _target.collider.GetInstanceID() : -1;  }
+    public bool CinematicEnabled    { get => _cinematicEnabled; set => _cinematicEnabled = value;       }
 
     // ---------------------------------
     // Name : Awake
@@ -144,6 +147,7 @@ public abstract class AiStateMachine : MonoBehaviour
                 if (bodyPart != null && bodyPart.gameObject.layer == _aiBodyPartLayer)
                 {
                     bodyPart.isKinematic = true;
+
                     _bodyParts.Add(bodyPart);
                     GameSceneManager.instance.RegisterAIStateMachine(bodyPart.GetInstanceID(), this);
                 }
@@ -374,15 +378,6 @@ public abstract class AiStateMachine : MonoBehaviour
 
     public virtual void TakeDamage(Vector3 position, Vector3 force, int damage, Rigidbody bodyPart, CharacterManager characterManager, int hitDirection)
     {
-        if (GameSceneManager.instance != null && GameSceneManager.instance.bloodParticles != null)
-        {
-            ParticleSystem blood = GameSceneManager.instance.bloodParticles;
-            blood.transform.position = position;
-
-            var main = blood.main;
-            main.simulationSpace = ParticleSystemSimulationSpace.World;
-
-            blood.Emit(60);
-        }
+        
     }
 }
