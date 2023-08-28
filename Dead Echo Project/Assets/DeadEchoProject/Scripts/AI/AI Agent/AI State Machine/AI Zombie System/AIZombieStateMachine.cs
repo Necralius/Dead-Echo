@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public enum AIBoneControlType { Animated, Ragdoll, RagdollToAnim }
 
@@ -14,7 +15,6 @@ public class BodyPartSnapshot
     public Transform transform;
     public Vector3 position;
     public Quaternion rotation;
-    public Quaternion localRotation;
 }
 
 // --------------------------------------------------------------------------
@@ -41,6 +41,7 @@ public class AIZombieStateMachine : AiStateMachine
     [SerializeField, Range(0f, 1f)]         float   _depletionRate          = 0.1f;
     [SerializeField]                        float   _reanimationBlendTime   = 0.5f;
     [SerializeField]                        float   _reanimationWaitTime    = 3f;
+    [SerializeField]                        LayerMask _geometryLayers;
 
     //Private
     private int     _seeking        = 0;
@@ -50,13 +51,18 @@ public class AIZombieStateMachine : AiStateMachine
     private float   _speed          = 0.0f;
 
     //Animation parameters hashes
-    private int _speedHash      = Animator.StringToHash("Speed");
-    private int _seekingHash    = Animator.StringToHash("Seeking");
-    private int _feedingHash    = Animator.StringToHash("Feeding");
-    private int _attackHash     = Animator.StringToHash("Attack");
-    private int _crawlingHash   = Animator.StringToHash("Crawling");
-    private int _hitTriggerHash = Animator.StringToHash("Hit");
-    private int _hitTypeHash    = Animator.StringToHash("HitType");
+    private int _speedHash              = Animator.StringToHash("Speed");
+    private int _seekingHash            = Animator.StringToHash("Seeking");
+    private int _feedingHash            = Animator.StringToHash("Feeding");
+    private int _attackHash             = Animator.StringToHash("Attack");
+    private int _crawlingHash           = Animator.StringToHash("Crawling");
+    private int _hitTriggerHash         = Animator.StringToHash("Hit");
+    private int _hitTypeHash            = Animator.StringToHash("HitType");
+    private int _reanimateFromBackHash  = Animator.StringToHash("Reanimate From Back");
+    private int _reanimateFromFrontHash = Animator.StringToHash("Reanimate From Front");
+    private int _upperBodyDamageHash    = Animator.StringToHash("Upper Body Damage");
+    private int _lowerBodyDamageHash    = Animator.StringToHash("Lower Body Damage");
+
 
     //Ragdoll System Data
     private AIBoneControlType           _boneControllType       = AIBoneControlType.Animated;
@@ -82,7 +88,7 @@ public class AIZombieStateMachine : AiStateMachine
     public bool     feeding         { get => _feeding;          set => _feeding         =  value; }
     public int      seeking         { get => _seeking;          set => _seeking         =  value; }
     public float    speed           { get => _speed;            set => _speed           =  value; }
-    public bool     isCrawling      { get => _upperBodyDamage >= _crawlThreshold; }
+    public bool     isCrawling      { get => _lowerBodyDamage >= _crawlThreshold; }
 
     // ----------------------------------------------------------------------
     // Name: Start
@@ -128,7 +134,12 @@ public class AIZombieStateMachine : AiStateMachine
     }
     protected void UpdateAnimatorDamage()
     {
-        if (_animator != null) _animator.SetBool(_crawlingHash, isCrawling);
+        if (_animator != null)
+        {
+            _animator.SetBool(_crawlingHash, isCrawling);
+            _animator.SetInteger(_lowerBodyDamageHash, _lowerBodyDamage);
+            _animator.SetInteger(_upperBodyDamageHash, _upperBodyDamage);
+        }
     }
 
     public override void TakeDamage(Vector3 position, Vector3 force, int damage, Rigidbody bodyPart, CharacterManager characterManager, int hitDirection)
@@ -263,10 +274,108 @@ public class AIZombieStateMachine : AiStateMachine
     // Name: Reanimate (Coroutine)
     // Desc: This method reanimates the zombie body.
     // ----------------------------------------------------------------------
-    private IEnumerator Reanimate()
+    protected IEnumerator Reanimate()
     {
+        //Reanimate if the zombie is in a ragdoll state
+        if (_boneControllType != AIBoneControlType.Ragdoll || _animator == null) yield break;
 
-        yield return null;
+        //Wait for the desired number of seconds before initiating the reanimation process
+        yield return new WaitForSeconds(_reanimationWaitTime);
 
+        //Record time at start of reanimation procedure
+        _ragdollEndTime = Time.time;
+
+        //Set rigidibodies back to begin kinematic
+        foreach(Rigidbody body in _bodyParts) body.isKinematic = true;
+
+        //Seting the zombie back in the reanimation mode
+        _boneControllType = AIBoneControlType.RagdollToAnim;
+
+        //Save positions and rotations of all bones prios to reanimation
+        foreach(BodyPartSnapshot snapshot in _bodyPartSnapshots)
+        {
+            snapshot.position       = snapshot.transform.position;
+            snapshot.rotation       = snapshot.transform.rotation;
+        }
+
+        //Record the ragdolls head and feet position
+        _ragdoolHeadPosition = animator.GetBoneTransform(HumanBodyBones.Head).position;
+        _ragdollFeetPosition = (animator.GetBoneTransform(HumanBodyBones.LeftFoot).position + _animator.GetBoneTransform(HumanBodyBones.RightFoot).position) * 0.5f;
+        _ragdollHipPosition  = _rootBone.position;
+
+        //Re-enables the animator
+        _animator.enabled = true;
+
+        if (_rootBone != null)
+        {
+            float forwardTest;
+            switch (_rootBoneAligmentType)
+            {
+                case AIBoneAligmentType.ZAxis:          forwardTest = _rootBone.forward.y;      break;
+                case AIBoneAligmentType.ZAxisInverted:  forwardTest = -_rootBone.forward.y;     break;
+                case AIBoneAligmentType.YAxis:          forwardTest = _rootBone.up.y;           break;
+                case AIBoneAligmentType.YAxisInverted:  forwardTest = -_rootBone.up.y;          break;
+                case AIBoneAligmentType.XAxis:          forwardTest = _rootBone.right.y;        break;
+                case AIBoneAligmentType.XAxisInverted:  forwardTest = -_rootBone.right.y;       break;
+                default:                                forwardTest = _rootBone.forward.y;      break;
+            }
+            if (forwardTest > 0) _animator.SetTrigger(_reanimateFromBackHash);
+            else _animator.SetTrigger(_reanimateFromFrontHash);
+        }
+        yield break;
+    }
+    protected virtual void LateUpdate()
+    {
+        if (_boneControllType == AIBoneControlType.RagdollToAnim)
+        {
+            if (Time.time <= _ragdollEndTime + _mecanimTransitionTime)
+            {
+                Vector3 animatedToRagdoll = _ragdollHipPosition - _rootBone.position;
+                Vector3 newRootPosition = transform.position + animatedToRagdoll;
+
+                RaycastHit[] hits = Physics.RaycastAll(newRootPosition + (Vector3.up * 0.25f), Vector3.down, float.MaxValue, _geometryLayers);
+                newRootPosition.y = float.MinValue;
+
+                foreach(RaycastHit hit in hits) 
+                    if (!hit.transform.IsChildOf(transform)) newRootPosition.y = Mathf.Max(hit.point.y, newRootPosition.y);
+
+                NavMeshHit navMeshHit;
+                if (NavMesh.SamplePosition(newRootPosition, out navMeshHit, 2f, NavMesh.AllAreas)) transform.position = navMeshHit.position;
+
+                Vector3 ragdollDirection = _ragdoolHeadPosition - _ragdollFeetPosition;
+                ragdollDirection.y = 0f;
+
+                Vector3 meanFeetPosition = 0.5f * (_animator.GetBoneTransform(HumanBodyBones.LeftFoot).position + _animator.GetBoneTransform(HumanBodyBones.RightFoot).position);
+                Vector3 animatedDirection = _animator.GetBoneTransform(HumanBodyBones.Head).position - meanFeetPosition;
+                animatedDirection.y = 0f;
+
+                transform.rotation *= Quaternion.FromToRotation(animatedDirection.normalized, ragdollDirection.normalized);
+            }
+            float blendAmount = Mathf.Clamp01((Time.time - _ragdollEndTime - _mecanimTransitionTime) / _reanimationBlendTime);
+
+            foreach(BodyPartSnapshot snapshot in _bodyPartSnapshots)
+            {
+                if (snapshot.transform == _rootBone) 
+                    snapshot.transform.position = Vector3.Lerp(snapshot.position, snapshot.transform.position, blendAmount);
+                snapshot.transform.rotation = Quaternion.Slerp(snapshot.rotation, snapshot.transform.rotation, blendAmount);
+            }
+            if (blendAmount == 1f)
+            {
+                _boneControllType = AIBoneControlType.Animated;
+                if (_navAgent) _navAgent.enabled = true;
+                if (_collider) _collider.enabled = true;
+
+                AIState newState = null;
+
+                if (_states.TryGetValue(AIStateType.Alerted, out newState))
+                {
+                    if (_currentState != null) _currentState.OnExitState();
+
+                    newState.OnEnterState();
+                    _currentState = newState;
+                    _currentStateType = AIStateType.Alerted;
+                }
+            }
+        }
     }
 }

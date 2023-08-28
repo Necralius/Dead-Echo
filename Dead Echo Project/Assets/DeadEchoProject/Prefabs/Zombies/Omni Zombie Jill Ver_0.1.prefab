@@ -291,7 +291,7 @@ GameObject:
   - component: {fileID: 1264221498487802029}
   - component: {fileID: 5594040446405770588}
   - component: {fileID: 9138375856568263899}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: MouthTrigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -503,7 +503,7 @@ PrefabInstance:
     - target: {fileID: -8778109796107686571, guid: e9ad29c1cfdcd81439a03e5cc55cac69,
         type: 3}
       propertyPath: m_Layer
-      value: 8
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e9ad29c1cfdcd81439a03e5cc55cac69,
         type: 3}
@@ -713,7 +713,7 @@ PrefabInstance:
     - target: {fileID: -7883749328917080035, guid: e9ad29c1cfdcd81439a03e5cc55cac69,
         type: 3}
       propertyPath: m_Layer
-      value: 8
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: -7863401937302029829, guid: e9ad29c1cfdcd81439a03e5cc55cac69,
         type: 3}
@@ -4359,6 +4359,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _currentStateType: 1
   _rootBone: {fileID: 8551396289052711870}
+  _rootBoneAligmentType: 2
   _targetTrigger: {fileID: 7481748300708804886}
   _sensorTrigger: {fileID: 8843009160944326279}
   _stoppingDistance: 1
@@ -4379,6 +4380,11 @@ MonoBehaviour:
   _satisfaction: 0.5
   _replenishRate: 1
   _depletionRate: 0.1
+  _reanimationBlendTime: 0.5
+  _reanimationWaitTime: 3
+  _geometryLayers:
+    serializedVersion: 2
+    m_Bits: 1
 --- !u!114 &761675141994331383
 MonoBehaviour:
   m_ObjectHideFlags: 0

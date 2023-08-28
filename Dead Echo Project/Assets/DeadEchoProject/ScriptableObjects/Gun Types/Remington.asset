@@ -25,7 +25,7 @@ MonoBehaviour:
     _bulletSpread: 0.1
     _bulletLifeTime: 2
     _bulletsPerShoot: 6
-    _bulletDamage: 15
+    _bulletDamage: 2
     _bulletImpactForce: 10
     _collisionMask:
       serializedVersion: 2
