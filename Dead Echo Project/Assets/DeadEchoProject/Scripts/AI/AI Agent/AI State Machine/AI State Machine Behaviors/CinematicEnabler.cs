@@ -26,5 +26,4 @@ public class CinematicEnabler : AIStateMachineLink
     {
         if (_stateMachine) _stateMachine.CinematicEnabled = OnExit;
     }
-
 }

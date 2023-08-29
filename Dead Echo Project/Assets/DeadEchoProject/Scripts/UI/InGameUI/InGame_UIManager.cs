@@ -7,10 +7,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using static NekraByte.FPS_Utility.GunData;
 
-public class UI_Manager : MonoBehaviour
+public class InGame_UIManager : MonoBehaviour
 {
     #region - Singleton Pattern -
-    public static UI_Manager Instance;
+    public static InGame_UIManager Instance;
     private void Awake() => Instance = this;
     #endregion
 

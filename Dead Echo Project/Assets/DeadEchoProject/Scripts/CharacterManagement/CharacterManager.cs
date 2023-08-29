@@ -60,7 +60,7 @@ public class CharacterManager : MonoBehaviour
         }
         if (_currentHealth <= (_maxHealth / 4)) _damageManager.SetCriticalHealth(true);
         else _damageManager.SetCriticalHealth(false);
-        UI_Manager.Instance.UpdatePlayerState(_fpsController, this);
+        InGame_UIManager.Instance.UpdatePlayerState(_fpsController, this);
     }
     #endregion
 }

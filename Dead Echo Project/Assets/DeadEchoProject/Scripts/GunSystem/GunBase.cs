@@ -302,7 +302,7 @@ public abstract class GunBase : MonoBehaviour
         _playerController.txt_bagAmmo.text = ($"/{_bagAmmo}");
         _playerController.txt_GunName.text = _gunDataConteiner.gunData.gunName;
 
-        UI_Manager.Instance.UpdateMode(_gunDataConteiner.gunData.gunMode, gunModes);
+        InGame_UIManager.Instance.UpdateMode(_gunDataConteiner.gunData.gunMode, gunModes);
     }
     #endregion
 

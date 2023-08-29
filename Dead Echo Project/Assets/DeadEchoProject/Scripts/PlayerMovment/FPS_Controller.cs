@@ -129,7 +129,7 @@ public class FPS_Controller : MonoBehaviour
     //
     private void Start()
     {
-        UI_Manager.Instance.UpdatePlayerState(this);
+        InGame_UIManager.Instance.UpdatePlayerState(this);
         defaultYPost = bodyCamera.transform.localPosition.y;
     }
     // ----------------------------------------------------------------------
@@ -251,7 +251,7 @@ public class FPS_Controller : MonoBehaviour
     private void CrouchHandler()
     {
         if (_isGrounded && !_duringCrouch) if (inputManager.crouching) StartCoroutine(CrouchAction());
-        UI_Manager.Instance.UpdatePlayerState(this);
+        InGame_UIManager.Instance.UpdatePlayerState(this);
     }
 
     // ----------------------------------------------------------------------
