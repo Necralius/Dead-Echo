@@ -3545,7 +3545,7 @@ CharacterJoint:
     bounciness: 0
     contactDistance: 0
   m_EnableProjection: 0
-  m_ProjectionDistance: 0.1
+  m_ProjectionDistance: 0.01
   m_ProjectionAngle: 180
   m_BreakForce: Infinity
   m_BreakTorque: Infinity
@@ -4344,7 +4344,7 @@ CapsuleCollider:
   m_Radius: 0.4
   m_Height: 1.84
   m_Direction: 1
-  m_Center: {x: 0, y: 0.87, z: 0}
+  m_Center: {x: 0, y: 0.92, z: 0}
 --- !u!114 &5563509195268111463
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4429,6 +4429,7 @@ MonoBehaviour:
   _waypointAngleThreshold: 25
   _threatAngleThreshold: 15
   _directionChangeTime: 1.5
+  _slerpSpeed: 45
 --- !u!114 &6369538733233562101
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4442,7 +4443,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 2
-  _slerpSeepd: 5
+  _slerpSpeed: 5
   _repathDistanceMultiplier: 0.035
   _repathVisualMinDuration: 0.05
   _repathVisualMaxDuration: 5

@@ -6,7 +6,7 @@ using UnityEngine.AI;
 public class AIZombieState_Pursuit1 : AIZombieState
 {
     [SerializeField, Range(0, 10)] private float _speed             = 1f;
-    [SerializeField] private float _slerpSeepd                      = 5f;
+    [SerializeField] private float _slerpSpeed                      = 5f;
     [SerializeField] private float _repathDistanceMultiplier        = 0.035f;
     [SerializeField] private float _repathVisualMinDuration         = 0.05f;
     [SerializeField] private float _repathVisualMaxDuration         = 5f;
@@ -89,7 +89,7 @@ public class AIZombieState_Pursuit1 : AIZombieState
             {
                 Quaternion newRot = Quaternion.LookRotation(_zombieStateMachine.navAgent.desiredVelocity);
 
-                _zombieStateMachine.transform.rotation = Quaternion.Slerp(_zombieStateMachine.transform.rotation, newRot, Time.deltaTime * _slerpSeepd);
+                _zombieStateMachine.transform.rotation = Quaternion.Slerp(_zombieStateMachine.transform.rotation, newRot, Time.deltaTime * _slerpSpeed);
             }
             else if (_zombieStateMachine.isTargetReached) return AIStateType.Alerted;
         }

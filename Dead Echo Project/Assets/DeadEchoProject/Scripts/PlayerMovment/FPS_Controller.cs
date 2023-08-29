@@ -8,7 +8,8 @@ using static NekraByte.FPS_Utility;
 public class FPS_Controller : MonoBehaviour
 {
     #region - Singleton Pattern -
-    public static FPS_Controller Instance;
+    //This code section represents an singleton pattern implementation.
+    public static FPS_Controller Instance { get; private set; }
     #endregion
 
     #region - Controller Dependencies -
@@ -112,16 +113,31 @@ public class FPS_Controller : MonoBehaviour
     // ---------------------------- Methods ----------------------------//
 
     #region - BuiltIn Methods -
+    // ----------------------------------------------------------------------
+    // Name: Awake
+    // Desc: This method is called on the first application frame.
+    // ----------------------------------------------------------------------
     private void Awake()
     {
         Instance = this;
         Cursor.lockState = CursorLockMode.Locked;
     }
+
+    //
+    // Name: Start
+    // Desc: This method is called on the game start, mainly he 
+    //
     private void Start()
     {
         UI_Manager.Instance.UpdatePlayerState(this);
         defaultYPost = bodyCamera.transform.localPosition.y;
     }
+    // ----------------------------------------------------------------------
+    // Name: Update
+    // Desc: This method is called every frame, mainly the method handle the
+    //       input actions, the movment complete system, the flashlight and
+    //       the object throwing system.
+    // ----------------------------------------------------------------------
     private void Update()
     {
         if (_canMove && inputManager != null)

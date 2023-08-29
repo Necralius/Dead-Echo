@@ -39,7 +39,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 10.069298, g: 8.740146, b: 8.693722, a: 1}
+  m_IndirectSpecularColor: {r: 10.069259, g: 8.740178, b: 8.69363, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -689,79 +689,6 @@ CapsuleCollider:
   m_Height: 0.26852936
   m_Direction: 1
   m_Center: {x: 0, y: 0.13426468, z: 0}
---- !u!1001 &35484972
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 199035665061809674, guid: 80a7c3c0afd4d7e4bb9210dc3c457118,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -9.056304
-      objectReference: {fileID: 0}
-    - target: {fileID: 199035665061809674, guid: 80a7c3c0afd4d7e4bb9210dc3c457118,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.0001001358
-      objectReference: {fileID: 0}
-    - target: {fileID: 199035665061809674, guid: 80a7c3c0afd4d7e4bb9210dc3c457118,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 8.635577
-      objectReference: {fileID: 0}
-    - target: {fileID: 199035665061809674, guid: 80a7c3c0afd4d7e4bb9210dc3c457118,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 199035665061809674, guid: 80a7c3c0afd4d7e4bb9210dc3c457118,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 199035665061809674, guid: 80a7c3c0afd4d7e4bb9210dc3c457118,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 199035665061809674, guid: 80a7c3c0afd4d7e4bb9210dc3c457118,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 199035665061809674, guid: 80a7c3c0afd4d7e4bb9210dc3c457118,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 199035665061809674, guid: 80a7c3c0afd4d7e4bb9210dc3c457118,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 180
-      objectReference: {fileID: 0}
-    - target: {fileID: 199035665061809674, guid: 80a7c3c0afd4d7e4bb9210dc3c457118,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2229257354478813517, guid: 80a7c3c0afd4d7e4bb9210dc3c457118,
-        type: 3}
-      propertyPath: m_Name
-      value: Omni Zombie Jill Ver_0.1 -> StableVersion
-      objectReference: {fileID: 0}
-    - target: {fileID: 5563509195268111463, guid: 80a7c3c0afd4d7e4bb9210dc3c457118,
-        type: 3}
-      propertyPath: _waypointNetwork
-      value: 
-      objectReference: {fileID: 289873916}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 80a7c3c0afd4d7e4bb9210dc3c457118, type: 3}
 --- !u!1 &84932503
 GameObject:
   m_ObjectHideFlags: 0
@@ -5610,7 +5537,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh33986
+  m_Name: pb_Mesh33982
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -6632,6 +6559,89 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 29debbf272c299c4f9a0d722709ab136, type: 3}
+--- !u!1001 &741062088266811544
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3412171659017180868, guid: 51f9e387aa7c5ab49a6c4a46e052798a,
+        type: 3}
+      propertyPath: _satisfaction
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3412171659017180868, guid: 51f9e387aa7c5ab49a6c4a46e052798a,
+        type: 3}
+      propertyPath: _lowerBodyDamage
+      value: 95
+      objectReference: {fileID: 0}
+    - target: {fileID: 3412171659017180868, guid: 51f9e387aa7c5ab49a6c4a46e052798a,
+        type: 3}
+      propertyPath: _waypointNetwork
+      value: 
+      objectReference: {fileID: 289873916}
+    - target: {fileID: 4605339748860254388, guid: 51f9e387aa7c5ab49a6c4a46e052798a,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -9.056304
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605339748860254388, guid: 51f9e387aa7c5ab49a6c4a46e052798a,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.0001001358
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605339748860254388, guid: 51f9e387aa7c5ab49a6c4a46e052798a,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 14.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605339748860254388, guid: 51f9e387aa7c5ab49a6c4a46e052798a,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5073204
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605339748860254388, guid: 51f9e387aa7c5ab49a6c4a46e052798a,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605339748860254388, guid: 51f9e387aa7c5ab49a6c4a46e052798a,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.86175746
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605339748860254388, guid: 51f9e387aa7c5ab49a6c4a46e052798a,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605339748860254388, guid: 51f9e387aa7c5ab49a6c4a46e052798a,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605339748860254388, guid: 51f9e387aa7c5ab49a6c4a46e052798a,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 119.029
+      objectReference: {fileID: 0}
+    - target: {fileID: 4605339748860254388, guid: 51f9e387aa7c5ab49a6c4a46e052798a,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4915488788294003454, guid: 51f9e387aa7c5ab49a6c4a46e052798a,
+        type: 3}
+      propertyPath: m_Name
+      value: Omni Zombie Jill Ver_0.1 -> StableVersion
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 51f9e387aa7c5ab49a6c4a46e052798a, type: 3}
 --- !u!1001 &4077680323897662753
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6744,4 +6754,4 @@ SceneRoots:
   - {fileID: 1660025899}
   - {fileID: 445187674}
   - {fileID: 2118250333}
-  - {fileID: 35484972}
+  - {fileID: 741062088266811544}

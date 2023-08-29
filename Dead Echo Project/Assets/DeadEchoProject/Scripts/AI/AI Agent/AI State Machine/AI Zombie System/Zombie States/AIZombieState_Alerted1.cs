@@ -6,10 +6,11 @@ using Random = UnityEngine.Random;
 public class AIZombieState_Alerted1 : AIZombieState
 {
 
-    [SerializeField, Range(1f,60f)] float _maxDuration = 10f;
-    [SerializeField] float _waypointAngleThreshold = 90f;
-    [SerializeField] float _threatAngleThreshold = 10f;
-    [SerializeField] float _directionChangeTime = 1.5f;
+    [SerializeField, Range(1f,60f)] float   _maxDuration                = 10f;
+    [SerializeField] float                  _waypointAngleThreshold     = 90f;
+    [SerializeField] float                  _threatAngleThreshold       = 10f;
+    [SerializeField] float                  _directionChangeTime        = 1.5f;
+    [SerializeField] float                  _slerpSpeed                 = 45f;
 
     //Private
     float _timer = 0f;
@@ -118,6 +119,8 @@ public class AIZombieState_Alerted1 : AIZombieState
                 _directionChangeTimer = 0;
             }
         }
+
+        if (!_zombieStateMachine.useRootRotation) _zombieStateMachine.transform.Rotate(new Vector3(0f, _slerpSpeed * _zombieStateMachine.seeking * Time.deltaTime, 0f));
 
         return AIStateType.Alerted;
     }
