@@ -110,6 +110,13 @@ public class FPS_Controller : MonoBehaviour
 
     #endregion
 
+    float _dragMultiplier       = 1f;
+    float _dragMultiplierLimit  = 1f;
+    [SerializeField, Range(0f, 1f)] float _npcStickiness = 0.5f;
+
+    public float dragMultiplierLimit    { get => _dragMultiplierLimit;  set => _dragMultiplierLimit = Mathf.Clamp01(value); }
+    public float dragMultiplier         { get => _dragMultiplier;       set => _dragMultiplier      = Mathf.Min(value, _dragMultiplierLimit); }
+
     // ---------------------------- Methods ----------------------------//
 
     #region - BuiltIn Methods -
@@ -166,6 +173,7 @@ public class FPS_Controller : MonoBehaviour
             }
             if (inputManager.flashLightAction.WasPressedThisFrame()) ChangeFlashlightState();
         }
+        _dragMultiplier = Mathf.Min(_dragMultiplier + Time.deltaTime, _dragMultiplierLimit);
     }
     #endregion
 
@@ -221,7 +229,7 @@ public class FPS_Controller : MonoBehaviour
         _walkingBackwards = inputManager.Move.y == -1;
         if (_walkingBackwards) speedValue = _isCrouching ? playerData._crouchSpeed : playerData._walkSpeed;
 
-        _moveInput = new Vector2(inputManager.Move.y * speedValue, inputManager.Move.x * speedValue);
+        _moveInput = new Vector2(inputManager.Move.y * speedValue * dragMultiplier, inputManager.Move.x * speedValue * dragMultiplier);
 
         float moveDirectionY = _moveDirection.y;
         _moveDirection = (transform.TransformDirection(Vector3.forward) * _moveInput.x) + (transform.TransformDirection(Vector3.right) * _moveInput.y);
@@ -229,6 +237,12 @@ public class FPS_Controller : MonoBehaviour
 
         if (!controller.isGrounded) _moveDirection.y -= playerData._playerGravity * Time.deltaTime;
         controller.Move(_moveDirection * Time.deltaTime);
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (GameSceneManager.instance.GetAIStateMachine(hit.collider.GetInstanceID()) != null) 
+            _dragMultiplier = 1f - _npcStickiness;     
     }
     #endregion
 

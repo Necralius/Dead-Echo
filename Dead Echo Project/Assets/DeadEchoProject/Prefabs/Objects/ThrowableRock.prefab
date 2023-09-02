@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: -4762298790485807265}
   - component: {fileID: 6519629711944075050}
   - component: {fileID: 6475938575589257051}
+  - component: {fileID: 7648813945538717097}
   m_Layer: 13
   m_Name: ThrowableRock
   m_TagString: AI Sound Emitter
@@ -245,11 +246,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb4cc0d1d5c192d4ab5e67455645dca1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultColliderSize: 27
+  timeToDeactive: 3
   clips:
   - {fileID: 8300000, guid: fad9f76621d1dd5489f50cd49c84057d, type: 3}
   - {fileID: 8300000, guid: bb88c0effeb0d8148b3731f4ff96e88b, type: 3}
   - {fileID: 8300000, guid: ac998f540956e1949b449a78b8586138, type: 3}
+  onCollision:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7648813945538717097}
+        m_TargetAssemblyTypeName: AISoundEmitter, Assembly-CSharp
+        m_MethodName: SetRadius
+        m_Mode: 4
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 1
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!135 &6475938575589257051
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -271,3 +287,16 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 219.2
   m_Center: {x: 0.16817701, y: 0.018092994, z: -0.020221537}
+--- !u!114 &7648813945538717097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6729308142977338910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e502bc4645c03f4caff62e6f8f5b202, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _decayRate: 1

@@ -16,20 +16,18 @@ public class MenuObject : MonoBehaviour
     public bool isActive = false;
     public string menuName = "Menu_";
 
-    public void Activate()
+    public void OpenMenu()
     {
         isActive = true; 
         gameObject.SetActive(true);
 
-        if (anim == null) return;
-        anim.SetTrigger(onEntryHash);
+        if (anim != null) anim.SetTrigger(onEntryHash);
     }
-    public void Deactivate()
+    public void CloseMenu()
     {
         isActive = false; 
         gameObject.SetActive(false);
 
-        if (anim == null) return;
-        anim.SetTrigger(onExitHash);
+        if (anim != null) anim.SetTrigger(onExitHash);
     }
 }

@@ -13,7 +13,7 @@ public class BulletBase : MonoBehaviour
     private float       _bulletSpeed                = 0f;
     private float       _bulletGravity              = 0f;
     private float       _bulletDamage               = 10f;
-    private int         _bulletOriginCharManager    = 0;
+    //private int         _bulletOriginCharManager    = 0;
     private float       _bulletImpactForce          = 30f;
     private Vector3     _startPosition              = Vector3.zero;
     private Vector3     _startForward               = Vector3.zero;

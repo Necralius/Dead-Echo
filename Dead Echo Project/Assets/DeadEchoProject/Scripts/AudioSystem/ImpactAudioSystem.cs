@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class ImpactAudioSystem : MonoBehaviour
 {
@@ -13,15 +14,9 @@ public class ImpactAudioSystem : MonoBehaviour
     #region - Data -
     [Header("Audio Data")]
     [SerializeField] private List<AudioClip> clips;
-    private float timeActive            = 1f;
-    private float timer                 = 0f;
-    private float destructionTimer      = 0f;
+    [SerializeField] private UnityEvent onCollision;
     #endregion
 
-    private void OnValidate()
-    {
-        col.radius = source.maxDistance * 27.4f;
-    }
     // ----------------------------------------------------------------------
     // Name: OnCollisionEnter
     // Desc: Detect an object collision to execute the audio impact system,
@@ -31,25 +26,25 @@ public class ImpactAudioSystem : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         col.enabled = true;
-        timer = 0;
-        destructionTimer = 0;
+        onCollision.Invoke();
         AudioSystem.Instance.PlayEffectSound(clips[Random.Range(0, clips.Count)], new Vector2(0.60f, 0.70f), new Vector2(0.95f, 1f), source);
+        Destroy(gameObject, 5f);
     }
     // ----------------------------------------------------------------------
     // Name: Update
     // Desc: Its called every frame, its used to manage an timer to deactive the object trigger when necessary.
     // ----------------------------------------------------------------------
-    private void Update()
-    {
-        destructionTimer += Time.deltaTime;
-        if (destructionTimer >= timeToDeactive) gameObject.SetActive(false);
+    //private void Update()
+    //{
+    //    destructionTimer += Time.deltaTime;
+    //    if (destructionTimer >= timeToDeactive) gameObject.SetActive(false);
 
-        if (timer >= timeActive)
-        {
-            col.enabled = false;
-            //col.radius = defaultColliderSize;
-            return;
-        }
-        timer += Time.deltaTime;
-    }
+    //    if (timer >= timeActive)
+    //    {
+    //        col.enabled = false;
+    //        //col.radius = defaultColliderSize;
+    //        return;
+    //    }
+    //    timer += Time.deltaTime;
+    //}
 }
