@@ -12,7 +12,7 @@ public enum AIBoneAligmentType  { XAxis, YAxis, ZAxis, XAxisInverted, YAxisInver
 
 // ------------------------------------------------------------------------
 // Class    :  AITarget
-// Desc     :  Descrives a potential target to the AI System
+// Desc     :  This structure storages all data from an potential target.
 // ------------------------------------------------------------------------
 public struct AITarget
 {
@@ -86,6 +86,15 @@ public abstract class AiStateMachine : MonoBehaviour
     protected Collider      _collider   = null;
     protected Transform     _transform  = null;
 
+    //IK
+    [Header("Iverse Kinematics")]
+    [SerializeField] private bool       _useIK = true;
+
+    [Header("Fooot IK")]
+    [SerializeField] private bool       _footIK             = true;
+    [SerializeField] private float      _distanceToGround   = 1f;
+    [SerializeField] private LayerMask  _groundMask;
+
     // Public Encapsulated Data
     public bool             isTargetReached { get =>_isTargetReached;   }
     public bool             inMeleeRange    { get; set;                 }
@@ -119,6 +128,8 @@ public abstract class AiStateMachine : MonoBehaviour
     public Vector3 targetPosition   { get => _target.position;                                          }
     public int targetColliderID     { get => _target.collider ? _target.collider.GetInstanceID() : -1;  }
     public bool CinematicEnabled    { get => _cinematicEnabled; set => _cinematicEnabled = value;       }
+    public bool UseIK { get => _useIK; set => _useIK = value; }
+    public bool UseFootIK { get => _footIK; set => _footIK = value; }
 
     // ------------------------------------------ Methods ------------------------------------------//
 
@@ -162,7 +173,6 @@ public abstract class AiStateMachine : MonoBehaviour
             }
         }
     }
-
 
     // ---------------------------------------------------------
     // Name: Start
@@ -351,6 +361,20 @@ public abstract class AiStateMachine : MonoBehaviour
         return Vector3.zero;
     }
 
+    public void SetStateOverride(AIStateType state)
+    {
+        if (state != _currentStateType && _states.ContainsKey(state))
+        {
+            if (_currentState != null) 
+                _currentState.OnExitState();
+
+            _currentState       = _states[state];
+            _currentStateType   = state;
+            _currentState.OnEnterState();
+        }
+    }
+
+
     // ----------------------------------------------------------------------
     // Name : OnTriggerEnter
     // Desc : Called by Physics system when the AI's Main collider enters
@@ -390,7 +414,41 @@ public abstract class AiStateMachine : MonoBehaviour
     }
     protected virtual void OnAnimatorIK(int layerIndex)
     {
-        if (_currentState != null) _currentState.OnAnimatorIKUpdated();
+        if (_animator == null) return;
+
+        if (_useIK)
+        {
+            if (_currentState != null) _currentState.OnAnimatorIKUpdated();
+
+            if (_footIK)
+            {
+                _animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1f);
+                _animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, 1f);
+
+                _animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1f);
+                _animator.SetIKRotationWeight(AvatarIKGoal.RightFoot, 1f);
+
+                RaycastHit hit;
+                Ray ray = new Ray(_animator.GetIKPosition(AvatarIKGoal.LeftFoot) + Vector3.up, Vector3.down);
+                if (Physics.Raycast(ray, out hit, _distanceToGround + 1f, _groundMask))
+                {
+                    Vector3 footPosition = hit.point;
+                    footPosition.y += _distanceToGround;
+                    _animator.SetIKPosition(AvatarIKGoal.LeftFoot, footPosition);
+                    _animator.SetIKRotation(AvatarIKGoal.LeftFoot, Quaternion.LookRotation(transform.forward, hit.normal));
+                }
+
+                ray = new Ray(_animator.GetIKPosition(AvatarIKGoal.RightFoot) + Vector3.up, Vector3.down);
+                if (Physics.Raycast(ray, out hit, _distanceToGround + 1f, _groundMask))
+                {
+                    Vector3 footPosition = hit.point;
+                    footPosition.y += _distanceToGround;
+                    _animator.SetIKPosition(AvatarIKGoal.RightFoot, footPosition);
+                    _animator.SetIKRotation(AvatarIKGoal.RightHand, Quaternion.LookRotation(transform.forward, hit.normal));
+                }
+            }
+            //Foot IK
+        }
     }
     public void NavAgentControl(bool positionUpdate, bool rotationUpdate)
     {

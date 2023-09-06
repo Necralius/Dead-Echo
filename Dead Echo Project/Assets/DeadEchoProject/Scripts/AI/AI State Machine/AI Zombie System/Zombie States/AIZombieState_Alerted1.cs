@@ -16,6 +16,8 @@ public class AIZombieState_Alerted1 : AIZombieState
     float _timer                    = 0f;
     float _directionChangeTimer     = 0f;
     float _screamChance             = 0f;
+    float _nextScream               = 0f;
+    float _screamFrequency          = 120f;
 
     // ----------------------------------------------------------------------
     // Name : GetStateType
@@ -29,14 +31,15 @@ public class AIZombieState_Alerted1 : AIZombieState
         if (_zombieStateMachine == null) return;
 
         _zombieStateMachine.NavAgentControl(true, false);
-        _zombieStateMachine.speed = 0f;
-        _zombieStateMachine.seeking = 0;
-        _zombieStateMachine.feeding = false;
-        _zombieStateMachine.attackType = 0;
 
-        _timer = _maxDuration;
-        _directionChangeTimer = 0f;
-        _screamChance = _zombieStateMachine.screamChance - Random.value;
+        _zombieStateMachine.speed           = 0f;
+        _zombieStateMachine.seeking         = 0;
+        _zombieStateMachine.feeding         = false;
+        _zombieStateMachine.attackType      = 0;
+
+        _timer                              = _maxDuration;
+        _directionChangeTimer               = 0f;
+        _screamChance                       = _zombieStateMachine.screamChance - Random.value;
     }
 
     // ----------------------------------------------------------------------
@@ -61,11 +64,12 @@ public class AIZombieState_Alerted1 : AIZombieState
         if (_zombieStateMachine.VisualThreat.type == AITargetType.Visual_Player)
         {
             _zombieStateMachine.SetTarget(_zombieStateMachine.VisualThreat);
-            if (_screamChance > 0f)
+            if (_screamChance > 0f && Time.time > _nextScream)
             {
                 if (_zombieStateMachine.Scream())
                 {
                     _screamChance = float.MinValue;
+                    _nextScream = Time.time + _screamFrequency;
                     return AIStateType.Alerted;
                 }
             }

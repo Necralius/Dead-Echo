@@ -23,7 +23,8 @@ public class Pistol : Mode_Semi
            _gunDataConteiner.gunBulletSettings._bulletLifeTime,
            _gunDataConteiner.gunBulletSettings._collisionMask,
            _gunDataConteiner.gunBulletSettings._bulletDamage,
-           _gunDataConteiner.gunBulletSettings._bulletImpactForce);
+           _gunDataConteiner.gunBulletSettings._bulletImpactForce, 
+           _playerController.transform);
         StartCoroutine(base.Shoot());
     }
 

@@ -68,6 +68,13 @@ public class AISoundEmitter : MonoBehaviour
         // TODO -> To represent an blood smell instinct on the zombies the radius seted on this method, will have some modification:
         // flot newRadius = Mathf.Max(_RadiusToSet, (MaxHealthValue - CurrentHealthValue) / 6f);
     }
+
+    // ----------------------------------------------------------------------
+    // Name: SetRadius (Method Overcharge)
+    // Desc: This method is an overcharge of the defaul SetRadius method,
+    //       the difference between the method are that, this method is only
+    //       for interactions where the radius will shrink over the time.
+    // ----------------------------------------------------------------------
     public void SetRadius(float newRadius)
     {
         if (!_collider) return;

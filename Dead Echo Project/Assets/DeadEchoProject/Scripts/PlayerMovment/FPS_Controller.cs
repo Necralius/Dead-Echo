@@ -17,6 +17,8 @@ public class FPS_Controller : MonoBehaviour
     private Transform bodyCamera            => GetComponentInChildren<Camera>().transform.parent;
     public GameObject cameraObject          => GetComponentInChildren<Camera>().gameObject;
     private InputManager inputManager       => InputManager.Instance != null ? InputManager.Instance : null;
+
+    public CharacterController characterController { get => controller; }
     #endregion
 
     #region - Gun System -
@@ -239,10 +241,9 @@ public class FPS_Controller : MonoBehaviour
         controller.Move(_moveDirection * Time.deltaTime);
     }
 
-    private void OnControllerColliderHit(ControllerColliderHit hit)
+    public void DoStickiness() 
     {
-        if (GameSceneManager.instance.GetAIStateMachine(hit.collider.GetInstanceID()) != null) 
-            _dragMultiplier = 1f - _npcStickiness;     
+        _dragMultiplier = 1f - _npcStickiness;     
     }
     #endregion
 

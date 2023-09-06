@@ -96,6 +96,7 @@ public class AIZombieStateMachine : AiStateMachine
     private IEnumerator                 _reanimationCoroutine   = null;
     private float                       _mecanimTransitionTime  = 0.1f;
 
+    #region - Encapsulated Data -
     // Public Encapsulated Data
     public float    replenishRate   { get => _replenishRate;    }
     public float    fov             { get => _fov;              }
@@ -113,6 +114,7 @@ public class AIZombieStateMachine : AiStateMachine
     public bool     isCrawling      { get => _lowerBodyDamage >= _crawlThreshold; }
     public bool     isScreaming     { get => _isScreaming > 0.1f; }
     public float    screamChance    { get => _screamChance; }
+    #endregion
 
     // ------------------------------------------ Methods ------------------------------------------ //
 
@@ -406,7 +408,7 @@ public class AIZombieStateMachine : AiStateMachine
     public bool Scream()
     {
         if (isScreaming) return true;
-        if (_animator == null || _cinematicEnabled || _screamPrefab == null) return false;
+        if (_animator == null || _cinematicEnabled || _screamPrefab == null || isCrawling) return false;
 
         _animator.SetTrigger(_screamHash);
         Vector3 spawnPos = _screamPosition == AIScreamPosition.Entity ? transform.position : VisualThreat.position;

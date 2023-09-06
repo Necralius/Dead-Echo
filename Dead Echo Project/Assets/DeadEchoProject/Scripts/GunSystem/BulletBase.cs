@@ -26,6 +26,8 @@ public class BulletBase : MonoBehaviour
     private Vector3     _direction                  = Vector3.zero;
     private LayerMask   _collisionLayerMask;
 
+    private Transform   _bulletOrigin = null;
+
     Func<Vector3, string> _hitInteraction;
 
     // ----------------------------------------------------------------------
@@ -41,15 +43,17 @@ public class BulletBase : MonoBehaviour
         float bulletLifeTime, 
         LayerMask collisionLayerMask, 
         float bulletDamage, 
-        float bulletImpactForce)
+        float bulletImpactForce, 
+        Transform playerAgent)
     {
-        _direction = Vector3.zero;
-        _startPosition = startPoint.position;
+        _direction              = Vector3.zero;
+        _startPosition          = startPoint.position;
 
-        float x = Random.Range(-spread, spread);
-        float y = Random.Range(-spread, spread);
+        float x                 = Random.Range(-spread, spread);
+        float y                 = Random.Range(-spread, spread);
+        _bulletOrigin           = playerAgent;
 
-        _direction              = FPS_Controller.Instance.cameraObject.transform.forward + new Vector3(x, y, 0);
+        _direction              = playerAgent.GetComponent<FPS_Controller>().cameraObject.transform.forward + new Vector3(x, y, 0);
 
         _startForward           = startPoint.forward + _direction;
 
