@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -9,6 +10,7 @@ public enum AIStateType         { None, Idle, Alerted, Patrol, Attack, Feeding, 
 public enum AITargetType        { None, Waypoint, Visual_Player, Visual_Light, Visual_Food, Audio }
 public enum AITriggerEventType  { Enter, Stay, Exit}
 public enum AIBoneAligmentType  { XAxis, YAxis, ZAxis, XAxisInverted, YAxisInverted, ZAxisInverted }
+public enum PatrolType          { Waypoint, RandomPatrol }
 
 // ------------------------------------------------------------------------
 // Class    :  AITarget
@@ -48,6 +50,15 @@ public struct AITarget
 
 public abstract class AiStateMachine : MonoBehaviour
 {
+    [Header("Waypoint System")]
+    [SerializeField] protected PatrolType           _patrolType                = PatrolType.Waypoint;
+
+    [SerializeField] protected bool                 _randomWaypointPatrol      = false;
+    [SerializeField] protected WaypointNetwork      _waypointNetwork           = null;
+    [SerializeField] protected float                _patrolRadius              = 10f;
+
+    protected int                                   _currentWaypoint           = -1;
+
     //Public
     public AITarget     VisualThreat    = new AITarget();
     public AITarget     AudioThreat     = new AITarget();
@@ -73,11 +84,6 @@ public abstract class AiStateMachine : MonoBehaviour
     [SerializeField] protected AIStateType          _currentStateType           = AIStateType.Idle;
     [SerializeField] protected AIBoneAligmentType   _rootBoneAligmentType       = AIBoneAligmentType.ZAxis;
 
-    [Header("Waypoint System")]
-    [SerializeField] protected bool                 _randomPatrol               = false;
-    [SerializeField] protected int                  _currentWaypoint            = -1;
-    [SerializeField] protected WaypointNetwork      _waypointNetwork            = null;
-
     [SerializeField, Range(0, 15)] protected float  _stoppingDistance           = 1f;
 
     // Dependencies Cache
@@ -90,10 +96,11 @@ public abstract class AiStateMachine : MonoBehaviour
     [Header("Iverse Kinematics")]
     [SerializeField] private bool       _useIK = true;
 
-    [Header("Fooot IK")]
+    [Header("Foot IK")]
     [SerializeField] private bool       _footIK             = true;
     [SerializeField] private float      _distanceToGround   = 1f;
     [SerializeField] private LayerMask  _groundMask;
+
 
     // Public Encapsulated Data
     public bool             isTargetReached { get =>_isTargetReached;   }
@@ -128,8 +135,10 @@ public abstract class AiStateMachine : MonoBehaviour
     public Vector3 targetPosition   { get => _target.position;                                          }
     public int targetColliderID     { get => _target.collider ? _target.collider.GetInstanceID() : -1;  }
     public bool CinematicEnabled    { get => _cinematicEnabled; set => _cinematicEnabled = value;       }
-    public bool UseIK { get => _useIK; set => _useIK = value; }
-    public bool UseFootIK { get => _footIK; set => _footIK = value; }
+    public bool UseIK               { get => _useIK; set => _useIK = value; }
+    public bool UseFootIK           { get => _footIK; set => _footIK = value; }
+    public PatrolType patrolType    { get => _patrolType; }
+    public bool RandomWaypointPatrol { get => _randomWaypointPatrol; set => _randomWaypointPatrol = value; }
 
     // ------------------------------------------ Methods ------------------------------------------//
 
@@ -328,7 +337,7 @@ public abstract class AiStateMachine : MonoBehaviour
 
     private void NextWaypoint()
     {
-        if (_randomPatrol && _waypointNetwork.waypoints.Count > 1)
+        if (_randomWaypointPatrol && _waypointNetwork.waypoints.Count > 1)
         {
             int oldWaypoint = _currentWaypoint;
             while (_currentWaypoint == oldWaypoint) _currentWaypoint = Random.Range(0, _waypointNetwork.waypoints.Count);
@@ -343,22 +352,48 @@ public abstract class AiStateMachine : MonoBehaviour
     // ----------------------------------------------------------------------
     public Vector3 GetWaypointPosition(bool increment)
     {
-        if (_currentWaypoint == -1)
+        switch (_patrolType)
         {
-            if (_randomPatrol) _currentWaypoint = Random.Range(0, _waypointNetwork.waypoints.Count);
-            else _currentWaypoint = 0;
-        }
-        else if (increment) NextWaypoint();
+            case PatrolType.Waypoint:
 
-        if (_waypointNetwork.waypoints[_currentWaypoint] != null)
-        {
-            Transform newWaypoint = _waypointNetwork.waypoints[_currentWaypoint];
+                if (_currentWaypoint == -1)
+                {
+                    if (_randomWaypointPatrol) _currentWaypoint = Random.Range(0, _waypointNetwork.waypoints.Count);
+                    else _currentWaypoint = 0;
+                }
+                else if (increment) NextWaypoint();
 
-            SetTarget(AITargetType.Waypoint,
-                null, newWaypoint.position, Vector3.Distance(newWaypoint.position, transform.position));
-            return newWaypoint.position;
+                if (_waypointNetwork.waypoints[_currentWaypoint] != null)
+                {
+                    Transform newWaypoint = _waypointNetwork.waypoints[_currentWaypoint];
+
+                    SetTarget(AITargetType.Waypoint,
+                        null, newWaypoint.position, Vector3.Distance(newWaypoint.position, transform.position));
+                    return newWaypoint.position;
+                }
+                break;
+
+            case PatrolType.RandomPatrol:
+                Vector3 point;
+                while (true) if (GetRandomPoint(transform.position, out point)) return point;
         }
         return Vector3.zero;
+    }
+
+    bool GetRandomPoint(Vector3 center, out Vector3 point)
+    {
+        for (int i = 0; i < 30; i++)
+        {
+            Vector3 randomPoint = center + Random.insideUnitSphere * _patrolRadius;
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(randomPoint, out hit, 1f, NavMesh.AllAreas))
+            {
+                point = hit.position;
+                return true;
+            }
+        }
+        point = Vector3.zero;
+        return false;
     }
 
     public void SetStateOverride(AIStateType state)

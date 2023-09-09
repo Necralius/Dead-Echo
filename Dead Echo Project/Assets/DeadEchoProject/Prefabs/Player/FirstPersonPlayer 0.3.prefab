@@ -917,6 +917,13 @@ MonoBehaviour:
   _aimOffset: 0
   _aimReloadOffset: 0.2
   gunModes: 
+  _clipProjector: {fileID: 8371191901417713723}
+  _checkDistance: 1
+  _newDirection: {x: 0, y: -90, z: 0}
+  _isClipped: 0
+  _clipingMask:
+    serializedVersion: 2
+    m_Bits: 4093640704
 --- !u!114 &8540348518518250308
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2757,6 +2764,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1075720712158764742}
   - component: {fileID: 7069990062900324182}
+  - component: {fileID: 7823178305961325052}
   m_Layer: 9
   m_Name: PlayerZone
   m_TagString: Untagged
@@ -2802,6 +2810,18 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &7823178305961325052
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4948747824827858216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96f43110bf53ba346893fa6b780f52f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4976347873116798113
 GameObject:
   m_ObjectHideFlags: 0
@@ -4033,7 +4053,7 @@ MonoBehaviour:
     _timeToCrouch: 0.25
     _crouchUpLayer:
       serializedVersion: 2
-      m_Bits: 0
+      m_Bits: 4227858433
     _crouchingCenter: {x: 0, y: 0.5, z: 0}
     _standingCenter: {x: 0, y: 0, z: 0}
     walkBobSpeed: 14
@@ -4062,36 +4082,10 @@ MonoBehaviour:
   weaponSwayObject: {fileID: 2803063961065135608}
   idleSwayObject: {fileID: 4114436444354716579}
   swayData:
-    gunSwayEffectors:
-      lookSwayEffector: 10
-      maxLoookSwayAmountEffector: 5
-      xMovmentSwayEffector: 10
-      yMovmentSwayEffector: 10
-      maxMovmentSwayEffector: 5
-      rotationaSwayEffector: 5
-      maxRotationSwayAmountEffector: 5
-    swayAmount: 0.1
-    maxAmount: 0.2
-    smoothAmount: 0.6
-    initialPosition: {x: 0, y: 0, z: 0}
-    rotationSwayAmount: 10
-    maxRotationSwayAmount: 10
-    smoothRotationAmount: 10
-    initialRotation: {x: 0, y: 0, z: 0, w: 0}
-    swayOnX: 1
-    swayOnY: 1
-    swayOnZ: 1
-    movmentSwayXAmount: 0.2
-    movmentSwayYAmount: 0.01
-    movmentSwaySmooth: 6
-    maxMovmentSwayAmount: 0.02
-    swayAmountA: 4
-    swayAmountB: 2
-    swayScale: 600
-    aimSwayScale: 6000
-    swayLerpSpeed: 14
-    swayTime: 5.128777
-    swayPosition: {x: -0.0015655803, y: 0.0042116484, z: 0}
+    _inputSway: 1
+    _movmentSway: 1
+    _rotationalSway: 1
+    _idleSway: 1
   objectThrowForce: 5
   objectThrowUpForce: 5
   flashLight: {fileID: 2656012778308125767}

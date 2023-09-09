@@ -67,6 +67,18 @@ public abstract class GunBase : MonoBehaviour
     int gunModeIndex = 0;
     #endregion
 
+    #region - Gun Clipping Prevetion -
+    [Header("Gun Clipping Prevention")]
+    [SerializeField] private GameObject                 _clipProjector  = null;
+    [SerializeField, Range(0.1f, 3f)] private float     _checkDistance  = 1f;
+    [SerializeField] private Vector3                    _newDirection   = Vector3.zero;
+    [SerializeField] private bool                       _isClipped      = false;
+    [SerializeField] private LayerMask                  _clipingMask;
+
+    private float       _lerpPos;
+    private RaycastHit  _hit;
+    #endregion
+
 
     //----------------------------------- Methods -----------------------------------//
 
@@ -158,7 +170,7 @@ public abstract class GunBase : MonoBehaviour
             */
 
             if (_inputManager.shootAction.WasPressedThisFrame() && _magAmmo <= 0) SS_GunShootJam();
-            if (!_isReloading && _canShoot)
+            if (!_isReloading && _canShoot && !_isClipped)
             {
                 if (_magAmmo > 0)
                 {
@@ -190,9 +202,32 @@ public abstract class GunBase : MonoBehaviour
         _playerController.armsAnimator.SetBool(_isWalkingHash, _playerController._isWalking);
         _playerController.armsAnimator.SetBool(_isRunningHash, _playerController._isSprinting);
 
+        ClipPrevetionBehavior();
+
         //NOTE: On override, always mantain the base code using the base.Update();
         //-> Otherwise, every systems of the gun base will be broken!!
     }
+    #endregion
+
+    #region - Clip Prevetion Behavior -
+    private void ClipPrevetionBehavior()
+    {
+        if (Physics.Raycast(_clipProjector.transform.position, _clipProjector.transform.forward, out _hit, _checkDistance, _clipingMask))
+        {
+            _lerpPos = 1 - (_hit.distance / _checkDistance);
+            _isClipped = true;
+        }
+        else
+        {
+            _lerpPos = 0;
+            _isClipped = false;
+        }
+
+        Mathf.Clamp01(_lerpPos);
+
+        transform.localRotation = Quaternion.Lerp(Quaternion.Euler(Vector3.zero), Quaternion.Euler(_newDirection), _lerpPos);
+    }
+
     #endregion
 
     #region - Shoot Behavior -

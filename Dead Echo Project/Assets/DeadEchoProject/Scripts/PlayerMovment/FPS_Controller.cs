@@ -15,9 +15,8 @@ public class FPS_Controller : MonoBehaviour
     #region - Controller Dependencies -
     private CharacterController controller  => GetComponent<CharacterController>();
     private Transform bodyCamera            => GetComponentInChildren<Camera>().transform.parent;
-    public GameObject cameraObject          => GetComponentInChildren<Camera>().gameObject;
     private InputManager inputManager       => InputManager.Instance != null ? InputManager.Instance : null;
-
+    public GameObject cameraObject          => GetComponentInChildren<Camera>().gameObject;
     public CharacterController characterController { get => controller; }
     #endregion
 
@@ -112,12 +111,15 @@ public class FPS_Controller : MonoBehaviour
 
     #endregion
 
+    #region - Drag System -
+    [Header("Drag Multiplier")]
     float _dragMultiplier       = 1f;
     float _dragMultiplierLimit  = 1f;
     [SerializeField, Range(0f, 1f)] float _npcStickiness = 0.5f;
 
-    public float dragMultiplierLimit    { get => _dragMultiplierLimit;  set => _dragMultiplierLimit = Mathf.Clamp01(value); }
+    public float dragMultiplierLimit    { get => _dragMultiplierLimit;  set => _dragMultiplierLimit = Mathf.Clamp01(value);                   }
     public float dragMultiplier         { get => _dragMultiplier;       set => _dragMultiplier      = Mathf.Min(value, _dragMultiplierLimit); }
+    #endregion
 
     // ---------------------------- Methods ----------------------------//
 
@@ -132,7 +134,7 @@ public class FPS_Controller : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
     }
 
-    //
+    // ----------------------------------------------------------------------
     // Name: Start
     // Desc: This method is called on the game start, mainly he 
     //
@@ -141,6 +143,7 @@ public class FPS_Controller : MonoBehaviour
         InGame_UIManager.Instance.UpdatePlayerState(this);
         defaultYPost = bodyCamera.transform.localPosition.y;
     }
+
     // ----------------------------------------------------------------------
     // Name: Update
     // Desc: This method is called every frame, mainly the method handle the
@@ -193,8 +196,6 @@ public class FPS_Controller : MonoBehaviour
         _isGrounded     =   controller.isGrounded;
         _inAir          =   !_isGrounded;
         _lookInput      =   inputManager.Look;
-
-        if (equippedGun != null) CalculateWeaponSway();
 
         ReticleManager.Instance.DataReceiver(this);
     }
@@ -320,73 +321,6 @@ public class FPS_Controller : MonoBehaviour
             defaultYPost + Mathf.Sin(_timer) * (_isCrouching ? playerData.crouchBobAmount : _isSprinting ? playerData.sprintBobAmount : playerData.walkBobAmount)
             , bodyCamera.transform.localPosition.z);
     }
-    #endregion
-
-    #region - Weapon Sway Calculations -
-    private void CalculateWeaponSway()
-    {
-        #region - Aim Effectors -
-        //This statements change all the sway mechanics values whether or not the player is aiming
-        float calcSwayAmount = equippedGun._isAiming ? swayData.swayAmount / swayData.gunSwayEffectors.lookSwayEffector : swayData.swayAmount;
-        float calcMaxAmount = equippedGun._isAiming ? swayData.maxAmount / swayData.gunSwayEffectors.maxLoookSwayAmountEffector : swayData.maxAmount;
-        float calcMovmentSwayXAmount = equippedGun._isAiming ? swayData.movmentSwayXAmount / swayData.gunSwayEffectors.xMovmentSwayEffector : swayData.movmentSwayXAmount;
-        float calcMovmentSwayYAmount = equippedGun._isAiming ? swayData.movmentSwayYAmount / swayData.gunSwayEffectors.yMovmentSwayEffector : swayData.movmentSwayYAmount;
-        float calcMaxMovmentSwayAmount = equippedGun._isAiming ? swayData.maxMovmentSwayAmount / swayData.gunSwayEffectors.maxMovmentSwayEffector : swayData.maxMovmentSwayAmount;
-        float calcRotationSwayAmount = equippedGun._isAiming ? swayData.rotationSwayAmount / swayData.gunSwayEffectors.rotationaSwayEffector : swayData.rotationSwayAmount;
-        float calcMaxRotationSwayAmount = equippedGun._isAiming ? swayData.maxRotationSwayAmount / swayData.gunSwayEffectors.maxRotationSwayAmountEffector : swayData.maxRotationSwayAmount;
-        #endregion
-
-        #region - Weapon Position Sway Calculations -
-        //This statements represent the weapon look movment sway calculations 
-        float lookInputX = -_lookInput.x * calcSwayAmount;
-        float lookInputY = -_lookInput.y * calcSwayAmount;
-
-        lookInputX = Mathf.Clamp(lookInputX, -calcMaxAmount, calcMaxAmount);
-        lookInputY = Mathf.Clamp(lookInputY, -calcMaxAmount, calcMaxAmount);
-
-        Vector3 finalPosition = new Vector3(lookInputX, lookInputY, 0);
-        weaponSwayObject.transform.localPosition = Vector3.Lerp(weaponSwayObject.transform.localPosition, finalPosition + swayData.initialPosition, swayData.smoothAmount * Time.deltaTime);
-        #endregion
-
-        #region - Movment Sway Calculations -
-        //This statementes represent the weapon sway based on the player movment
-
-        float movmentInputX = _moveInput.x * calcMovmentSwayXAmount;
-        float movmentInputY = _moveInput.y * calcMovmentSwayYAmount;
-
-        movmentInputX = Mathf.Clamp(movmentInputX, -calcMaxMovmentSwayAmount, calcMaxMovmentSwayAmount);
-        movmentInputY = Mathf.Clamp(movmentInputY, -calcMaxMovmentSwayAmount, calcMaxMovmentSwayAmount);
-
-        Vector3 movmentSwayFinalPosition = new Vector3(movmentInputY, movmentInputX, 0);
-
-        weaponSwayObject.transform.localPosition = Vector3.Lerp(weaponSwayObject.transform.localPosition, movmentSwayFinalPosition + swayData.initialPosition, swayData.movmentSwaySmooth * Time.deltaTime);
-        #endregion
-
-        #region - Weapon Rotation Sway Calculations -
-        //This statementes represent the weapon rotational sway calculations
-
-        float rotationX = Mathf.Clamp(_lookInput.y * calcRotationSwayAmount, -calcMaxRotationSwayAmount, calcMaxRotationSwayAmount);
-        float rotationY = Mathf.Clamp(_lookInput.x * calcRotationSwayAmount, -calcMaxRotationSwayAmount, calcMaxRotationSwayAmount);
-
-        Quaternion finalRotation = Quaternion.Euler(new Vector3(swayData.swayOnX ? -rotationX : 0f, swayData.swayOnY ? -rotationY : 0f, swayData.swayOnZ ? -rotationY : 0f));
-
-        weaponSwayObject.transform.localRotation = Quaternion.Slerp(weaponSwayObject.transform.localRotation, finalRotation * swayData.initialRotation, swayData.smoothRotationAmount * Time.deltaTime);
-        #endregion
-
-        #region - Breathing Idle Sway -
-        //This statements use the LissajousCurve calculation to make an breathing idle procedural animation
-        Vector3 targetPosition = LissajousCurve(swayData.swayTime, swayData.swayAmountA, swayData.swayAmountB) / (equippedGun._isAiming ? swayData.aimSwayScale : swayData.swayScale);
-
-        swayData.swayPosition = Vector3.Lerp(swayData.swayPosition, targetPosition, Time.smoothDeltaTime * swayData.swayLerpSpeed);
-
-        idleSwayObject.transform.localPosition = swayData.swayPosition;
-
-        swayData.swayTime += Time.deltaTime;
-
-        if (swayData.swayTime > 6.3f) swayData.swayTime = 0;
-        #endregion
-    }
-    private Vector3 LissajousCurve(float Time, float A, float B) => new Vector3(Mathf.Sin(Time), A * Mathf.Sin(B * Time + Mathf.PI));//This method return an calculation that is used to make an procedural horizontal and vertical wave that represent an breathing idle animation
     #endregion
 
     #region - Gun Equip System -
