@@ -53,7 +53,7 @@ public class BulletBase : MonoBehaviour
         float y                 = Random.Range(-spread, spread);
         _bulletOrigin           = playerAgent;
 
-        _direction              = playerAgent.GetComponent<FPS_Controller>().cameraObject.transform.forward + new Vector3(x, y, 0);
+        _direction              = playerAgent.GetComponent<ControllerManager>()._cameraObject.transform.forward + new Vector3(x, y, 0);
 
         _startForward           = startPoint.forward + _direction;
 

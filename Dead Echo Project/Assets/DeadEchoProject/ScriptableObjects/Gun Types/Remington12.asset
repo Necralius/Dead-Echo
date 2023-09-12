@@ -10,22 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 0}
-  m_Name: Remington
-  m_EditorClassIdentifier: Assembly-CSharp:NekraByte:FPS_Utility/GunDataConteiner
+  m_Name: Remington12
+  m_EditorClassIdentifier: Assembly-CSharp:NekraByte:FPS_Utility/Core/DataTypes/GunDataConteiner
   gunData:
-    gunName: Remington
+    gunName: Remington12
     shootType: 1
     gunMode: 1
-    rateOfFire: 1
+    rateOfFire: 0.9
   gunBulletSettings:
-    shootDamageRange: {x: 10, y: 25}
+    shootDamageRange: {x: 1, y: 5}
     _bulletTag: RifleBullet
-    _bulletSpeed: 100
-    _bulletGravity: 3
+    _bulletSpeed: 50
+    _bulletGravity: 2
     _bulletSpread: 0.1
-    _bulletLifeTime: 2
+    _bulletLifeTime: 10
     _bulletsPerShoot: 6
-    _bulletDamage: 2
+    _bulletDamage: 5
     _bulletImpactForce: 10
     _collisionMask:
       serializedVersion: 2
@@ -33,7 +33,7 @@ MonoBehaviour:
   gunAudioAsset:
     ShootClip: {fileID: 8300000, guid: 49182f7f6c11bda40bc100004a1a4f21, type: 3}
     AimClip: {fileID: 8300000, guid: 6d18729c8b539aa4d800edeb0bd8dc1c, type: 3}
-    DrawClip: {fileID: 8300000, guid: ba2ef8b9083c04742b864552507d7b60, type: 3}
+    DrawClip: {fileID: 0}
     HolstClip: {fileID: 8300000, guid: ba2ef8b9083c04742b864552507d7b60, type: 3}
     ReloadClip: {fileID: 8300000, guid: 614dd3f89ac464643bf6edb2294c2f78, type: 3}
     ReloadClipVar1: {fileID: 8300000, guid: 5816412c6ef38924896bc3afa4a9aead, type: 3}

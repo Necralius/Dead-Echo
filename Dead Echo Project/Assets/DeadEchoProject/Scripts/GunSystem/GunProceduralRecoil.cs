@@ -9,7 +9,7 @@ public class GunProceduralRecoil : MonoBehaviour
 
     #region - Class References -
     public GameObject Weapon => gameObject;
-    [HideInInspector] public GameObject cameraObject;
+    [HideInInspector] public GameObject recoilObject;
     #endregion
 
     #region - Weapon Recoil Vectors -
@@ -39,7 +39,7 @@ public class GunProceduralRecoil : MonoBehaviour
     #endregion
 
     #region - Recoil Calculation -
-    private void Update() => RecoilCalculation();
+    //private void Update() => RecoilCalculation();
     private void RecoilCalculation()
     {
         //This method use the Vector3.Lerp to interpolate between two vectors to apply the recoil, one vector represents the weapon position with the recoil values, the other vector literally applis the recoil to the current position and rotation
@@ -58,7 +58,7 @@ public class GunProceduralRecoil : MonoBehaviour
 
         var newRot = new Vector3(currentRotation.x * RecoilReduct, currentRotation.y * RecoilReduct, currentRotation.z * RecoilReduct);
 
-        cameraObject.transform.localRotation = Quaternion.Euler(newRot);
+        recoilObject.transform.localRotation = Quaternion.Euler(newRot);
     }
     #endregion
 

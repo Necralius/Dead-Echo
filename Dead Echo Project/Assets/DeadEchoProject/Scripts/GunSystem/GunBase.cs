@@ -1,27 +1,25 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using static NekraByte.FPS_Utility;
-using static NekraByte.FPS_Utility.GunData;
-using static UnityEngine.InputSystem.InputSettings;
 using Random = UnityEngine.Random;
+using static NekraByte.FPS_Utility.Core.Enumerators;
+using static NekraByte.FPS_Utility.Core.Procedural;
+using static NekraByte.FPS_Utility.Core.DataTypes;
 
 [RequireComponent(typeof(Animator))]
 public abstract class GunBase : MonoBehaviour
 {
     #region - Dependencies -
-    [HideInInspector] public    Animator                _animator;
-    [HideInInspector] public    FPS_Controller          _playerController;
-    [HideInInspector] public    CharacterManager _characterManager;
-    [SerializeField] protected  GunDataConteiner        _gunDataConteiner;
-    protected                   InputManager            _inputManager;
-    protected                   GunProceduralRecoil     _recoilAsset => GetComponent<GunProceduralRecoil>();
-    private                     Transform               _aimHolder => _playerController.aimHolder;
-    public                      ParticleSystem          _muzzleFlash;
-    public                      Transform               _rockThrowPosition;
+    [HideInInspector] public    Animator                _animator           = null;
+    protected                   ControllerManager       _playerController   = null;
+    [HideInInspector] public    CharacterManager        _characterManager   = null;
+    [SerializeField] protected  GunDataConteiner        _gunDataConteiner   = null;
+    protected                   InputManager            _inputManager       = null;
+    protected                   GunProceduralRecoil     _recoilAsset        = null;
+    private                     Transform               _aimHolder          = null;
+    public                      ParticleSystem          _muzzleFlash        = null;
+    public                      Transform               _rockThrowPosition  = null;
     #endregion
 
     #region - Ammo System Data -
@@ -39,6 +37,7 @@ public abstract class GunBase : MonoBehaviour
     public bool                     _isReloading     = false;
     public bool                     _isShooting      = false;
     public bool                     _isAiming        = false;
+    public bool                     _aimOverride     = false;
     public bool                     _canShoot        = true;
     #endregion
 
@@ -50,6 +49,9 @@ public abstract class GunBase : MonoBehaviour
     [SerializeField, Range(1, 20)] private float _aimSpeed;
     [SerializeField] private float _aimOffset;
     [SerializeField] private float _aimReloadOffset;
+    [SerializeField] private float damping = 0.2f;
+    [SerializeField] private float stiffness = 2f;
+    [SerializeField] private SpringInterpolator aimInterpolator; 
     #endregion
 
     #region - Animation Hashes -
@@ -62,23 +64,22 @@ public abstract class GunBase : MonoBehaviour
     #endregion
 
     #region - Gun Mode System -
-    [Header("Gun Mode System")]
-    [SerializeField] private List<GunMode> gunModes;
+    //[Header("Gun Mode System")]
+    private List<GunMode> gunModes = new List<GunMode>();
     int gunModeIndex = 0;
     #endregion
 
     #region - Gun Clipping Prevetion -
     [Header("Gun Clipping Prevention")]
-    [SerializeField] private GameObject                 _clipProjector  = null;
     [SerializeField, Range(0.1f, 3f)] private float     _checkDistance  = 1f;
     [SerializeField] private Vector3                    _newDirection   = Vector3.zero;
     [SerializeField] private bool                       _isClipped      = false;
     [SerializeField] private LayerMask                  _clipingMask;
+    private Transform                 _clipProjector  = null;
 
     private float       _lerpPos;
     private RaycastHit  _hit;
     #endregion
-
 
     //----------------------------------- Methods -----------------------------------//
 
@@ -91,10 +92,19 @@ public abstract class GunBase : MonoBehaviour
     // ----------------------------------------------------------------------
     protected virtual void Start()
     {
-        _playerController           = GetComponentInParent<FPS_Controller>();
-        _inputManager               = InputManager.Instance;
+        _playerController           = GetComponentInParent<CamLocker>()._playerController;
         _animator                   = GetComponent<Animator>();
-        _recoilAsset.cameraObject   = _playerController.cameraObject;       
+        _recoilAsset                = GetComponent<GunProceduralRecoil>();
+
+        _inputManager               = _playerController._inptManager;
+
+        _recoilAsset.recoilObject   = AnimationLayer.GetAnimationLayer("RecoilLayer", _playerController._animLayers).layerObject;
+        _aimHolder                  = AnimationLayer.GetAnimationLayer("AimLayer", _playerController._animLayers).layerObject.transform;
+        _clipProjector              = AnimationLayer.GetAnimationLayer("GunLayer", _playerController._animLayers).layerObject.transform;
+
+        if (_gunDataConteiner == null) return;
+
+        gunModes = new List<GunMode>();
 
         switch (_gunDataConteiner.gunData.shootType)
         {
@@ -132,6 +142,8 @@ public abstract class GunBase : MonoBehaviour
         }
 
         UI_Update();
+
+        aimInterpolator = new SpringInterpolator(_aimHolder.transform.position);
     }
 
     // ----------------------------------------------------------------------
@@ -144,15 +156,17 @@ public abstract class GunBase : MonoBehaviour
         //First, the method verifies if all the class dependencies is valid, if its not the program behavior is returned, otherwise,
         //the program continue to his default behavior.
         if (!_isEquiped)                             return;
-        if (_playerController               == null) return;
-        if (_inputManager                   == null) return;
-        if (_playerController.armsAnimator  == null) return;
-        if (_animator                       == null) return;
+        if (_playerController                   == null) return;
+        if (_inputManager                       == null) return;
+        if (_playerController._armsAnimator     == null) return;
+        if (_animator                           == null) return;
 
         //The class focus on limiting the functionalitys, using ifs to limit the actions based in expressions.
         if (!_playerController._isSprinting)
         {
-            _isAiming = _inputManager.aiming;
+            if (!_aimOverride) 
+                _isAiming = _inputManager.aiming;
+
             _recoilAsset.isAiming = _isAiming;
 
             if (_playerController._isThrowingObject) return;
@@ -199,8 +213,8 @@ public abstract class GunBase : MonoBehaviour
         Aim(); //-> This statement calls the aim position calculation method.
 
         //The below statements set the animations on the main arms animator controler.
-        _playerController.armsAnimator.SetBool(_isWalkingHash, _playerController._isWalking);
-        _playerController.armsAnimator.SetBool(_isRunningHash, _playerController._isSprinting);
+        _playerController._armsAnimator.SetBool(_isWalkingHash, _playerController._isWalking);
+        _playerController._armsAnimator.SetBool(_isRunningHash, _playerController._isSprinting);
 
         ClipPrevetionBehavior();
 
@@ -212,6 +226,12 @@ public abstract class GunBase : MonoBehaviour
     #region - Clip Prevetion Behavior -
     private void ClipPrevetionBehavior()
     {
+        if (_clipProjector == null)
+        {
+            Debug.Log("Is Null");
+            return;
+        }
+
         if (Physics.Raycast(_clipProjector.transform.position, _clipProjector.transform.forward, out _hit, _checkDistance, _clipingMask))
         {
             _lerpPos = 1 - (_hit.distance / _checkDistance);
@@ -238,8 +258,13 @@ public abstract class GunBase : MonoBehaviour
     // ----------------------------------------------------------------------
     protected virtual IEnumerator Shoot()
     {
+        if (_gunDataConteiner == null) yield break;
+        if (_muzzleFlash == null) yield break;
+        if (_recoilAsset == null) yield break;
+
         SS_Shoot();
-        
+
+
         if (_gunDataConteiner.gunData.shootType == ShootType.Semi_Shotgun ||
             _gunDataConteiner.gunData.shootType == ShootType.Semi_Pistol ||
             _gunDataConteiner.gunData.shootType == ShootType.Sniper) _animator.SetTrigger(_shootHash);
@@ -264,11 +289,13 @@ public abstract class GunBase : MonoBehaviour
     // ----------------------------------------------------------------------
     private void Aim()
     {
+        if (_aimHolder == null) return;
+
         if (_playerController._isSprinting) _aimTargetPos = _defaultPosition;
         else if (_isAiming) _aimTargetPos = new Vector3(_aimPosition.x, _aimPosition.y, _aimPosition.z + (_isReloading ? _aimReloadOffset : _aimOffset));
         else _aimTargetPos = _defaultPosition;
 
-        _aimHolder.transform.localPosition = Vector3.Lerp(_aimHolder.transform.localPosition, _aimTargetPos, _aimSpeed * Time.deltaTime);
+        _aimHolder.transform.localPosition = aimInterpolator.SpringLerp(_aimTargetPos, stiffness, damping, Time.deltaTime * _aimSpeed);
     }
     #endregion
 
@@ -454,7 +481,7 @@ public abstract class GunBase : MonoBehaviour
         if (rock.GetComponent<Rigidbody>())
         {
             Rigidbody rb = rock.GetComponent<Rigidbody>();
-            Vector3 forceToAdd = _playerController.cameraObject.transform.forward *
+            Vector3 forceToAdd = _playerController._cameraObject.forward *
                 _playerController.objectThrowForce +
                 transform.up *
                 _playerController.objectThrowUpForce;

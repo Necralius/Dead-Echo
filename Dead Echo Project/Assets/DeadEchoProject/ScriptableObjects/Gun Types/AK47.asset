@@ -11,31 +11,31 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 0}
   m_Name: AK47
-  m_EditorClassIdentifier: Assembly-CSharp:NekraByte:FPS_Utility/GunDataConteiner
+  m_EditorClassIdentifier: Assembly-CSharp:NekraByte:FPS_Utility/Core/DataTypes/GunDataConteiner
   gunData:
     gunName: AK47
     shootType: 2
     gunMode: 0
     rateOfFire: 0.1
   gunBulletSettings:
-    shootDamageRange: {x: 10, y: 25}
+    shootDamageRange: {x: 35, y: 60}
     _bulletTag: RifleBullet
-    _bulletSpeed: 1000
-    _bulletGravity: 1
+    _bulletSpeed: 500
+    _bulletGravity: 2
     _bulletSpread: 0.001
     _bulletLifeTime: 10
     _bulletsPerShoot: 1
-    _bulletDamage: 41
-    _bulletImpactForce: 3
+    _bulletDamage: 15
+    _bulletImpactForce: 10
     _collisionMask:
       serializedVersion: 2
-      m_Bits: 4227858560
+      m_Bits: 4261412992
   gunAudioAsset:
     ShootClip: {fileID: 8300000, guid: 34cb9be5d62dbdf4cb998f4f84d1c3db, type: 3}
     AimClip: {fileID: 8300000, guid: 4c8628db2f8f3284caab565ef0bb81ce, type: 3}
     DrawClip: {fileID: 0}
     HolstClip: {fileID: 0}
     ReloadClip: {fileID: 8300000, guid: b1596116f9fa31f498e3ba15e736b6dd, type: 3}
-    ReloadClipVar1: {fileID: 8300000, guid: b1596116f9fa31f498e3ba15e736b6dd, type: 3}
+    ReloadClipVar1: {fileID: 8300000, guid: 27a6421a8ca60ec49af482f6bdb078d9, type: 3}
     FullReloadClip: {fileID: 8300000, guid: 9e3f41eeb402d014889023664764ce32, type: 3}
     BoltActionClip: {fileID: 0}

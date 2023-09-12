@@ -11,22 +11,22 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 0}
   m_Name: Makarov
-  m_EditorClassIdentifier: Assembly-CSharp:NekraByte:FPS_Utility/GunDataConteiner
+  m_EditorClassIdentifier: Assembly-CSharp:NekraByte:FPS_Utility/Core/DataTypes/GunDataConteiner
   gunData:
     gunName: Makarov
     shootType: 4
-    gunMode: 1
-    rateOfFire: 0.2
+    gunMode: 2
+    rateOfFire: 0.1
   gunBulletSettings:
     shootDamageRange: {x: 10, y: 25}
     _bulletTag: RifleBullet
-    _bulletSpeed: 900
+    _bulletSpeed: 500
     _bulletGravity: 2
-    _bulletSpread: 0.001
+    _bulletSpread: 1
     _bulletLifeTime: 10
     _bulletsPerShoot: 1
-    _bulletDamage: 30
-    _bulletImpactForce: 1
+    _bulletDamage: 15
+    _bulletImpactForce: 10
     _collisionMask:
       serializedVersion: 2
       m_Bits: 4227858560

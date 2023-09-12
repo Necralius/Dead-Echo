@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using static NekraByte.FPS_Utility;
+using static NekraByte.FPS_Utility.Core.DataTypes;
 
 public class FPS_Controller : MonoBehaviour
 {
@@ -87,9 +88,6 @@ public class FPS_Controller : MonoBehaviour
     [Header("Weapon Sway")]
     public GameObject weaponSwayObject;
     public GameObject idleSwayObject;
-
-    [Header("Sway Data")]
-    [SerializeField] private SwayData swayData;
 
     #endregion
 
@@ -375,4 +373,6 @@ public class FPS_Controller : MonoBehaviour
         SS_Flashlight();
     }
     #endregion
+
+
 }

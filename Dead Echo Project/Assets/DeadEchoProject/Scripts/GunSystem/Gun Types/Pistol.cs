@@ -13,10 +13,10 @@ public class Pistol : Mode_Semi
         _canShoot = false;
 
         BulletBase bullet = ObjectPooler.Instance.SpawnFromPool(_gunDataConteiner.gunBulletSettings._bulletTag,
-            _playerController.shootPoint.transform.position,
-            _playerController.shootPoint.transform.rotation).GetComponent<BulletBase>();
+            _playerController._shootPoint.transform.position,
+            _playerController._shootPoint.transform.rotation).GetComponent<BulletBase>();
 
-        bullet.Initialize(_playerController.shootPoint.transform,
+        bullet.Initialize(_playerController._shootPoint.transform,
            _gunDataConteiner.gunBulletSettings._bulletSpread,
            _gunDataConteiner.gunBulletSettings._bulletSpeed,
            _gunDataConteiner.gunBulletSettings._bulletGravity,

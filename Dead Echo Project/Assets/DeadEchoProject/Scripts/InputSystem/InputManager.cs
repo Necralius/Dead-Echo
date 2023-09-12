@@ -38,8 +38,8 @@ public class InputManager : MonoBehaviour
     //Movment Actions
     private InputAction moveAction;
     private InputAction lookAction;
-    private InputAction jumpAction;
-    private InputAction crouchAction;
+    public InputAction jumpAction;
+    public InputAction crouchAction;
     public InputAction sprintAction;
 
     //Gun Behavior Actions

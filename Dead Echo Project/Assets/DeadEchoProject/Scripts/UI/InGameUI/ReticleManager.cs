@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-using static NekraByte.FPS_Utility;
+using static NekraByte.FPS_Utility.Core.Enumerators;
 
 namespace NekraliusDevelopmentStudio
 {
@@ -71,6 +71,22 @@ namespace NekraliusDevelopmentStudio
                 isShooting      = controller.equippedGun._isShooting;
                 isAiming        = controller.equippedGun._isAiming;
                 isReloading     = controller.equippedGun._isReloading;
+            }
+
+            SetReticleState();
+        }
+        public void DataReceiver(ControllerManager controller)
+        {
+            isMoving        = controller._isWalking;
+            isRunning       = controller._isSprinting;
+            isCrouching     = controller._isCrouching;
+            inAir           = controller._currentState.Equals(MovementState.Air);
+            
+            if (controller._equippedGun != null)
+            {
+                isShooting      = controller._equippedGun._isShooting;
+                isAiming        = controller._equippedGun._isAiming;
+                isReloading     = controller._equippedGun._isReloading;
             }
 
             SetReticleState();

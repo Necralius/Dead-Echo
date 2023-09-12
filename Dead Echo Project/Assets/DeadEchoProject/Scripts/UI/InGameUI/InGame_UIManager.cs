@@ -5,7 +5,8 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static NekraByte.FPS_Utility.GunData;
+using static NekraByte.FPS_Utility.Core.DataTypes;
+using static NekraByte.FPS_Utility.Core.Enumerators;
 
 public class InGame_UIManager : MonoBehaviour
 {
@@ -36,6 +37,10 @@ public class InGame_UIManager : MonoBehaviour
     }
 
     public void UpdatePlayerState(FPS_Controller controller)
+    {
+        playerSprite.GetComponent<Slider>().image.sprite = controller._isCrouching ? crouchSprite : standUpSprite;
+    }
+    public void UpdatePlayerState(ControllerManager controller)
     {
         playerSprite.GetComponent<Slider>().image.sprite = controller._isCrouching ? crouchSprite : standUpSprite;
     }

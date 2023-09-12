@@ -270,7 +270,7 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""610f58d6-e4fe-426e-9297-f6dd7311c5fc"",
-                    ""path"": ""<Keyboard>/leftCtrl"",
+                    ""path"": ""<Keyboard>/c"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
