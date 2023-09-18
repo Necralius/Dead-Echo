@@ -12,7 +12,7 @@ public class BulletBase : MonoBehaviour
     //Private Data
     private float       _bulletSpeed                = 0f;
     private float       _bulletGravity              = 0f;
-    private float       _bulletDamage               = 10f;
+    private Vector2     _bulletDamage               = new Vector2(1,5);
     //private int         _bulletOriginCharManager    = 0;
     private float       _bulletImpactForce          = 30f;
     private Vector3     _startPosition              = Vector3.zero;
@@ -42,7 +42,7 @@ public class BulletBase : MonoBehaviour
         float gravity, 
         float bulletLifeTime, 
         LayerMask collisionLayerMask, 
-        float bulletDamage, 
+        Vector2 bulletDamage, 
         float bulletImpactForce, 
         Transform playerAgent)
     {
@@ -170,12 +170,14 @@ public class BulletBase : MonoBehaviour
         // In this code section the bullet verifies if the hit has finded an object of type AI Body Part and executes an aditional actions on the hit.
         if (hit.transform.gameObject.layer == LayerMask.NameToLayer("AI Body Part"))
         {
+            int damage = (int)Random.Range(-_bulletDamage.x, _bulletDamage.y);
+
             // The method tries to get an valid AI Instance acessing the GameSceneManager and execute an hit action
             AiStateMachine stateMachine = GameSceneManager.instance.GetAIStateMachine(hit.rigidbody.GetInstanceID());
             if (stateMachine) 
                 stateMachine.TakeDamage(hit.point, 
                     -hit.normal * _bulletImpactForce, 
-                    (int)_bulletDamage, 
+                    damage, 
                     hit.rigidbody, 
                     _bulletOrigin.GetComponent<CharacterManager>(), 
                     0);

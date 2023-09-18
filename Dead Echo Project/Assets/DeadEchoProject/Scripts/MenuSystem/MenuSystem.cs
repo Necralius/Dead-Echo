@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MenuSystem : MonoBehaviour
 {
-
+    
     public void StartGame()
     {
         //Start a new game from the starting point

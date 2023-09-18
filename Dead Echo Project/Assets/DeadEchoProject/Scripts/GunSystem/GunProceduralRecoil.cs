@@ -1,16 +1,13 @@
 using UnityEngine;
+using static NekraByte.FPS_Utility.Core.DataTypes.GunDataConteiner;
 
 public class GunProceduralRecoil : MonoBehaviour
 {
-    //Code made by Victor Paulo Melo da Silva - Junior Unity Programmer - https://www.linkedin.com/in/victor-nekra-dev/
-    //GunProceduralRecoil - Code Update Version 0.4 - (Refactored code).
-    //Feel free to take all the code logic and apply in yours projects.
-    //This project represents a work to improve my personal portifolio, and has no intention of obtaining any financial return.
-
-    #region - Class References -
-    public GameObject Weapon => gameObject;
-    [HideInInspector] public GameObject recoilObject;
-    #endregion
+    /* Code made by Victor Paulo Melo da Silva - Junior Unity Programmer - https://www.linkedin.com/in/victor-nekra-dev/
+     * GunProceduralRecoil - Code Update Version 0.7 - (Refactored code).
+     * Feel free to take all the code logic and apply in yours projects.
+     * This project represents a work to improve my personal habilities, and has no intention of obtaining any financial return.
+     */
 
     #region - Weapon Recoil Vectors -
     private Vector3 currentRotation;
@@ -20,54 +17,107 @@ public class GunProceduralRecoil : MonoBehaviour
     private Vector3 targetPosition;
     #endregion
 
-    #region - Recoil Values -
-    [SerializeField] private float recoilX = -3;
-    [SerializeField] private float recoilY = 3;
-    [SerializeField] private float recoilZ = 2;
-
-    [SerializeField] private float snappiness = 6;
-    [SerializeField] private float returnSpeed = 20;
-
-    #region - Aim Value Effector -
-    public float RecoilReduct = 1;
-    public float aimReductionFactor = 0.3f;
+    #region - Class References -
+    private GameObject recoilObject     = null;
     #endregion
 
-    public float Z_KickBack = 0.4f;
-    float Z_Current_KickBack = 0.4f;
-    public bool isAiming;
+    #region - Recoil Values -
+    private float _recoilX      = -3;
+    private float _recoilY      = 3f;
+    private float _recoilZ      = 2f;
+
+    private float _snappiness       = 6f;
+    private float _returnSpeed      = 20f;
+
+    private float _zKickBack                = 0.4f;
+    private float Z_Current_KickBack        = 0.4f;
+
+    private float _recoilReduct                 = 1f;
+    [HideInInspector] public bool _isAiming     = false;
+    #endregion
+
+    // ------------------------------------------ Methods ------------------------------------------ //
+
+    #region - BuiltIn Methods -
+    // ----------------------------------------------------------------------
+    // Name: Start
+    // Desc: This method is called on the game start, and mainly the method
+    //       get all the class dependencies objects.
+    // ----------------------------------------------------------------------
+    private void Start()
+    {
+        recoilObject = AnimationLayer.GetAnimationLayer("RecoilLayer", ControllerManager.Instance._animLayers).layerObject;
+    }
+    #endregion
+
+    #region - Data Initialization -
+    // ----------------------------------------------------------------------
+    // Name: InitializeData
+    // Desc: This method receive the initial recoil data by the current
+    //       weapon.
+    // ----------------------------------------------------------------------
+    public void InitializeData(RecoilData data)
+    {
+        _recoilX        = data._recoilX;
+        _recoilY        = data._recoilY;
+        _recoilZ        = data._recoilZ;
+
+        _zKickBack      = data._zKickback;
+
+        _snappiness     = data._snappiness;
+        _returnSpeed    = data._returnSpeed;
+
+        _recoilReduct   = data._recoilReduction;
+    }
     #endregion
 
     #region - Recoil Calculation -
-    //private void Update() => RecoilCalculation();
+    // ----------------------------------------------------------------------
+    // Name: RecoilCalculation
+    // Desc: This method calls the recoil movement calculation every frame
+    //       update.
+    // -----------------------------------------------------------------------
+    private void Update() => RecoilCalculation();
+
+    // ----------------------------------------------------------------------
+    // Name: RecoilCalculation
+    // Desc: This method calculates the recoil vectors, adding smoothig using
+    //       lerps and slerps, considering the aim state and finally adding
+    //       the movement to the recoil object.
+    // ----------------------------------------------------------------------
     private void RecoilCalculation()
     {
         //This method use the Vector3.Lerp to interpolate between two vectors to apply the recoil, one vector represents the weapon position with the recoil values, the other vector literally applis the recoil to the current position and rotation
-        if (isAiming) Z_Current_KickBack = Z_KickBack * aimReductionFactor;
-        else Z_Current_KickBack = Z_KickBack;
+        if (_isAiming) Z_Current_KickBack = _zKickBack;
+        else Z_Current_KickBack = _zKickBack;
 
-        targetPosition = Vector3.Lerp(targetPosition, Vector3.zero, returnSpeed * Time.deltaTime);
-        currentPosition = Vector3.Lerp(currentPosition, targetPosition, snappiness * Time.deltaTime);
-        Weapon.transform.localPosition = currentPosition;
+        targetPosition      = Vector3.Lerp(targetPosition, Vector3.zero, _returnSpeed * Time.deltaTime);
+        currentPosition     = Vector3.Lerp(currentPosition, targetPosition, _snappiness * Time.deltaTime);
 
-        Vector3 localRot = new Vector3(0, Weapon.transform.localRotation.y, Weapon.transform.localRotation.z);
-        targetRotation = Vector3.Lerp(targetRotation, localRot, returnSpeed * Time.deltaTime);
-        currentRotation = Vector3.Slerp(currentRotation, targetRotation, snappiness * Time.deltaTime);
+        recoilObject.transform.localPosition = currentPosition;
 
-        Weapon.transform.localRotation = Quaternion.Euler(currentRotation);
+        targetRotation      = Vector3.Lerp(targetRotation, Vector3.zero, _returnSpeed * Time.deltaTime);
+        currentRotation     = Vector3.Slerp(currentRotation, targetRotation, _snappiness * Time.fixedDeltaTime);
 
-        var newRot = new Vector3(currentRotation.x * RecoilReduct, currentRotation.y * RecoilReduct, currentRotation.z * RecoilReduct);
-
-        recoilObject.transform.localRotation = Quaternion.Euler(newRot);
+        recoilObject.transform.localRotation = Quaternion.Euler(currentRotation);
     }
     #endregion
 
     #region - Recoil Fire -
+    // ----------------------------------------------------------------------
+    // Name: RecoilFire
+    // Desc: This method trigger the gun recoil action, seting the recoil to
+    //       the target rotation that will be handle on the update section
+    //       later.
+    // ----------------------------------------------------------------------
     public void RecoilFire()
     {
         //This method fires the recoil, add the recoil variables values to the current targetRotation and position
-        targetPosition -= Vector3.forward * Z_Current_KickBack;
-        targetRotation += new Vector3(recoilX, Random.Range(-recoilY, recoilY), Random.Range(-recoilZ, recoilZ));
+        targetPosition -= _isAiming ? (Vector3.forward * Z_Current_KickBack) * _recoilReduct : Vector3.forward * Z_Current_KickBack;
+
+        if (_isAiming) targetRotation += new Vector3(_recoilX, Random.Range(-_recoilY, _recoilY), Random.Range(-_recoilZ, _recoilZ)) * _recoilReduct;
+        else targetRotation += new Vector3(_recoilX, Random.Range(-_recoilY, _recoilY), Random.Range(-_recoilZ, _recoilZ));
+        
     }
     #endregion
 }

@@ -6,6 +6,7 @@ using Random = UnityEngine.Random;
 using static NekraByte.FPS_Utility.Core.Enumerators;
 using static NekraByte.FPS_Utility.Core.Procedural;
 using static NekraByte.FPS_Utility.Core.DataTypes;
+using UnityEngine.Rendering.HighDefinition;
 
 [RequireComponent(typeof(Animator))]
 public abstract class GunBase : MonoBehaviour
@@ -42,23 +43,13 @@ public abstract class GunBase : MonoBehaviour
     #endregion
 
     #region - Aim System -
-    [Header("Aim System"), Tooltip("Aim settings")]
-    [SerializeField] private Vector3 _defaultPosition;
-    [SerializeField] private Vector3 _aimPosition;
-    private Vector3 _aimTargetPos;
-    [SerializeField, Range(1, 20)] private float _aimSpeed;
-    [SerializeField] private float _aimOffset;
-    [SerializeField] private float _aimReloadOffset;
-    [SerializeField] private float damping = 0.2f;
-    [SerializeField] private float stiffness = 2f;
-    [SerializeField] private SpringInterpolator aimInterpolator; 
     #endregion
 
     #region - Animation Hashes -
     private     int _isWalkingHash      = Animator.StringToHash("isWalking");
     private     int _isRunningHash      = Animator.StringToHash("isRunning");
     protected   int _isReloadingHash    = Animator.StringToHash("isReloading");
-    protected   int _reloadFactor       = Animator.StringToHash("ReloadFactor");
+    protected   int _reloadFactorHash       = Animator.StringToHash("ReloadFactor");
     protected   int _holstWeaponHash    = Animator.StringToHash("HolstWeapon");
     protected   int _shootHash          = Animator.StringToHash("Shoot");
     #endregion
@@ -66,7 +57,7 @@ public abstract class GunBase : MonoBehaviour
     #region - Gun Mode System -
     //[Header("Gun Mode System")]
     private List<GunMode> gunModes = new List<GunMode>();
-    int gunModeIndex = 0;
+    int _gunModeIndex = 0;
     #endregion
 
     #region - Gun Clipping Prevetion -
@@ -80,6 +71,11 @@ public abstract class GunBase : MonoBehaviour
     private float       _lerpPos;
     private RaycastHit  _hit;
     #endregion
+
+    [SerializeField] private float smoothTime = 10f;
+
+    private Vector3 originalWeaponPosition;
+    private Camera _camera;
 
     //----------------------------------- Methods -----------------------------------//
 
@@ -95,17 +91,19 @@ public abstract class GunBase : MonoBehaviour
         _playerController           = GetComponentInParent<CamLocker>()._playerController;
         _animator                   = GetComponent<Animator>();
         _recoilAsset                = GetComponent<GunProceduralRecoil>();
-
         _inputManager               = _playerController._inptManager;
 
-        _recoilAsset.recoilObject   = AnimationLayer.GetAnimationLayer("RecoilLayer", _playerController._animLayers).layerObject;
         _aimHolder                  = AnimationLayer.GetAnimationLayer("AimLayer", _playerController._animLayers).layerObject.transform;
         _clipProjector              = AnimationLayer.GetAnimationLayer("GunLayer", _playerController._animLayers).layerObject.transform;
 
+        _camera = _camera = AnimationLayer.GetAnimationLayer("CameraLayer", _playerController._animLayers).layerObject.GetComponent<Camera>();
+        originalWeaponPosition = _aimHolder.localPosition;
+        
         if (_gunDataConteiner == null) return;
 
-        gunModes = new List<GunMode>();
+        _recoilAsset.InitializeData(_gunDataConteiner.recoilData);
 
+        gunModes = new List<GunMode>();
         switch (_gunDataConteiner.gunData.shootType)
         {
             case ShootType.Semi_Shotgun:
@@ -142,8 +140,6 @@ public abstract class GunBase : MonoBehaviour
         }
 
         UI_Update();
-
-        aimInterpolator = new SpringInterpolator(_aimHolder.transform.position);
     }
 
     // ----------------------------------------------------------------------
@@ -160,6 +156,9 @@ public abstract class GunBase : MonoBehaviour
         if (_inputManager                       == null) return;
         if (_playerController._armsAnimator     == null) return;
         if (_animator                           == null) return;
+        if (_recoilAsset                        == null) return;
+        
+        _recoilAsset.InitializeData(_gunDataConteiner.recoilData);
 
         //The class focus on limiting the functionalitys, using ifs to limit the actions based in expressions.
         if (!_playerController._isSprinting)
@@ -167,9 +166,10 @@ public abstract class GunBase : MonoBehaviour
             if (!_aimOverride) 
                 _isAiming = _inputManager.aiming;
 
-            _recoilAsset.isAiming = _isAiming;
+            _recoilAsset._isAiming = _isAiming;
 
             if (_playerController._isThrowingObject) return;
+
             /* The below statements verifies if the player triggered the reload button
              * and if is not reloading, if the current mag ammo is different  from its
              * maximum and if has any ammo in the inventory.
@@ -224,14 +224,21 @@ public abstract class GunBase : MonoBehaviour
     #endregion
 
     #region - Clip Prevetion Behavior -
+    // ----------------------------------------------------------------------
+    // Name: ClipPreventionBehavior
+    // Desc: This method prevent the gun clipping in surfaces, basically the
+    //       method detects an surface collision in front of the gund,
+    //       later, the gun rotates towards the new rotation seted on the
+    //       _newDirection.
+    // ----------------------------------------------------------------------
     private void ClipPrevetionBehavior()
     {
         if (_clipProjector == null)
         {
-            Debug.Log("Is Null");
+            Debug.Log("Clip projector is Null");
             return;
         }
-
+        
         if (Physics.Raycast(_clipProjector.transform.position, _clipProjector.transform.forward, out _hit, _checkDistance, _clipingMask))
         {
             _lerpPos = 1 - (_hit.distance / _checkDistance);
@@ -245,9 +252,8 @@ public abstract class GunBase : MonoBehaviour
 
         Mathf.Clamp01(_lerpPos);
 
-        transform.localRotation = Quaternion.Lerp(Quaternion.Euler(Vector3.zero), Quaternion.Euler(_newDirection), _lerpPos);
+        _aimHolder.transform.localRotation = Quaternion.Lerp(Quaternion.Euler(Vector3.zero), Quaternion.Euler(_newDirection), _lerpPos);
     }
-
     #endregion
 
     #region - Shoot Behavior -
@@ -266,7 +272,7 @@ public abstract class GunBase : MonoBehaviour
 
 
         if (_gunDataConteiner.gunData.shootType == ShootType.Semi_Shotgun ||
-            _gunDataConteiner.gunData.shootType == ShootType.Semi_Pistol ||
+            _gunDataConteiner.gunData.shootType == ShootType.Semi_Pistol  ||
             _gunDataConteiner.gunData.shootType == ShootType.Sniper) _animator.SetTrigger(_shootHash);
 
         _recoilAsset.RecoilFire();
@@ -289,13 +295,35 @@ public abstract class GunBase : MonoBehaviour
     // ----------------------------------------------------------------------
     private void Aim()
     {
-        if (_aimHolder == null) return;
+        if (_aimHolder  == null) return;
+        if (_camera     == null) return;
+        if (_isClipped)         return;
 
-        if (_playerController._isSprinting) _aimTargetPos = _defaultPosition;
-        else if (_isAiming) _aimTargetPos = new Vector3(_aimPosition.x, _aimPosition.y, _aimPosition.z + (_isReloading ? _aimReloadOffset : _aimOffset));
-        else _aimTargetPos = _defaultPosition;
+        if (_isAiming)
+        {
+            // Calculate the target screen position at the center of the screen
+            Vector3 targetScreenPosition = new Vector3(Screen.width / 2f, Screen.height / 2f, 0f);
 
-        _aimHolder.transform.localPosition = aimInterpolator.SpringLerp(_aimTargetPos, stiffness, damping, Time.deltaTime * _aimSpeed);
+            // Convert the screen position to a world position based on the weapon's distance from the camera
+            float distanceFromCamera = Vector3.Distance(_aimHolder.position, _camera.transform.position);
+            Vector3 targetWorldPosition = _camera.ScreenToWorldPoint(new Vector3(targetScreenPosition.x, targetScreenPosition.y, distanceFromCamera));
+
+            // Convert the world position to a local position relative to the weapon
+            Vector3 targetLocalPosition = _aimHolder.parent.InverseTransformPoint(targetWorldPosition);
+
+            // Apply the specified offsets
+            targetLocalPosition += new Vector3(_gunDataConteiner.gunData.aimOffset.x, 
+                _gunDataConteiner.gunData.aimOffset.y, 
+                _gunDataConteiner.gunData.aimOffset.z);
+
+            // Apply the reload offset if applicable
+            targetLocalPosition.z = _isReloading ? _gunDataConteiner.gunData.aimOffset.z + _gunDataConteiner.gunData._aimReloadOffset : 
+                _gunDataConteiner.gunData.aimOffset.z;
+
+            // Lerp the weapon position to match the target position
+            _aimHolder.localPosition = Vector3.Lerp(_aimHolder.localPosition, targetLocalPosition, Time.deltaTime * smoothTime);
+        }
+        else _aimHolder.localPosition = Vector3.Lerp(_aimHolder.localPosition, originalWeaponPosition, Time.deltaTime * smoothTime);
     }
     #endregion
 
@@ -319,7 +347,7 @@ public abstract class GunBase : MonoBehaviour
         SS_Reload(reloadIndex);
 
         _animator.SetTrigger(_isReloadingHash);
-        _animator.SetFloat(_reloadFactor, reloadIndex);
+        _animator.SetFloat(_reloadFactorHash, reloadIndex);
     }
 
     // ----------------------------------------------------------------------
@@ -378,12 +406,12 @@ public abstract class GunBase : MonoBehaviour
     // ----------------------------------------------------------------------
     private void ChangeGunMode()
     {
-        gunModeIndex++;
-        if (gunModeIndex > gunModes.Count - 1) gunModeIndex = 0;
+        _gunModeIndex++;
+        if (_gunModeIndex > gunModes.Count - 1) _gunModeIndex = 0;
 
-        gunModeIndex = Mathf.Clamp(gunModeIndex, 0, gunModes.Count);
+        _gunModeIndex = Mathf.Clamp(_gunModeIndex, 0, gunModes.Count);
 
-        _gunDataConteiner.gunData.gunMode = gunModes[gunModeIndex];
+        _gunDataConteiner.gunData.gunMode = gunModes[_gunModeIndex];
 
         UI_Update(); // -> Updates the gun UI.
         SS_ChangeGunMode(); // -> Trigger the method sound.        
@@ -455,15 +483,15 @@ public abstract class GunBase : MonoBehaviour
     }
     public void EndDraw()
     {
-        _isEquiped = true;
-        _canShoot = true;
+        _isEquiped  = true;
+        _canShoot   = true;
         UI_Update();
     }
     public void GunHolst()
     {
         _animator.SetTrigger(_holstWeaponHash);
-        _isEquiped = false;
-        _canShoot = false;
+        _isEquiped  = false;
+        _canShoot   = false;
         SS_GunHolst();
     }
     public void EndHolst()

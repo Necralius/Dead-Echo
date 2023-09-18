@@ -31,9 +31,11 @@ namespace NekraByte
                 [CreateAssetMenu(menuName = "NekraByte/FPS_Utility/Guns/New Gun Data", fileName = "New Gun Data")]
                 public class GunDataConteiner : ScriptableObject
                 {
-                    public GunData gunData = new GunData();
-                    public BulletSettings gunBulletSettings = new BulletSettings();
-                    public AudioAsset gunAudioAsset = new AudioAsset();
+                    [Header("Gun General Data")]
+                    public GunData          gunData             = new GunData();
+                    public BulletSettings   gunBulletSettings   = new BulletSettings();
+                    public AudioAsset       gunAudioAsset       = new AudioAsset();
+                    public RecoilData       recoilData          = new RecoilData();
 
                     #region - Gun Data Model -
                     [Serializable]
@@ -45,6 +47,10 @@ namespace NekraByte
                         public GunMode gunMode;
 
                         [Range(0.01f, 2f)] public float rateOfFire = 0.1f;
+
+                        [Header("Aim Data")]
+                        public Vector3 aimOffset = new Vector3();
+                        public float _aimReloadOffset = 0.3f;
                     }
                     #endregion
 
@@ -52,17 +58,16 @@ namespace NekraByte
                     [Serializable]
                     public class BulletSettings
                     {
-                        [Header("Gun Settings"), Tooltip("Gun aspects settings")]
-                        public Vector2 shootDamageRange = new(10f, 25f);
-                        [SerializeField] public string _bulletTag = "RifleBullet";
-                        [Range(1, 5000)] public float _bulletSpeed = 500f;
-                        [Range(1f, 50)] public float _bulletGravity = 2f;
-                        [Range(0.001f, 10)] public float _bulletSpread = 1f;
-                        [Range(1, 15)] public float _bulletLifeTime = 10f;
-                        [Range(1, 10)] public int _bulletsPerShoot = 1;
-                        public float _bulletDamage = 15f;
-                        public float _bulletImpactForce = 10f;
-                        public LayerMask _collisionMask;
+                        [Header("Gun Settings"), Tooltip("Gun Bullet Settings")]
+                        public Vector2                          _shootDamageRange   = new(10f, 25f);
+                        [SerializeField]        public string   _bulletTag          = "RifleBullet";
+                        [Range(1, 1000)]        public float    _bulletSpeed        = 200f;
+                        [Range(0.1f, 50)]       public float    _bulletGravity      = 2f;
+                        [Range(0.001f, 10)]     public float    _bulletSpread       = 0.1f;
+                        [Range(1f, 15f)]        public float    _bulletLifeTime     = 5f;
+                        [Range(1, 10)]          public int      _bulletsPerShoot    = 1;
+                        [Range(1f, 30f)]        public float    _bulletImpactForce  = 10f;
+                        public LayerMask                        _collisionMask;
                     }
                     #endregion
 
@@ -80,6 +85,28 @@ namespace NekraByte
                         public AudioClip BoltActionClip;
                     }
                     #endregion
+
+                    #region - Gun Recoil Asset -
+                    [Serializable]
+                    public class RecoilData
+                    {
+                        [Header("Recoil Vertical Settings")]
+                        public float _recoilX = -3;
+                        public float _recoilY = 3;
+                        public float _recoilZ = 2;
+
+                        [Header("Back Recoil")]
+                        public float _zKickback = 0.4f;
+
+                        [Header("Recoil Smoothing")]
+                        public float _snappiness = 6f;
+                        public float _returnSpeed = 20f;
+
+                        [Header("Aim Effector"), Tooltip("When aiming the player receive less recoil, this variable change the recoil reduction")]
+                        public float _recoilReduction = 0.3f;
+                    }
+                    #endregion
+
                 }
                 #endregion
 
@@ -88,12 +115,13 @@ namespace NekraByte
                 public class SwayData
                 {
                     [Header("Sway State")]
-                    public bool _inputSway = true;
-                    public bool _movementSway = true;
-                    public bool _idleSway = true;
+                    public bool _inputSway      = true;
+                    public bool _movementSway   = true;
+                    public bool _idleSway       = true;
 
                     [Header("Input Sway")]
-                    public float inpt_amount;
+                    public float inpt_amountX;
+                    public float inpt_amountY;
                     public float inpt_smoothAmount;
                     public float inpt_swayResetSmooth;
 
@@ -101,17 +129,22 @@ namespace NekraByte
                     public float inpt_clampY = 12f;
 
                     [Header("Weapon Movement Sway")]
-                    public float move_SwayX;
-                    public float move_SwayY;
+                    public float move_amountX;
+                    public float move_amountY;
                     public float move_SmoothAmount;
 
                     [Header("Idle Sway")]
-                    public float swayAmountA = 1f;
-                    public float swayAmountB = 2f;
-                    public float swayScale = 600f;
-                    public float swayLerpSpeed = 14f;
+                    public float swayAmountA    = 1f;
+                    public float swayAmountB    = 2f;
+                    public float swayScale      = 400f;
+                    public float swayLerpSpeed  = 14f;
 
                     [HideInInspector] public float swayTime;
+
+                    [Header("Aim Effectors")]
+                    public float idle_AimEffector = 0.3f;
+                    public float inpt_AimEffector = 0.3f;
+                    public float move_AimEffector = 0.3f;
                 }
                 #endregion
 
@@ -156,13 +189,14 @@ namespace NekraByte
                 }
                 #endregion
 
+                #region - Character UI State -
                 [Serializable]
                 public struct CharacterState
                 {                  
                     public StateType type;
                     public Sprite stateSprite;
                 }
-
+                #endregion
             }
 
             // --------------------------------------------------------------
@@ -251,6 +285,7 @@ namespace NekraByte
                 }
                 #endregion
 
+                #region - Animation Layer Type -
                 public enum LayerBehavior
                 {
                     None, 
@@ -258,7 +293,9 @@ namespace NekraByte
                     Override, 
                     Referencial
                 }
+                #endregion
 
+                #region - Player State Types -
                 public enum StateType 
                 { 
                     Stand,
@@ -267,8 +304,8 @@ namespace NekraByte
                     Jumping
                 }
                 public enum MovementState { Idle, Walking, Sprinting, Crouching, Air, Sliding }
+                #endregion
             }
         }
-
     }
 }

@@ -17,7 +17,7 @@ public class AIDamageTrigger : MonoBehaviour
 
     private void Start()
     {
-        _stateMachine       = transform.root.GetComponentInChildren<AiStateMachine>();
+        _stateMachine       = GetComponentInParent<AiStateMachine>();
         _parameterHash      = Animator.StringToHash( _paramenter );
         _gameSceneManager   = GameSceneManager.instance;
         if (_stateMachine != null) _animator = _stateMachine.animator;
@@ -25,13 +25,14 @@ public class AIDamageTrigger : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (!_animator) return;
+        if (_animator           == null) return;
+        if (_gameSceneManager   == null) return;
 
         if (other.gameObject.CompareTag("Player") && _animator.GetFloat(_parameterHash) > 0.9f)
         {
-            if (GameSceneManager.instance && GameSceneManager.instance.bloodParticles)
+            if (_gameSceneManager.bloodParticles)
             {
-                ParticleSystem system = GameSceneManager.instance.bloodParticles;
+                ParticleSystem system = _gameSceneManager.bloodParticles;
 
                 system.transform.position = transform.position;
                 system.transform.rotation = Camera.main.transform.rotation;
@@ -45,7 +46,6 @@ public class AIDamageTrigger : MonoBehaviour
             if (_gameSceneManager != null)
             {
                 PlayerInfo info = _gameSceneManager.GetPlayerInfo(other.GetInstanceID());
-
                 if (info != null && info.characterManager != null) 
                     info.characterManager.TakeDamage(_damageAmount);
             }

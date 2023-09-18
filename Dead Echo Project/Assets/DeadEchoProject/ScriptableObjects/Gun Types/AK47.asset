@@ -17,15 +17,16 @@ MonoBehaviour:
     shootType: 2
     gunMode: 0
     rateOfFire: 0.1
+    aimOffset: {x: -0.029, y: -0.19, z: -0.35}
+    _aimReloadOffset: 0.3
   gunBulletSettings:
-    shootDamageRange: {x: 35, y: 60}
+    _shootDamageRange: {x: 5, y: 15}
     _bulletTag: RifleBullet
-    _bulletSpeed: 500
+    _bulletSpeed: 200
     _bulletGravity: 2
     _bulletSpread: 0.001
     _bulletLifeTime: 10
     _bulletsPerShoot: 1
-    _bulletDamage: 15
     _bulletImpactForce: 10
     _collisionMask:
       serializedVersion: 2
@@ -39,3 +40,11 @@ MonoBehaviour:
     ReloadClipVar1: {fileID: 8300000, guid: 27a6421a8ca60ec49af482f6bdb078d9, type: 3}
     FullReloadClip: {fileID: 8300000, guid: 9e3f41eeb402d014889023664764ce32, type: 3}
     BoltActionClip: {fileID: 0}
+  recoilData:
+    _recoilX: -5
+    _recoilY: 3
+    _recoilZ: 3
+    _zKickback: 0.1
+    _snappiness: 6
+    _returnSpeed: 10
+    _recoilReduction: 0.3

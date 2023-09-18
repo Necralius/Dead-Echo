@@ -9,6 +9,15 @@ using static NekraByte.FPS_Utility.Core.Enumerators;
 [RequireComponent(typeof(Rigidbody))]
 public class ControllerManager : MonoBehaviour
 {
+    #region - Singleton Pattern -
+    public static ControllerManager Instance { get; private set; }
+    private void Awake()
+    {
+        if (Instance != null) Destroy(Instance);
+        Instance = this;
+    }
+    #endregion
+
     #region - Movment Settings -
     [Header("Camera Look")]
     [SerializeField, Range(1, 100)] private float   _sensX          = 10f;
@@ -337,7 +346,7 @@ public class ControllerManager : MonoBehaviour
         _rb.useGravity = !_onSlope;
 
         if (_isGrounded)
-            _rb.AddForce(_moveDirection.normalized * _targetSpeed * 10f, ForceMode.Force);
+            _rb.AddForce(_moveDirection.normalized * _targetSpeed * 10f * _dragMultiplier, ForceMode.Force);
         else if (!_isGrounded)
             _rb.AddForce(_moveDirection.normalized * _targetSpeed * 10f * airMultiplier, ForceMode.Force);
     }
@@ -505,6 +514,7 @@ public class ControllerManager : MonoBehaviour
     #region - Throw Rock State -
     private void StartThrowing()
     {
+        if (_equippedGun._rockThrowPosition == null) return;
         _equippedGun._animator.SetBool(objectThrowingHash, true);
         _isThrowingObject = true;
     }
@@ -554,5 +564,4 @@ public class ControllerManager : MonoBehaviour
         SS_Flashlight();
     }
     #endregion
-
 }

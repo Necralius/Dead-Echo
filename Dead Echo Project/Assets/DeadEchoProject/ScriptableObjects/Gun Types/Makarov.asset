@@ -16,16 +16,17 @@ MonoBehaviour:
     gunName: Makarov
     shootType: 4
     gunMode: 1
-    rateOfFire: 0.1
+    rateOfFire: 0.7
+    aimOffset: {x: -0.0315, y: -0.239, z: -0.38}
+    _aimReloadOffset: 0.1
   gunBulletSettings:
-    shootDamageRange: {x: 10, y: 25}
+    _shootDamageRange: {x: 2, y: 8}
     _bulletTag: RifleBullet
-    _bulletSpeed: 500
+    _bulletSpeed: 150
     _bulletGravity: 2
     _bulletSpread: 0.001
     _bulletLifeTime: 10
     _bulletsPerShoot: 1
-    _bulletDamage: 15
     _bulletImpactForce: 10
     _collisionMask:
       serializedVersion: 2
@@ -39,3 +40,11 @@ MonoBehaviour:
     ReloadClipVar1: {fileID: 8300000, guid: a0d010892f3812c4ab833fbf4bc0675f, type: 3}
     FullReloadClip: {fileID: 8300000, guid: cd99c89aaf8cd7a4e881e2be8dbb1618, type: 3}
     BoltActionClip: {fileID: 0}
+  recoilData:
+    _recoilX: -3
+    _recoilY: 3
+    _recoilZ: 2
+    _zKickback: 0.4
+    _snappiness: 6
+    _returnSpeed: 20
+    _recoilReduction: 0.3

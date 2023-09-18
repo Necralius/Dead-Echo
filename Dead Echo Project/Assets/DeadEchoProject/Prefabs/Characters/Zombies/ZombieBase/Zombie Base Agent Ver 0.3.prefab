@@ -57,7 +57,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: -8.3059025, y: -1.26, z: 13.685638}
-  m_LocalScale: {x: 1.3801, y: 1.3801, z: 1.3801}
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6170235965302495764}
@@ -3700,7 +3700,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _paramenter: RightHand
   _bloodParticlesBurstAmount: 5
-  _damageAmount: 5
+  _damageAmount: 1
 --- !u!135 &5395340143882930508
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -3952,7 +3952,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _paramenter: LeftHand
   _bloodParticlesBurstAmount: 5
-  _damageAmount: 5
+  _damageAmount: 1
 --- !u!135 &8127807666907342940
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -4076,14 +4076,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 155031eee7a0eff48896076a4ee96114, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _patrolType: 0
+  _patrolType: 1
   _randomWaypointPatrol: 0
   _waypointNetwork: {fileID: 0}
-  _patrolRadius: 10
+  _patrolRadius: 40
   _rootBone: {fileID: 6186245246101855517}
   _targetTrigger: {fileID: 373625169896892041}
   _sensorTrigger: {fileID: 1510393073573368439}
-  _currentStateType: 1
+  _currentStateType: 3
   _rootBoneAligmentType: 2
   _stoppingDistance: 1
   _useIK: 1

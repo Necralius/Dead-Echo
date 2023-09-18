@@ -21,7 +21,7 @@ public class AutomaticRifle : Mode_Auto
             _gunDataConteiner.gunBulletSettings._bulletGravity, 
             _gunDataConteiner.gunBulletSettings._bulletLifeTime, 
             _gunDataConteiner.gunBulletSettings._collisionMask,
-            _gunDataConteiner.gunBulletSettings._bulletDamage,
+            _gunDataConteiner.gunBulletSettings._shootDamageRange,
             _gunDataConteiner.gunBulletSettings._bulletImpactForce, 
             _playerController.transform);
         StartCoroutine(base.Shoot());

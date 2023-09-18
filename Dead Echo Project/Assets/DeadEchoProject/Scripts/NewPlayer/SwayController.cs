@@ -7,12 +7,12 @@ using static NekraByte.FPS_Utility.Core.Procedural;
 
 public class SwayController : MonoBehaviour
 {
-    private ControllerManager _controllerManager;
-    private InputManager _inptManager;
+    private ControllerManager   _controllerManager      = null;
+    private InputManager        _inptManager            = null;
 
-    private GameObject _swayObject;
+    private GameObject          _swayObject             = null;
 
-    [SerializeField] private SwayData _swayData;
+    [SerializeField] private SwayData _swayData         = new SwayData();
 
     #region - Input Sway -
     private Vector3 newWeaponRotation;
@@ -30,6 +30,8 @@ public class SwayController : MonoBehaviour
     private Vector3 targetWeaponMovementRotationVelocity;
     #endregion
 
+    private bool isAiming = false;
+
     private Vector3 swayPosition;
 
     Vector2 look;
@@ -37,16 +39,18 @@ public class SwayController : MonoBehaviour
 
     private void Start()
     {
-        _controllerManager = GetComponent<ControllerManager>();
-        _inptManager = InputManager.Instance;
-        _swayObject = AnimationLayer.GetAnimationLayer("SwayLayer", _controllerManager._animLayers).layerObject;
+        _controllerManager  = GetComponent<ControllerManager>();
+        _inptManager        = InputManager.Instance;
+        _swayObject         = AnimationLayer.GetAnimationLayer("SwayLayer", _controllerManager._animLayers).layerObject;
 
-        newWeaponRotation = _swayObject.transform.localRotation.eulerAngles;
+        newWeaponRotation   = _swayObject.transform.localRotation.eulerAngles;
     }
     private void Update()
     {
         look = _inptManager.Look;
         move = _inptManager.Move;
+
+        isAiming = _controllerManager._equippedGun._isAiming;
 
         SwayHandler();
     }
@@ -54,21 +58,28 @@ public class SwayController : MonoBehaviour
     {
         if (_swayData._inputSway)
         {
-            targetWeaponRotation.y += _swayData.inpt_amount * look.x * Time.deltaTime;
-            targetWeaponRotation.x += _swayData.inpt_amount * look.y * Time.deltaTime;
+
+            float xValue = isAiming ? _swayData.inpt_amountX * _swayData.move_AimEffector : _swayData.inpt_amountX;
+            float yValue = isAiming ? _swayData.inpt_amountY * _swayData.move_AimEffector : _swayData.inpt_amountY;
+
+            targetWeaponRotation.y += xValue * look.x * Time.deltaTime;
+            targetWeaponRotation.x += yValue * look.y * Time.deltaTime;
 
             targetWeaponRotation.x = Mathf.Clamp(targetWeaponRotation.x, -_swayData.inpt_clampX, _swayData.inpt_clampX);
             targetWeaponRotation.y = Mathf.Clamp(targetWeaponRotation.y, -_swayData.inpt_clampY, _swayData.inpt_clampY);
             targetWeaponRotation.z = targetWeaponRotation.y;
 
-            targetWeaponRotation = Vector3.SmoothDamp(targetWeaponRotation, Vector3.zero, ref targetWeaponRotationVelocity, _swayData.inpt_swayResetSmooth);
-            newWeaponRotation = Vector3.SmoothDamp(newWeaponRotation, targetWeaponRotation, ref newWeaponRotationVelocity, _swayData.inpt_smoothAmount);
+            targetWeaponRotation    = Vector3.SmoothDamp(targetWeaponRotation, Vector3.zero, ref targetWeaponRotationVelocity, _swayData.inpt_swayResetSmooth);
+            newWeaponRotation       = Vector3.SmoothDamp(newWeaponRotation, targetWeaponRotation, ref newWeaponRotationVelocity, _swayData.inpt_smoothAmount);
         }
 
         if (_swayData._movementSway)
         {
-            targetWeaponMovementRotation.z  = _swayData.move_SwayX * move.x;
-            targetWeaponMovementRotation.x  = _swayData.move_SwayY * -move.y;
+            float xValue = isAiming ? _swayData.move_amountX * _swayData.move_AimEffector : _swayData.move_amountX;
+            float yValue = isAiming ? _swayData.move_amountY * _swayData.move_AimEffector : _swayData.move_amountY;
+
+            targetWeaponMovementRotation.z  = xValue * move.x;
+            targetWeaponMovementRotation.x  = yValue * -move.y;
 
             targetWeaponMovementRotation    = Vector3.SmoothDamp(targetWeaponMovementRotation, Vector3.zero, ref targetWeaponMovementRotationVelocity, _swayData.inpt_swayResetSmooth);
             newWeaponMovementRotation       = Vector3.SmoothDamp(newWeaponMovementRotation, targetWeaponMovementRotation, ref newWeaponMovementRotationVelocity, _swayData.move_SmoothAmount);
@@ -76,7 +87,12 @@ public class SwayController : MonoBehaviour
 
         if (_swayData._idleSway)
         {
-            var targetPosition = LissajousCurve(_swayData.swayTime, _swayData.swayAmountA, _swayData.swayAmountB) / _swayData.swayScale;
+            float amountA = isAiming ? _swayData.swayAmountA * _swayData.idle_AimEffector : _swayData.swayAmountA;
+            float amountB = isAiming ? _swayData.swayAmountB * _swayData.idle_AimEffector : _swayData.swayAmountB;
+
+            float swayScale = isAiming ? _swayData.swayScale * (_swayData.idle_AimEffector * 1000) : _swayData.swayScale;
+
+            var targetPosition = LissajousCurve(_swayData.swayTime, amountA, amountB) / swayScale;
 
             swayPosition = Vector3.Lerp(swayPosition, targetPosition, Time.smoothDeltaTime * _swayData.swayLerpSpeed);
             _swayData.swayTime += Time.deltaTime;

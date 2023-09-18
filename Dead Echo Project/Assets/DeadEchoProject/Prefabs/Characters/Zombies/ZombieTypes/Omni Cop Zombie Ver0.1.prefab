@@ -760,7 +760,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _paramenter: LeftHand
   _bloodParticlesBurstAmount: 5
-  _damageAmount: 5
+  _damageAmount: 1
 --- !u!1 &1606825431951144870
 GameObject:
   m_ObjectHideFlags: 0
@@ -1088,7 +1088,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _paramenter: RightHand
   _bloodParticlesBurstAmount: 5
-  _damageAmount: 5
+  _damageAmount: 1
 --- !u!1 &2814506651486141582
 GameObject:
   m_ObjectHideFlags: 0
@@ -1422,7 +1422,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: -8.3059025, y: -1.26, z: 13.685638}
-  m_LocalScale: {x: 1.3801, y: 1.3801, z: 1.3801}
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2854155657653324325}
@@ -6643,19 +6643,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 155031eee7a0eff48896076a4ee96114, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _patrolType: 0
+  _patrolType: 1
   _randomWaypointPatrol: 0
   _waypointNetwork: {fileID: 0}
-  _patrolRadius: 10
+  _patrolRadius: 50
   _rootBone: {fileID: 8412083446112914970}
   _targetTrigger: {fileID: 6884301360877197203}
   _sensorTrigger: {fileID: 4433464284559863631}
-  _currentStateType: 1
+  _currentStateType: 3
   _rootBoneAligmentType: 2
   _stoppingDistance: 1
   _useIK: 1
   _footIK: 1
-  _distanceToGround: 1
+  _distanceToGround: 0.08
   _groundMask:
     serializedVersion: 2
     m_Bits: 4227858432

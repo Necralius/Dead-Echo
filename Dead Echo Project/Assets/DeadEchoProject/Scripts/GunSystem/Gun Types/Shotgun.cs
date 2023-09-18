@@ -36,7 +36,7 @@ public class Shotgun : Mode_Semi
            _gunDataConteiner.gunBulletSettings._bulletGravity,
            _gunDataConteiner.gunBulletSettings._bulletLifeTime,
            _gunDataConteiner.gunBulletSettings._collisionMask,
-           _gunDataConteiner.gunBulletSettings._bulletDamage,
+           _gunDataConteiner.gunBulletSettings._shootDamageRange,
            _gunDataConteiner.gunBulletSettings._bulletImpactForce,
            _playerController.transform);
         }
@@ -49,7 +49,7 @@ public class Shotgun : Mode_Semi
         SS_Reload();
 
         _animator.SetTrigger(_isReloadingHash);
-        _animator.SetFloat(_reloadFactor, 0);
+        _animator.SetFloat(_reloadFactorHash, 0);
     }
     public override void EndReload()
     {
