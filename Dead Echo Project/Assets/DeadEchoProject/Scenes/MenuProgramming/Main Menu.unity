@@ -2009,6 +2009,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3cae3a22d695074f91ee067def51009, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fileName: 
   loadImageFill: {fileID: 419123118}
   loadingScreen: {fileID: 2102664778}
 --- !u!1001 &1395103881
@@ -3247,6 +3248,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: btn_Quit
+      objectReference: {fileID: 0}
+    - target: {fileID: 6747975515296602635, guid: 076e0ea0b5643d147b580b6bc51da72d,
+        type: 3}
+      propertyPath: m_text
+      value: Quit
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4944,7 +4950,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 80
+  m_Spacing: 60.21
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0

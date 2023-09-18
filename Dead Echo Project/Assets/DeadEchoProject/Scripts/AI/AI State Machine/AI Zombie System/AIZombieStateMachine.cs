@@ -288,9 +288,9 @@ public class AIZombieStateMachine : AiStateMachine
             {
                 if (hitStrenght > 5f) bodyPart.AddForce(force, ForceMode.Impulse);
 
-                if (bodyPart.CompareTag("Head")) _health = Mathf.Max(_health - damage, 0);
-                else if (bodyPart.CompareTag("Upper Body")) _upperBodyDamage += damage;
-                else if (bodyPart.CompareTag("Lower Body")) _lowerBodyDamage += damage;
+                if (bodyPart.CompareTag("Head")) _health = Mathf.Max(_health - damage * 3, 0);
+                else if (bodyPart.CompareTag("Upper Body")) _upperBodyDamage += damage * 10;
+                else if (bodyPart.CompareTag("Lower Body")) _lowerBodyDamage += damage * 10;
 
                 UpdateAnimatorDamage();
 
@@ -322,12 +322,12 @@ public class AIZombieStateMachine : AiStateMachine
             }
             else if (bodyPart.CompareTag("Upper Body"))
             {
-                _upperBodyDamage += damage;
+                _upperBodyDamage += damage * 10;
                 UpdateAnimatorDamage();
             }
             else if (bodyPart.CompareTag("Lower Body"))
             {
-                _lowerBodyDamage += damage;
+                _lowerBodyDamage += damage * 10;
                 UpdateAnimatorDamage();
                 shouldRagdoll = true;
             }

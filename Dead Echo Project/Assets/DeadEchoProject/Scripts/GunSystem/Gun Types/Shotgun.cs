@@ -74,17 +74,17 @@ public class Shotgun : Mode_Semi
 
     private void SS_Reload()
     {
-        if (ValidateClip(_gunDataConteiner.gunAudioAsset.ReloadClip))
+        if (_gunDataConteiner.gunAudioAsset.ReloadClip != null)
             AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.ReloadClip);
     }
     public void SS_BulletTrigger()
     {
-        if (ValidateClip(_gunDataConteiner.gunAudioAsset.ReloadClipVar1))
+        if (_gunDataConteiner.gunAudioAsset.ReloadClipVar1 != null)
             AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.ReloadClipVar1);
     }
     public void SS_PumpAction()
     {
-        if (ValidateClip(_gunDataConteiner.gunAudioAsset.BoltActionClip))
+        if (_gunDataConteiner.gunAudioAsset.BoltActionClip != null)
             AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.BoltActionClip);
     }
 }

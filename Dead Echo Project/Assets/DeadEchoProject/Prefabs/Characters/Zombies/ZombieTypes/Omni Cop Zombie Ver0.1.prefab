@@ -6643,8 +6643,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 155031eee7a0eff48896076a4ee96114, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _patrolType: 1
-  _randomWaypointPatrol: 0
+  _patrolType: 0
+  _randomWaypointPatrol: 1
   _waypointNetwork: {fileID: 0}
   _patrolRadius: 50
   _rootBone: {fileID: 8412083446112914970}

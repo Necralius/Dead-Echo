@@ -3,6 +3,8 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using static NekraByte.FPS_Utility.Core.Enumerators;
+using static NekraByte.FPS_Utility.Core.DataTypes;
+using System.IO;
 
 namespace NekraByte
 {
@@ -27,9 +29,24 @@ namespace NekraByte
                 }
                 #endregion
 
+                #region - Game Data -
+                public class GameData
+                {
+                    public Vector3 playerPosition;
+                    public Quaternion playerRotation;
+
+                    public int GunID;
+
+                    public GunDataConteiner primaryGun;
+                    public GunDataConteiner secondaryGun;
+
+
+                }
+                #endregion
+
                 #region - Gun Data Main Conteiner -       
-                [CreateAssetMenu(menuName = "NekraByte/FPS_Utility/Guns/New Gun Data", fileName = "New Gun Data")]
-                public class GunDataConteiner : ScriptableObject
+                [Serializable]
+                public class GunDataConteiner
                 {
                     [Header("Gun General Data")]
                     public GunData          gunData             = new GunData();
@@ -197,6 +214,12 @@ namespace NekraByte
                     public Sprite stateSprite;
                 }
                 #endregion
+
+                public interface IDataPersistence
+                {
+                    void Load(GameData gameData);
+                    void Save(GameData gameData);
+                }
             }
 
             // --------------------------------------------------------------
@@ -236,6 +259,65 @@ namespace NekraByte
                         velocity += acceleration * deltaTime;
                         _currentPos += velocity * deltaTime;
                         return _currentPos;
+                    }
+                }
+                #endregion
+
+                #region - Json File Data Handler -
+                public class FileDataHandler
+                {
+                    private string dataDirPath = "";
+                    private string dataFileName = "";
+
+                    public GameData data;
+
+                    public FileDataHandler(string dataDirPath, string dataFileName)
+                    {
+                        this.dataDirPath = dataDirPath;
+                        this.dataFileName = dataFileName;
+                    }
+
+                    public void SaveGunData(GameData data)
+                    {
+                        string fullPath = Path.Combine(dataDirPath, dataFileName);
+                        try
+                        {
+                            Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
+
+                            string dataToStore = JsonUtility.ToJson(data, true);
+
+                            using (FileStream stream = new FileStream(fullPath, FileMode.Create))
+                            {
+                                using (StreamWriter writer = new StreamWriter(stream)) writer.Write(dataToStore);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError(e.ToString());
+                        }
+                    }
+                    public GameData LoadGunData()
+                    {
+                        string fullPath = Path.Combine(dataDirPath, dataFileName);
+                        GameData loadedData = null;
+                        if (File.Exists(fullPath))
+                        {
+                            try
+                            {
+                                string dataToLoad = "";
+                                using (FileStream stream = new FileStream(fullPath, FileMode.Open))
+                                {
+                                    using (StreamReader reader = new StreamReader(stream)) dataToLoad = reader.ReadToEnd();
+                                }
+
+                                loadedData = JsonUtility.FromJson<GameData>(dataToLoad);
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.LogError(e.ToString());
+                            }
+                        }
+                        return loadedData;
                     }
                 }
                 #endregion

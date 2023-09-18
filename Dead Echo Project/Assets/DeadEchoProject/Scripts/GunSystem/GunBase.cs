@@ -49,7 +49,7 @@ public abstract class GunBase : MonoBehaviour
     private     int _isWalkingHash      = Animator.StringToHash("isWalking");
     private     int _isRunningHash      = Animator.StringToHash("isRunning");
     protected   int _isReloadingHash    = Animator.StringToHash("isReloading");
-    protected   int _reloadFactorHash       = Animator.StringToHash("ReloadFactor");
+    protected   int _reloadFactorHash   = Animator.StringToHash("ReloadFactor");
     protected   int _holstWeaponHash    = Animator.StringToHash("HolstWeapon");
     protected   int _shootHash          = Animator.StringToHash("Shoot");
     #endregion
@@ -91,12 +91,12 @@ public abstract class GunBase : MonoBehaviour
         _playerController           = GetComponentInParent<CamLocker>()._playerController;
         _animator                   = GetComponent<Animator>();
         _recoilAsset                = GetComponent<GunProceduralRecoil>();
-        _inputManager               = _playerController._inptManager;
+        _inputManager               = InputManager.Instance;
 
         _aimHolder                  = AnimationLayer.GetAnimationLayer("AimLayer", _playerController._animLayers).layerObject.transform;
         _clipProjector              = AnimationLayer.GetAnimationLayer("GunLayer", _playerController._animLayers).layerObject.transform;
+        _camera                     = AnimationLayer.GetAnimationLayer("CameraLayer", _playerController._animLayers).layerObject.GetComponent<Camera>();
 
-        _camera = _camera = AnimationLayer.GetAnimationLayer("CameraLayer", _playerController._animLayers).layerObject.GetComponent<Camera>();
         originalWeaponPosition = _aimHolder.localPosition;
         
         if (_gunDataConteiner == null) return;
@@ -423,17 +423,17 @@ public abstract class GunBase : MonoBehaviour
     // SS -> SoundSystem
     private void SS_ChangeGunMode()
     {
-        if (ValidateClip(_playerController.changeGunMode)) 
+        if (_playerController.changeGunMode != null) 
             AudioSystem.Instance.PlayGunClip(_playerController.changeGunMode);
     }
     private void SS_Aim()
     {
-        if (ValidateClip(_gunDataConteiner.gunAudioAsset.AimClip))
+        if (_gunDataConteiner.gunAudioAsset.AimClip != null)
             AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.AimClip);
     }
     protected void SS_Shoot()
     {
-        if (ValidateClip(_gunDataConteiner.gunAudioAsset.ShootClip)) 
+        if (_gunDataConteiner.gunAudioAsset.ShootClip != null) 
             AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.ShootClip, Vector2.zero, Vector2.zero);
     }
     protected void SS_Reload(int reloadIndex)
@@ -442,37 +442,36 @@ public abstract class GunBase : MonoBehaviour
         {
             case 0:
 
-                if (ValidateClip(_gunDataConteiner.gunAudioAsset.ReloadClip)) 
+                if (_gunDataConteiner.gunAudioAsset.ReloadClip != null) 
                     AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.ReloadClip);
                 break;
             case 1:
 
-                if (ValidateClip(_gunDataConteiner.gunAudioAsset.ReloadClipVar1)) 
+                if (_gunDataConteiner.gunAudioAsset.ReloadClipVar1 != null) 
                     AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.ReloadClipVar1);
                 break;
             case 2:
 
-                if (ValidateClip(_gunDataConteiner.gunAudioAsset.FullReloadClip)) 
+                if (_gunDataConteiner.gunAudioAsset.FullReloadClip != null) 
                     AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.FullReloadClip);
                 break;
         }
     }
     private void SS_GunAwake()
     {
-        if (ValidateClip(_gunDataConteiner.gunAudioAsset.DrawClip)) 
+        if (_gunDataConteiner.gunAudioAsset.DrawClip != null) 
             AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.DrawClip);   
     }
     private void SS_GunHolst()
     {
-        if (ValidateClip(_gunDataConteiner.gunAudioAsset.HolstClip)) 
+        if (_gunDataConteiner.gunAudioAsset.HolstClip != null) 
             AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.HolstClip);
     }
     private void SS_GunShootJam()
     {
-        if (ValidateClip(_playerController.gunShootJam))
+        if (_playerController.gunShootJam != null)
             AudioSystem.Instance.PlayGunClip(_playerController.gunShootJam);
     }
-    protected bool ValidateClip(AudioClip clip) => !clip.Equals(null);
     #endregion
 
     #region - Inventory Guns Change -

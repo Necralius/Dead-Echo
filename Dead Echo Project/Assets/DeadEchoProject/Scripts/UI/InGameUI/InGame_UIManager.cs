@@ -63,10 +63,10 @@ public class InGame_UIManager : MonoBehaviour
         playerSprite.GetComponent<Slider>().image.sprite = correctStateSprt;
     }
 
-    //
+    // ----------------------------------------------------------------------
     // Name: UpdateMode
     // Desc: This method updates the gun mode
-    //
+    // ----------------------------------------------------------------------
     public void UpdateMode(GunMode gunMode, List<GunMode> allModes)
     {
         for (int i = 0; i < modes.Count; i++)

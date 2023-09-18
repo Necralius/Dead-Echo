@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using static NekraByte.FPS_Utility;
 
 public class PlayerInfo
@@ -30,10 +31,17 @@ public class GameSceneManager : MonoBehaviour
     private Dictionary<int, PlayerInfo> _playerInfos = new Dictionary<int, PlayerInfo>();
 
     [SerializeField] private ParticleSystem _bloodParticles = null;
+
+    [SerializeField] private GameObject deathScreen = null;
     
     //Public
     public ParticleSystem bloodParticles { get => _bloodParticles; }
     //Public Methods
+
+    private void Awake()
+    {
+        Time.timeScale = 1f;
+    }
 
     // ----------------------------------------------------------------------
     // Name : RegisterAIStateMachine
@@ -63,6 +71,16 @@ public class GameSceneManager : MonoBehaviour
     // ----------------------------------------------------------------------
     public void RegisterPlayerInfo(int key, PlayerInfo playerInfo) { if (!_playerInfos.ContainsKey(key)) _playerInfos[key] = playerInfo; }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Y)) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            if (Cursor.lockState == CursorLockMode.Locked) Cursor.lockState = CursorLockMode.None;
+            else Cursor.lockState = CursorLockMode.Locked;
+        }
+    }
+
 
     // ----------------------------------------------------------------------
     // Name : GetAIStateMachine
@@ -75,5 +93,10 @@ public class GameSceneManager : MonoBehaviour
 
         if (_playerInfos.TryGetValue(key, out info)) return info;
         return null;
+    }
+
+    public void DeathScreen()
+    {
+        deathScreen.SetActive(true);
     }
 }

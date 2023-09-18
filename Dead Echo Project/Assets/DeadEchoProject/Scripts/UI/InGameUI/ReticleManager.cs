@@ -18,6 +18,8 @@ namespace NekraliusDevelopmentStudio
         void Awake() => Instance = this;
         #endregion
 
+        private CanvasGroup cg;
+
         #region - Reticle Settings -
         [Header("Reticle Settings")]
         [SerializeField] private float reticleChangeSpeed = 2f;
@@ -54,6 +56,8 @@ namespace NekraliusDevelopmentStudio
 
         //-------------------------------------------Methods--------------------------------//
 
+        private void Start() => cg = GetComponent<CanvasGroup>();
+
         #region - Reticle State Management -
         // ------------------------------------------------------------------
         // Name : DataReceiver
@@ -83,14 +87,16 @@ namespace NekraliusDevelopmentStudio
         // ------------------------------------------------------------------
         private void SetReticleState()
         {
-            if (isCrouching)                                currentState = ReticleState.Crouching;
+            if (isAiming)                                   currentState = ReticleState.Aiming;
+            else if(isCrouching)                            currentState = ReticleState.Crouching;
             else if (isReloading)                           currentState = ReticleState.Reloading;
             else if (inAir)                                 currentState = ReticleState.InAir;
             else if (isShooting)                            currentState = ReticleState.Shooting;
             else if (isMoving && !isRunning)                currentState = ReticleState.Walking;
             else if (isRunning && isMoving && !isCrouching) currentState = ReticleState.Spriting;
-            else if (isAiming && isMoving)                  currentState = ReticleState.Aiming;
             else                                            currentState = ReticleState.Idle;
+
+            cg.alpha = currentState == ReticleState.Aiming ? 0f : 1f;
         }
         #endregion
 

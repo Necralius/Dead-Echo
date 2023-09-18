@@ -59,6 +59,13 @@ public class CharacterManager : MonoBehaviour
         if (_currentHealth <= (_maxHealth / 4)) _damageManager.SetCriticalHealth(true);
         else _damageManager.SetCriticalHealth(false);
         InGame_UIManager.Instance.UpdatePlayerState(_fpsController, this);
+        if (_currentHealth <= 0) Die();
     }
     #endregion
+
+    private void Die()
+    {
+        GameSceneManager.instance.DeathScreen();
+        Time.timeScale = 0f;
+    }
 }

@@ -4076,8 +4076,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 155031eee7a0eff48896076a4ee96114, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _patrolType: 1
-  _randomWaypointPatrol: 0
+  _patrolType: 0
+  _randomWaypointPatrol: 1
   _waypointNetwork: {fileID: 0}
   _patrolRadius: 40
   _rootBone: {fileID: 6186245246101855517}
@@ -4099,7 +4099,7 @@ MonoBehaviour:
   _intelligence: 1
   _satisfaction: 1
   _replenishRate: 1
-  _depletionRate: 0.1
+  _depletionRate: 1
   _health: 100
   _lowerBodyDamage: 0
   _upperBodyDamage: 0
