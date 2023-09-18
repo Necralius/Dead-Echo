@@ -45,10 +45,9 @@ public class AIDamageTrigger : MonoBehaviour
             if (_gameSceneManager != null)
             {
                 PlayerInfo info = _gameSceneManager.GetPlayerInfo(other.GetInstanceID());
-                if (info != null && info.characterManager != null)
-                {
+
+                if (info != null && info.characterManager != null) 
                     info.characterManager.TakeDamage(_damageAmount);
-                }
             }
         }
     }

@@ -15,14 +15,14 @@ MonoBehaviour:
   gunData:
     gunName: Makarov
     shootType: 4
-    gunMode: 2
+    gunMode: 1
     rateOfFire: 0.1
   gunBulletSettings:
     shootDamageRange: {x: 10, y: 25}
     _bulletTag: RifleBullet
     _bulletSpeed: 500
     _bulletGravity: 2
-    _bulletSpread: 1
+    _bulletSpread: 0.001
     _bulletLifeTime: 10
     _bulletsPerShoot: 1
     _bulletDamage: 15

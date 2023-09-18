@@ -2,12 +2,9 @@ using NekraliusDevelopmentStudio;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem.XR;
-
-public enum MovementState { Idle, Walking, Sprinting, Crouching, Air, Sliding }
+using static NekraByte.FPS_Utility.Core.Enumerators;
 
 [RequireComponent(typeof(Rigidbody))]
 public class ControllerManager : MonoBehaviour
@@ -96,9 +93,11 @@ public class ControllerManager : MonoBehaviour
     #endregion
 
     #region - Animation Hashes -
-    private int objectThrowingHash = Animator.StringToHash("ThrowObject");
-    private int objectThrowCancelHash = Animator.StringToHash("ObjectThrowCancel");
-    private int objectInstantThrow = Animator.StringToHash("ObjectInstantThrow");
+    private int objectThrowingHash      = Animator.StringToHash("ThrowObject");
+    private int objectThrowCancelHash   = Animator.StringToHash("ObjectThrowCancel");
+    private int objectInstantThrow      = Animator.StringToHash("ObjectInstantThrow");
+    private int armWalkHash             = Animator.StringToHash("isWalking");
+    private int armRunningHash          = Animator.StringToHash("isRunning");
     #endregion
 
     #region - Rock Throwing System -
@@ -135,6 +134,8 @@ public class ControllerManager : MonoBehaviour
     public float dragMultiplier { get => _dragMultiplier; set => _dragMultiplier = Mathf.Min(value, _dragMultiplierLimit); }
     #endregion
 
+    public Animator     armsAnimator;
+
     public List<AnimationLayer> _animLayers;
 
     #region - Gun Change System -
@@ -157,6 +158,9 @@ public class ControllerManager : MonoBehaviour
     // ----------------------------------------------------------------------
     private void Start()
     {
+        AnimationLayer[] layers     = _playerInstance.GetComponentsInChildren<AnimationLayer>();
+        _animLayers                 = layers.ToList();
+
         InGame_UIManager.Instance.UpdatePlayerState(this);
         Cursor.lockState    = CursorLockMode.Locked;
 
@@ -166,9 +170,7 @@ public class ControllerManager : MonoBehaviour
         _inptManager        = InputManager.Instance;
         _startYScale        = transform.localScale.y;
 
-        AnimationLayer[] layers = _playerInstance.GetComponentsInChildren<AnimationLayer>();
-
-        _animLayers = layers.ToList();
+        armsAnimator        = AnimationLayer.GetAnimationLayer("AnimationsLayer", _animLayers).animator;
     }
 
     // ----------------------------------------------------------------------
@@ -216,7 +218,7 @@ public class ControllerManager : MonoBehaviour
     {
         _isMoving       = _rb.velocity != Vector3.zero;
         _isSprinting    = _inptManager.sprint && _isMoving && !_walkingBackwards && !_isCrouching;
-        _isWalking      = _isMoving;
+        _isWalking      = _inptManager.Move != Vector2.zero;
         _isGrounded     = Physics.Raycast(transform.position, Vector3.down, _playerHeight * 0.5f + 0.3f, _groundMask);
         _onSlope        = OnSlope();
 
@@ -224,6 +226,9 @@ public class ControllerManager : MonoBehaviour
         else _rb.drag = 0f;
 
         ReticleManager.Instance.DataReceiver(this);
+
+        _armsAnimator.SetBool(armWalkHash, _isWalking);
+        _armsAnimator.SetBool(armRunningHash, _isSprinting);
 
         SpeedLimit();
         InputHandler();
@@ -430,6 +435,7 @@ public class ControllerManager : MonoBehaviour
         {
             _currentState   = MovementState.Crouching;
             _targetSpeed    = _crouchSpeed;
+            
         }
         if (_isGrounded && _inptManager.sprint)
         {

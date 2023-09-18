@@ -1,0 +1,2 @@
+[Aa]ssets/[Pp]ackages filter=lfs diff=lfs mergelfs -text
+LightingData.asset filter=lfs diff=lfs merge=lfs -text

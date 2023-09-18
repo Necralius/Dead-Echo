@@ -22,16 +22,14 @@ public class CharacterManager : MonoBehaviour
 
     //Private
     private Collider                _collider               = null;
-    private FPS_Controller          _fpsController          = null;
-    private CharacterController     _characterController    = null;
+    private ControllerManager       _fpsController          = null;
     private GameSceneManager        _gameSceneManager       = null;
 
     #region - BuiltIn Methods -
     private void Start()
     {
-        _collider               = GetComponent<Collider>();
-        _fpsController          = GetComponent<FPS_Controller>();
-        _characterController    = GetComponent<CharacterController>();
+        _collider               = GetComponentInChildren<Collider>();
+        _fpsController          = GetComponent<ControllerManager>();
         _gameSceneManager       = GameSceneManager.instance;
 
         if (_gameSceneManager != null)

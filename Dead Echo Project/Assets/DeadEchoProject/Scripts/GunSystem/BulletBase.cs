@@ -173,7 +173,12 @@ public class BulletBase : MonoBehaviour
             // The method tries to get an valid AI Instance acessing the GameSceneManager and execute an hit action
             AiStateMachine stateMachine = GameSceneManager.instance.GetAIStateMachine(hit.rigidbody.GetInstanceID());
             if (stateMachine) 
-                stateMachine.TakeDamage(hit.point, -hit.normal * _bulletImpactForce, (int)_bulletDamage, hit.rigidbody, CharacterManager.Instance, 0);
+                stateMachine.TakeDamage(hit.point, 
+                    -hit.normal * _bulletImpactForce, 
+                    (int)_bulletDamage, 
+                    hit.rigidbody, 
+                    _bulletOrigin.GetComponent<CharacterManager>(), 
+                    0);
         }
         // This code section resets the bullet data after its impact interactions
         ResetBullet();

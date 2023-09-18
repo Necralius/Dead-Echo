@@ -1,12 +1,10 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static NekraByte.FPS_Utility.Core.DataTypes;
 using static NekraByte.FPS_Utility.Core.Enumerators;
+using static NekraByte.FPS_Utility.Core.DataTypes;
 
 public class InGame_UIManager : MonoBehaviour
 {
@@ -28,27 +26,51 @@ public class InGame_UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI lifeText;
     private Slider lifeSlider => playerSprite.GetComponent<Slider>();
 
-    public void UpdatePlayerState(FPS_Controller controller, CharacterManager manager)
+    [SerializeField] private List<CharacterState> _stanceStates;
+
+    // ----------------------------------------------------------------------
+    // Name: UpdatePlayerState
+    // Desc: This method updates completly the character UI.
+    // ----------------------------------------------------------------------
+    public void UpdatePlayerState(ControllerManager controller, CharacterManager manager)
     {
-        playerSprite.GetComponent<Slider>().image.sprite = controller._isCrouching ? crouchSprite : standUpSprite;
+        UpdatePlayerState(controller);
         lifeText.text           = lifeSlider.value.ToString("F0") + "%";
         lifeSlider.value        = manager._currentHealth;
         lifeSlider.maxValue     = manager._maxHealth;
     }
 
-    public void UpdatePlayerState(FPS_Controller controller)
-    {
-        playerSprite.GetComponent<Slider>().image.sprite = controller._isCrouching ? crouchSprite : standUpSprite;
-    }
+    // ----------------------------------------------------------------------
+    // Name: UpdatePlayerState (Overcharge)
+    // Desc: This method updates the player UI stance state, changing the character
+    //       state sprite to the correct state.
+    // ----------------------------------------------------------------------
     public void UpdatePlayerState(ControllerManager controller)
     {
-        playerSprite.GetComponent<Slider>().image.sprite = controller._isCrouching ? crouchSprite : standUpSprite;
+        CharacterState state;
+        switch(controller._currentState)
+        {
+            case MovementState.Idle:        state = _stanceStates.Find(e => e.type == StateType.Stand);     break;
+            case MovementState.Walking:     state = _stanceStates.Find(e => e.type == StateType.Stand);     break;
+            case MovementState.Sprinting:   state = _stanceStates.Find(e => e.type == StateType.Stand);     break;
+            case MovementState.Sliding:     state = _stanceStates.Find(e => e.type == StateType.Crouch);    break;
+            case MovementState.Crouching:   state = _stanceStates.Find(e => e.type == StateType.Crouch);    break;
+            case MovementState.Air:         state = _stanceStates.Find(e => e.type == StateType.Jumping);   break;
+            default: state = _stanceStates[0]; break;
+        }
+
+        Sprite correctStateSprt = state.stateSprite;
+        playerSprite.GetComponent<Slider>().image.sprite = correctStateSprt;
     }
+
+    //
+    // Name: UpdateMode
+    // Desc: This method updates the gun mode
+    //
     public void UpdateMode(GunMode gunMode, List<GunMode> allModes)
     {
         for (int i = 0; i < modes.Count; i++)
         {
-
             if (allModes.Contains(modes[i].mode)) modes[i].obj.SetActive(true);
             else modes[i].obj.SetActive(false);
 

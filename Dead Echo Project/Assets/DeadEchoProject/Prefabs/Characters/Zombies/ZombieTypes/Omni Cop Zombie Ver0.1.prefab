@@ -1422,7 +1422,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: -8.3059025, y: -1.26, z: 13.685638}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.3801, y: 1.3801, z: 1.3801}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2854155657653324325}
@@ -6643,29 +6643,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 155031eee7a0eff48896076a4ee96114, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _currentStateType: 1
+  _patrolType: 0
+  _randomWaypointPatrol: 0
+  _waypointNetwork: {fileID: 0}
+  _patrolRadius: 10
   _rootBone: {fileID: 8412083446112914970}
-  _rootBoneAligmentType: 2
   _targetTrigger: {fileID: 6884301360877197203}
   _sensorTrigger: {fileID: 4433464284559863631}
+  _currentStateType: 1
+  _rootBoneAligmentType: 2
   _stoppingDistance: 1
-  _waypointNetwork: {fileID: 0}
-  _randomPatrol: 1
-  _currentWaypoint: -1
+  _useIK: 1
+  _footIK: 1
+  _distanceToGround: 1
+  _groundMask:
+    serializedVersion: 2
+    m_Bits: 4227858432
   _fov: 120
   _sight: 0.5
   _hearing: 1
   _agression: 0.5
+  _intelligence: 1
+  _satisfaction: 1
+  _replenishRate: 1
+  _depletionRate: 0.1
   _health: 100
   _lowerBodyDamage: 0
   _upperBodyDamage: 0
   _upperBodyThreshold: 30
   _limpThreshold: 30
   _crawlThreshold: 90
-  _intelligence: 1
-  _satisfaction: 1
-  _replenishRate: 1
-  _depletionRate: 0.1
+  _screamChance: 1
+  _screamRadius: 20
+  _screamPosition: 0
+  _screamPrefab: {fileID: 2275832350520478436, guid: 99a7b07c9c1dd644fa33a658c00a4b3d,
+    type: 3}
   _reanimationBlendTime: 0.5
   _reanimationWaitTime: 3
   _geometryLayers:
@@ -6767,7 +6779,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 2
-  _stoppingDistance: 1.5
+  _stoppingDistance: 2
   _slerpSpeed: 5
   _lookAtWeight: 0.7
   _lookAtAngleThreshold: 15

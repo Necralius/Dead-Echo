@@ -59,22 +59,6 @@ namespace NekraliusDevelopmentStudio
         // Name : DataReceiver
         // Desc : This method gets an FPS Controller instance and sets all state booleans.
         // ------------------------------------------------------------------
-        public void DataReceiver(FPS_Controller controller)
-        {
-            isMoving        = controller._isWalking;
-            isRunning       = controller._isSprinting;
-            isCrouching     = controller._isCrouching;
-            inAir           = controller._inAir;
-            
-            if (controller.equippedGun != null)
-            {
-                isShooting      = controller.equippedGun._isShooting;
-                isAiming        = controller.equippedGun._isAiming;
-                isReloading     = controller.equippedGun._isReloading;
-            }
-
-            SetReticleState();
-        }
         public void DataReceiver(ControllerManager controller)
         {
             isMoving        = controller._isWalking;

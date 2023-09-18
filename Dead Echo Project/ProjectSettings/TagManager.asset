@@ -12,6 +12,7 @@ TagManager:
   - Lower Body
   - Upper Body
   - Head
+  - Cloth
   layers:
   - Default
   - TransparentFX

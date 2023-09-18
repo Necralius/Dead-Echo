@@ -6,7 +6,6 @@ using static NekraByte.FPS_Utility.Core.Enumerators;
 
 namespace NekraByte
 {
-
     public static class FPS_Utility
     {       
         public static class Core
@@ -91,16 +90,28 @@ namespace NekraByte
                     [Header("Sway State")]
                     public bool _inputSway = true;
                     public bool _movementSway = true;
-                    public bool _rotationalSway = true;
                     public bool _idleSway = true;
 
                     [Header("Input Sway")]
                     public float inpt_amount;
-                    public float inpt_maxAmout;
                     public float inpt_smoothAmount;
+                    public float inpt_swayResetSmooth;
 
-                    public float inpt_damping;
-                    public float inpt_stiffness;
+                    public float inpt_clampX = 12f;
+                    public float inpt_clampY = 12f;
+
+                    [Header("Weapon Movement Sway")]
+                    public float move_SwayX;
+                    public float move_SwayY;
+                    public float move_SmoothAmount;
+
+                    [Header("Idle Sway")]
+                    public float swayAmountA = 1f;
+                    public float swayAmountB = 2f;
+                    public float swayScale = 600f;
+                    public float swayLerpSpeed = 14f;
+
+                    [HideInInspector] public float swayTime;
                 }
                 #endregion
 
@@ -144,7 +155,14 @@ namespace NekraByte
                     #endregion      
                 }
                 #endregion
-                 
+
+                [Serializable]
+                public struct CharacterState
+                {                  
+                    public StateType type;
+                    public Sprite stateSprite;
+                }
+
             }
 
             // --------------------------------------------------------------
@@ -235,8 +253,20 @@ namespace NekraByte
 
                 public enum LayerBehavior
                 {
-                    None, Additive, Override, Referencial
+                    None, 
+                    Additive, 
+                    Override, 
+                    Referencial
                 }
+
+                public enum StateType 
+                { 
+                    Stand,
+                    Crouch,
+                    Sliding,
+                    Jumping
+                }
+                public enum MovementState { Idle, Walking, Sprinting, Crouching, Air, Sliding }
             }
         }
 
