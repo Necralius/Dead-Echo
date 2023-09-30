@@ -28,7 +28,6 @@ public class ImpactAudioSystem : MonoBehaviour
         col.enabled = true;
         onCollision.Invoke();
         AudioSystem.Instance.PlayEffectSound(clips[Random.Range(0, clips.Count)], new Vector2(0.60f, 0.70f), new Vector2(0.95f, 1f), source);
-        Destroy(gameObject, 5f);
     }
     // ----------------------------------------------------------------------
     // Name: Update

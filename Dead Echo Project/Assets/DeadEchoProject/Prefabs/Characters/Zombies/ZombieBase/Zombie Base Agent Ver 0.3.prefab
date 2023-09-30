@@ -4105,9 +4105,9 @@ MonoBehaviour:
   _upperBodyDamage: 0
   _upperBodyThreshold: 30
   _limpThreshold: 30
-  _crawlThreshold: 90
-  _screamChance: 1
-  _screamRadius: 20
+  _crawlThreshold: 60
+  _screamChance: 0.779
+  _screamRadius: 38.6
   _screamPosition: 1
   _screamPrefab: {fileID: 2275832350520478436, guid: 99a7b07c9c1dd644fa33a658c00a4b3d,
     type: 3}

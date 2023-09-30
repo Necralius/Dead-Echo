@@ -8,8 +8,9 @@ public class MenuObject : MonoBehaviour
     //Private Data
     Animator anim => GetComponent<Animator>();
 
-    private int onEntryHash = Animator.StringToHash("OnEntry");
-    private int onExitHash = Animator.StringToHash("OnExit");
+    private int onEntryHash     = Animator.StringToHash("OnEntry");
+    private int onExitHash      = Animator.StringToHash("OnExit");
+
     public MenuType type;
 
     //Public Data
@@ -27,7 +28,14 @@ public class MenuObject : MonoBehaviour
     {
         isActive = false; 
         gameObject.SetActive(false);
-
+    }
+    public void CloseMenu_Animated()
+    {
         if (anim != null) anim.SetTrigger(onExitHash);
+    }
+    public void DeactiveMenu()
+    {
+        isActive = false;
+        gameObject.SetActive(false);
     }
 }

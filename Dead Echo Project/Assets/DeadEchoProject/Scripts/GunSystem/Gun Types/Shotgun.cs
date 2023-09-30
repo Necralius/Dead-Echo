@@ -59,32 +59,32 @@ public class Shotgun : Mode_Semi
     }
     public void TriggerBullet()
     {
-        if (_magAmmo < (_magMaxAmmo - 1)) _magAmmo++;
+        if (_gunDataConteiner.ammoData._magAmmo < (_gunDataConteiner.ammoData._magMaxAmmo - 1)) _gunDataConteiner.ammoData._magAmmo++;
         UI_Update();
     }
     public void VerifyNeed()
     {
-        if (!(_magAmmo < (_magMaxAmmo - 1))) _animator.SetTrigger(endReloadHash);
+        if (!(_gunDataConteiner.ammoData._magAmmo < (_gunDataConteiner.ammoData._magMaxAmmo - 1))) _animator.SetTrigger(endReloadHash);
     }
     public void TriggerLastBullet()
     {
-        _magAmmo++;
+        _gunDataConteiner.ammoData._magAmmo++;
         UI_Update();
     }
 
     private void SS_Reload()
     {
-        if (_gunDataConteiner.gunAudioAsset.ReloadClip != null)
-            AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.ReloadClip);
+        if (_gunAudioAsset.ReloadClip != null)
+            AudioSystem.Instance.PlayGunClip(_gunAudioAsset.ReloadClip);
     }
     public void SS_BulletTrigger()
     {
-        if (_gunDataConteiner.gunAudioAsset.ReloadClipVar1 != null)
-            AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.ReloadClipVar1);
+        if (_gunAudioAsset.ReloadClipVar1 != null)
+            AudioSystem.Instance.PlayGunClip(_gunAudioAsset.ReloadClipVar1);
     }
     public void SS_PumpAction()
     {
-        if (_gunDataConteiner.gunAudioAsset.BoltActionClip != null)
-            AudioSystem.Instance.PlayGunClip(_gunDataConteiner.gunAudioAsset.BoltActionClip);
+        if (_gunAudioAsset.BoltActionClip != null)
+            AudioSystem.Instance.PlayGunClip(_gunAudioAsset.BoltActionClip);
     }
 }

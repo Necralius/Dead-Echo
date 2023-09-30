@@ -170,7 +170,7 @@ public class BulletBase : MonoBehaviour
         // In this code section the bullet verifies if the hit has finded an object of type AI Body Part and executes an aditional actions on the hit.
         if (hit.transform.gameObject.layer == LayerMask.NameToLayer("AI Body Part"))
         {
-            int damage = (int)Random.Range(-_bulletDamage.x, _bulletDamage.y);
+            int damage = (int)Random.Range(_bulletDamage.x, _bulletDamage.y);
 
             // The method tries to get an valid AI Instance acessing the GameSceneManager and execute an hit action
             AiStateMachine stateMachine = GameSceneManager.instance.GetAIStateMachine(hit.rigidbody.GetInstanceID());

@@ -37,7 +37,7 @@ MonoBehaviour:
     supportWaterDeformation: 1
     deformationAtlasSize: 512
     maximumDeformerCount: 64
-    supportWaterFoam: 1
+    supportWaterFoam: 0
     foamAtlasSize: 512
     waterCPUSimulation: 1
     supportComputeThickness: 0
@@ -99,7 +99,7 @@ MonoBehaviour:
       reflectionProbeTexLastValidCubeMip: 3
       reflectionProbeTexLastValidPlanarMip: 0
       reflectionProbeDecreaseResToFit: 1
-      skyReflectionSize: 1024
+      skyReflectionSize: 256
       skyLightingOverrideLayerMask:
         serializedVersion: 2
         m_Bits: 0
@@ -148,7 +148,7 @@ MonoBehaviour:
       maxScreenSpaceShadowSlots: 4
       screenSpaceShadowBufferFormat: 48
     decalSettings:
-      drawDistance: 1000
+      drawDistance: 150
       atlasWidth: 2048
       atlasHeight: 2048
       perChannelMask: 1

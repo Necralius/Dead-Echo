@@ -10,65 +10,76 @@ public class GameStateManager : MonoBehaviour
 {
     public static GameStateManager Instance;
 
-    [SerializeField] private string fileName;
+    [SerializeField] private string permanentSaveName;
 
-    private GameData gameData;
-    private FileDataHandler dataHandler;
+    private FileDataHandler dynamicDataHandler;
 
-    [SerializeField] private List<IDataPersistence> dataPersistenceObjects;
+    private List<IDataPersistence> dataPersistenceObjects = new List<IDataPersistence>();
 
-    private void Start()
-    {
-        dataHandler = new FileDataHandler(Application.persistentDataPath, fileName);
+    private List<GameSaveData> gameDatas = new List<GameSaveData>();
 
-        //dataPersistenceObjects = FindAllDataPersistencObjects();
-    }
+    private List<string> gameSavesPath = new List<string>();
+
+    public GameSaveData currentGameData;
+
+    public ApplicationData currentApplicationData;
+    private FileDataHandler staticDataHandler;
+
+    public void RegisterDataHandler(IDataPersistence dataPersistence) => dataPersistenceObjects.Add(dataPersistence);
 
     private void Awake()
     {
         if (Instance != null) Destroy(Instance);
         Instance = this;
 
-        DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(gameObject);       
     }
 
-    [SerializeField] public Image loadImageFill         = null;
-    [SerializeField] public GameObject loadingScreen    = null;
-
-    public void LoadScene(int sceneID)
+    private void Start()
     {
-        StartCoroutine(LoadSceneAsync(sceneID));
-    }
-    IEnumerator LoadSceneAsync(int sceneID)
-    {
-        if (loadingScreen != null) loadingScreen.SetActive(true);
-        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneID);
+        staticDataHandler = new FileDataHandler(Application.persistentDataPath, permanentSaveName);
 
-        while (!operation.isDone)
+        currentApplicationData = staticDataHandler.LoadApplicationData();
+
+        if (currentApplicationData == null)
         {
-            float progressValue = Mathf.Clamp01(operation.progress / 0.9f);
-
-            if (loadImageFill != null) loadImageFill.fillAmount = progressValue;
-
-            yield return new WaitForSeconds(0.001f);
+            staticDataHandler.EncapsulateApplicationData(new ApplicationData());
+            currentApplicationData = staticDataHandler.LoadApplicationData();
         }
+    }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.P)) 
+            SaveGameData();
     }
 
     public void LoadGame()
     {
-        this.gameData = dataHandler.LoadGameState();
+        currentGameData = dynamicDataHandler.LoadGameState();
 
-        if (this.gameData == null)
+        if (currentGameData == null)
         {
             Debug.Log("No data found.");
             return;
         }
 
-        foreach (IDataPersistence dataPersistence in dataPersistenceObjects) dataPersistence.Load(gameData);
+        foreach (IDataPersistence dataPersistence in dataPersistenceObjects)
+            dataPersistence.Load(currentGameData);
     }
-    private List<IDataPersistence> FindAllDataPersistencObjects()
+
+    public void SaveGameData()
     {
-        IEnumerable<IDataPersistence> dataPersistences = (IEnumerable<IDataPersistence>)Resources.FindObjectsOfTypeAll(typeof(IDataPersistence));
-        return dataPersistences.ToList();
+        if (currentGameData == null) 
+            return;
+
+        foreach(IDataPersistence dataPersistence in dataPersistenceObjects) dataPersistence.Save(currentGameData);
+
+        dynamicDataHandler.EncapsulateData(currentGameData);
+    }
+
+    public void SaveApplicationData()
+    {
+        currentApplicationData.UpdateSave();
+        staticDataHandler.EncapsulateApplicationData(currentApplicationData);
     }
 }

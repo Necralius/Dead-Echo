@@ -74,8 +74,11 @@ public class AIZombieState_Patrol1 : AIZombieState
         
         if (!_zombieStateMachine.useRootRotation)
         {
-            Quaternion newRot = Quaternion.LookRotation(_zombieStateMachine.navAgent.desiredVelocity);
-            _zombieStateMachine.transform.rotation = Quaternion.Slerp(_zombieStateMachine.transform.rotation, newRot, Time.deltaTime * _slerpRotationSpeed);
+            if (_zombieStateMachine.navAgent.desiredVelocity != Vector3.zero)
+            {
+                Quaternion newRot = Quaternion.LookRotation(_zombieStateMachine.navAgent.desiredVelocity);
+                _zombieStateMachine.transform.rotation = Quaternion.Slerp(_zombieStateMachine.transform.rotation, newRot, Time.deltaTime * _slerpRotationSpeed);
+            }
         }
 
         if (_zombieStateMachine.navAgent.isPathStale || 

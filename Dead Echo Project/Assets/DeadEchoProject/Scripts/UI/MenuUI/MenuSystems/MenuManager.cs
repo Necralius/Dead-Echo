@@ -16,7 +16,7 @@ public class MenuManager : MonoBehaviour
     // ----------------------------------------------------------------------
     void Start()
     {
-        menuObjects = GetComponentsInChildren<MenuObject>().ToList();
+        //menuObjects = GetComponents<MenuObject>().ToList();
     }
 
     public void OpenMenu(string menuName)

@@ -5,6 +5,7 @@ using System.Linq;
 using static NekraByte.FPS_Utility.Core.Enumerators;
 using static NekraByte.FPS_Utility.Core.DataTypes;
 using System.IO;
+using Unity.VisualScripting;
 
 namespace NekraByte
 {
@@ -29,17 +30,109 @@ namespace NekraByte
                 }
                 #endregion
 
-                #region - Game Data -
-                public class GameData
+                #region - Game Save Data -
+                [Serializable]
+                public class GameSaveData
                 {
-                    public Vector3 playerPosition;
-                    public Quaternion playerRotation;
+                    public GameSaveData(string saveName)
+                    {
+                        this.saveName = saveName;
+                        saveHour = DateTime.Now.ToString();
 
-                    public int GunID;
+                    }
 
-                    public GunDataConteiner primaryGun;
-                    public GunDataConteiner secondaryGun;
+                    [Header("Save Data")]
+                    public string       saveName        = "";
+                    public string       saveHour        = "";
+                    public Texture2D    lastScreenshot  = null;
 
+                    [Header("Player Data")]
+                    public Vector3      playerPosition = Vector3.zero;
+                    public Quaternion   playerRotation = Quaternion.identity;
+
+                    public float        playerHealth    = 0f;
+
+                    [Header("Gun Data")]
+                    public int GunID = 0;
+
+                    public List<GunDataConteiner> guns = new List<GunDataConteiner>();
+                }
+                #endregion
+
+                #region - Application Permanent Data -
+                [Serializable]
+                public class ApplicationData
+                {
+                    public ApplicationData()
+                    {
+                        saveHour = DateTime.Now.ToString();
+                        ResetToDefault();
+                    }
+
+                    public Dictionary<int, string> saveDirectorys = new Dictionary<int, string>();
+
+                    public string saveHour = "";
+
+                    [Header("Game Settings")]
+
+                    [Space]
+
+                    [Header("Audio Settings")]
+                    public float _generalVolume;
+                    public float _effectsVolume;
+                    public float _musicVolume;
+                    public float _zombiesVolume;
+
+                    [Header("Graphics Settings")]
+                    public Resolution   _currentResolution;
+                    public int          _resolutionIndex    = 0;
+                    public bool         _isFullscreen       = true;
+                    public bool         _vSyncActive        = false;
+                    public int          _vSyncCount         = 0;
+
+                    public float brightness     = 1f;
+
+                    public int shadowQuality    = 1;
+
+                    [Header("Gameplay Settings")]
+                    public float xSensitivity = 6f;
+                    public float ySensitivity = 6f;
+
+                    public bool invertX = false;
+                    public bool invertY = false;
+
+                    public void UpdateSave() => saveHour = DateTime.Now.ToString();
+
+                    public void ResetToDefault()
+                    {
+                        ResetVolumeSettings();
+                        ResetGraphicsSettings();
+                        ResetGameplaySettings();
+                    }
+                    public void ResetVolumeSettings()
+                    {
+                        _generalVolume  = 1f;
+                        _effectsVolume  = 1f;
+                        _musicVolume    = 1f;
+                        _zombiesVolume  = 1f;
+                    }
+                    public void ResetGraphicsSettings()
+                    {
+                        _resolutionIndex = 0;
+                        _vSyncCount = 0;
+                        _vSyncActive = false;
+
+                        _isFullscreen       = true;
+                    }
+                    public void ResetGameplaySettings()
+                    {
+
+                        xSensitivity = 5f;
+                        ySensitivity = 5f;
+
+                        invertX = false;
+                        invertY = false;
+                    }
 
                 }
                 #endregion
@@ -51,8 +144,8 @@ namespace NekraByte
                     [Header("Gun General Data")]
                     public GunData          gunData             = new GunData();
                     public BulletSettings   gunBulletSettings   = new BulletSettings();
-                    public AudioAsset       gunAudioAsset       = new AudioAsset();
                     public RecoilData       recoilData          = new RecoilData();
+                    public AmmoData         ammoData            = new AmmoData();
 
                     #region - Gun Data Model -
                     [Serializable]
@@ -88,20 +181,6 @@ namespace NekraByte
                     }
                     #endregion
 
-                    #region - Gun Audio Asset -
-                    [Serializable]
-                    public struct AudioAsset
-                    {
-                        public AudioClip ShootClip;
-                        public AudioClip AimClip;
-                        public AudioClip DrawClip;
-                        public AudioClip HolstClip;
-                        public AudioClip ReloadClip;
-                        public AudioClip ReloadClipVar1;
-                        public AudioClip FullReloadClip;
-                        public AudioClip BoltActionClip;
-                    }
-                    #endregion
 
                     #region - Gun Recoil Asset -
                     [Serializable]
@@ -124,6 +203,33 @@ namespace NekraByte
                     }
                     #endregion
 
+                    #region - Ammo Data -
+                    public class AmmoData
+                    {
+                        [Header("Gun Ammo"), Tooltip("Gun ammo quantity settings")]
+                        [Range(0, 500)] public int  _bagMaxAmmo     = 200;
+                        [Range(1, 150)] public int  _magMaxAmmo     = 31;
+
+                        public int                  _bagAmmo        = 60;
+                        public int                  _magAmmo        = 31;
+                    }
+                    #endregion
+
+                }
+                #endregion
+
+                #region - Gun Audio Asset -
+                [Serializable]
+                public struct AudioAsset
+                {
+                    public AudioClip ShootClip;
+                    public AudioClip AimClip;
+                    public AudioClip DrawClip;
+                    public AudioClip HolstClip;
+                    public AudioClip ReloadClip;
+                    public AudioClip ReloadClipVar1;
+                    public AudioClip FullReloadClip;
+                    public AudioClip BoltActionClip;
                 }
                 #endregion
 
@@ -217,8 +323,9 @@ namespace NekraByte
 
                 public interface IDataPersistence
                 {
-                    void Load(GameData gameData);
-                    void Save(GameData gameData);
+                    void RegisterDataSaver();
+                    void Load(GameSaveData gameData);
+                    void Save(GameSaveData gameData);
                 }
             }
 
@@ -269,7 +376,7 @@ namespace NekraByte
                     private string dataDirPath = "";
                     private string dataFileName = "";
 
-                    public GameData data;
+                    public GameSaveData data;
 
                     public FileDataHandler(string dataDirPath, string dataFileName)
                     {
@@ -277,7 +384,7 @@ namespace NekraByte
                         this.dataFileName = dataFileName;
                     }
 
-                    public void SaveGunData(GameData data)
+                    public void SaveGunData(GameSaveData data)
                     {
                         string fullPath = Path.Combine(dataDirPath, dataFileName);
                         try
@@ -296,10 +403,10 @@ namespace NekraByte
                             Debug.LogError(e.ToString());
                         }
                     }
-                    public GameData LoadGunData()
+                    public GameSaveData LoadGunData()
                     {
                         string fullPath = Path.Combine(dataDirPath, dataFileName);
-                        GameData loadedData = null;
+                        GameSaveData loadedData = null;
                         if (File.Exists(fullPath))
                         {
                             try
@@ -310,7 +417,7 @@ namespace NekraByte
                                     using (StreamReader reader = new StreamReader(stream)) dataToLoad = reader.ReadToEnd();
                                 }
 
-                                loadedData = JsonUtility.FromJson<GameData>(dataToLoad);
+                                loadedData = JsonUtility.FromJson<GameSaveData>(dataToLoad);
                             }
                             catch (Exception e)
                             {

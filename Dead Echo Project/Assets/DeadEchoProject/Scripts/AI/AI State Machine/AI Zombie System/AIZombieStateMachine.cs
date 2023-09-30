@@ -282,13 +282,15 @@ public class AIZombieStateMachine : AiStateMachine
 
         float hitStrenght = force.magnitude;
 
+        //Debug.Log($"Hit Strenght: {hitStrenght}, Force: {force}");
+
         if (_boneControllType == AIBoneControlType.Ragdoll)
         {
             if (bodyPart != null)
             {
-                if (hitStrenght > 5f) bodyPart.AddForce(force, ForceMode.Impulse);
+                if (hitStrenght > 20f) bodyPart.AddForce(force, ForceMode.Impulse);
 
-                if (bodyPart.CompareTag("Head")) _health = Mathf.Max(_health - damage * 3, 0);
+                if (bodyPart.CompareTag("Head")) _health -= damage * 10;
                 else if (bodyPart.CompareTag("Upper Body")) _upperBodyDamage += damage * 10;
                 else if (bodyPart.CompareTag("Lower Body")) _lowerBodyDamage += damage * 10;
 
@@ -311,14 +313,14 @@ public class AIZombieStateMachine : AiStateMachine
         //Local space position of hit
         Vector3 hitLocPos = transform.InverseTransformPoint(position);
        
-        bool shouldRagdoll = (hitStrenght > 5f);
+        bool shouldRagdoll = (hitStrenght > 20f);
 
         if (bodyPart != null)
         {
             if (bodyPart.CompareTag("Head"))
             {
-                _health = Mathf.Max(_health - damage, 0);
-                if (_health == 0) shouldRagdoll = true;
+                _health -= damage * 10;
+                if (_health <= 0) shouldRagdoll = true;
             }
             else if (bodyPart.CompareTag("Upper Body"))
             {
@@ -381,7 +383,7 @@ public class AIZombieStateMachine : AiStateMachine
 
             foreach (Rigidbody body in _bodyParts) if (body) body.isKinematic = false;
 
-            if (hitStrenght > 5f) if (bodyPart != null) bodyPart.AddForce(force, ForceMode.Impulse);
+            if (hitStrenght > 15f) if (bodyPart != null) bodyPart.AddForce(force, ForceMode.Impulse);
 
             _boneControllType = AIBoneControlType.Ragdoll;
 
@@ -426,6 +428,8 @@ public class AIZombieStateMachine : AiStateMachine
     // ----------------------------------------------------------------------
     protected IEnumerator Reanimate()
     {
+        if (_health == 0) yield break;
+
         //Reanimate only if the zombie is in a ragdoll state
         if (_boneControllType != AIBoneControlType.Ragdoll || _animator == null) yield break;
 
@@ -450,7 +454,7 @@ public class AIZombieStateMachine : AiStateMachine
 
         //Record the ragdolls head and feet position
         _ragdoolHeadPosition = animator.GetBoneTransform(HumanBodyBones.Head).position;
-        _ragdollFeetPosition = (animator.GetBoneTransform(HumanBodyBones.LeftFoot).position + _animator.GetBoneTransform(HumanBodyBones.RightFoot).position) * 0.5f;
+        _ragdollFeetPosition = (animator.GetBoneTransform(HumanBodyBones.LeftFoot).position + _animator.GetBoneTransform(HumanBodyBones.RightFoot).position) * 0.2f;
         _ragdollHipPosition  = _rootBone.position;
 
         //Re-enables the animator
