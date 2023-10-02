@@ -55,7 +55,7 @@ namespace NekraByte
                     [Header("Gun Data")]
                     public int GunID = 0;
 
-                    public List<GunDataConteiner> guns = new List<GunDataConteiner>();
+                    public List<GunDataConteiner.AmmoData> guns = new List<GunDataConteiner.AmmoData>();
                 }
                 #endregion
 
@@ -83,23 +83,40 @@ namespace NekraByte
                     public float _musicVolume;
                     public float _zombiesVolume;
 
+                    [Space]
+
                     [Header("Graphics Settings")]
+
+                    [Header("Resolution")]
                     public Resolution   _currentResolution;
                     public int          _resolutionIndex    = 0;
+
                     public bool         _isFullscreen       = true;
+                    [Header("vSync")]
                     public bool         _vSyncActive        = false;
                     public int          _vSyncCount         = 0;
 
-                    public float brightness     = 1f;
+                    [Header("Shadows")]
+                    public int shadowQuality        = 1;
+                    public int shadowResolution     = 1;
 
-                    public int shadowQuality    = 1;
+                    [Header("Quality Settings")]
+                    public int qualityLevelIndex    = 1;
+
+                    public int anisotropicFiltering = 1;
+                    public int antialiasing         = 1;
+
+                    public float brightness         = 1f;
 
                     [Header("Gameplay Settings")]
-                    public float xSensitivity = 6f;
-                    public float ySensitivity = 6f;
+                    public float xSensitivity       = 7f;
+                    public float ySensitivity       = 7f;
 
-                    public bool invertX = false;
-                    public bool invertY = false;
+                    public bool invertX             = false;
+                    public bool invertY             = false;
+
+                    public int aimType              = 0;
+                    public int crouchType           = 0;                 
 
                     public void UpdateSave() => saveHour = DateTime.Now.ToString();
 
@@ -118,20 +135,29 @@ namespace NekraByte
                     }
                     public void ResetGraphicsSettings()
                     {
-                        _resolutionIndex = 0;
-                        _vSyncCount = 0;
-                        _vSyncActive = false;
+                        _resolutionIndex    = 0;
 
                         _isFullscreen       = true;
-                    }
+
+                        _vSyncCount         = 0;
+                        _vSyncActive        = false;
+
+                        shadowQuality       = 1;
+                        shadowResolution    = 1;
+
+                        anisotropicFiltering    = 1;
+                        antialiasing            = 1;
+                    }              
                     public void ResetGameplaySettings()
                     {
+                        xSensitivity    = 7f;
+                        ySensitivity    = 7f;
 
-                        xSensitivity = 5f;
-                        ySensitivity = 5f;
+                        invertX         = false;
+                        invertY         = false;
 
-                        invertX = false;
-                        invertY = false;
+                        aimType         = 0;
+                        crouchType      = 0;
                     }
 
                 }
@@ -146,6 +172,8 @@ namespace NekraByte
                     public BulletSettings   gunBulletSettings   = new BulletSettings();
                     public RecoilData       recoilData          = new RecoilData();
                     public AmmoData         ammoData            = new AmmoData();
+
+                    public void LoadData(AmmoData savedConteiner) => ammoData = savedConteiner;
 
                     #region - Gun Data Model -
                     [Serializable]
@@ -180,7 +208,6 @@ namespace NekraByte
                         public LayerMask                        _collisionMask;
                     }
                     #endregion
-
 
                     #region - Gun Recoil Asset -
                     [Serializable]

@@ -153,12 +153,23 @@ public abstract class GunBase : MonoBehaviour
         //The class focus on limiting the functionalitys, using ifs to limit the actions based in expressions.
         if (!_playerController._isSprinting)
         {
-            if (!_aimOverride) 
-                _isAiming = _inputManager.aiming;
+            if (!_aimOverride)
+            {
+                if (GameStateManager.Instance.currentApplicationData.aimType == 0)
+                    _isAiming = _inputManager.aiming;
+                else if (GameStateManager.Instance.currentApplicationData.aimType == 1)
+                {
+                    if (_inputManager.aimAction.WasPerformedThisFrame()) _isAiming = true;
+                    else if (_inputManager.aimAction.WasPerformedThisFrame() && _isAiming) _isAiming = false;
+
+                    if (!_aimOverride) _isAiming = _inputManager.aiming;
+                }
+            }
 
             _recoilAsset._isAiming = _isAiming;
 
-            if (_playerController._isThrowingObject) return;
+            if (_playerController._isThrowingObject) 
+                return;
 
             /* The below statements verifies if the player triggered the reload button
              * and if is not reloading, if the current mag ammo is different  from its

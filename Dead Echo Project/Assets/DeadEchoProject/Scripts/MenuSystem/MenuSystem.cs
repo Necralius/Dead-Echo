@@ -10,6 +10,8 @@ using UnityEngine.UI;
 public class MenuSystem : MonoBehaviour
 {
 
+
+
     //Volume Data
     [Header("Audio System")]
     [SerializeField] private SliderFloatField _generalVolume    = null;
@@ -21,8 +23,8 @@ public class MenuSystem : MonoBehaviour
     [SerializeField] Toggle vSyncActive                         = null;
     [SerializeField] Toggle fullscreenActive                    = null;
 
-    private List<Resolution> resolutions    = new List<Resolution>();
-    private int currentResolutionIndex      = 0;
+    private List<Resolution> resolutions                           = new List<Resolution>();
+    private int currentResolutionIndex                             = 0;
     private Resolution currentResolution;
     [SerializeField] private TMP_Dropdown resolutionDrp            = null;
 
@@ -43,6 +45,8 @@ public class MenuSystem : MonoBehaviour
     {
         _gameStateManager = GameStateManager.Instance;
         resolutions = Screen.resolutions.ToList();
+
+        LoadSettings();
     }
 
     #region - Volume System -
@@ -81,8 +85,8 @@ public class MenuSystem : MonoBehaviour
 
     #region - Graphics Settings -
 
-    #region - Resolution Setting -
-    public void UpdateResoluitonDrpd()
+    #region - Resolution Settings -
+    private void UpdateResolutionDrpd()
     {
         resolutionDrp.ClearOptions();
 
@@ -117,23 +121,38 @@ public class MenuSystem : MonoBehaviour
     public void SetAndSaveGraphicsSettings()
     {
         #region - Set -
-        Screen.SetResolution(currentResolution.width, currentResolution.height, fullscreenActive.isOn);       
+        Screen.SetResolution(currentResolution.width, currentResolution.height, fullscreenActive.isOn);
+        QualitySettings.SetQualityLevel(presetQualityDrp.value);
 
-        QualitySettings.vSyncCount = vSyncDrp.value;
+        QualitySettings.shadows                 = (ShadowQuality)shadowQualityDrp.value;
+        QualitySettings.shadowResolution        = (ShadowResolution)shadowResolutionDrp.value;
+        QualitySettings.anisotropicFiltering    = (AnisotropicFiltering)anisotropicQualityDrp.value;
+        QualitySettings.antiAliasing            = antialisingQualityDrp.value;
+
+        QualitySettings.vSyncCount              = vSyncDrp.value;
         #endregion
 
         #region - Save -
         if (_gameStateManager.currentApplicationData == null) 
             return;
 
-        _gameStateManager.currentApplicationData._currentResolution = currentResolution;
-        _gameStateManager.currentApplicationData._resolutionIndex   = currentResolutionIndex;
-        _gameStateManager.currentApplicationData._isFullscreen      = fullscreenActive.isOn;
+        _gameStateManager.currentApplicationData._currentResolution     = currentResolution;
+        _gameStateManager.currentApplicationData._resolutionIndex       = currentResolutionIndex;
+        _gameStateManager.currentApplicationData._isFullscreen          = fullscreenActive.isOn;
 
-        _gameStateManager.currentApplicationData._vSyncActive       = vSyncActive.isOn;
-        _gameStateManager.currentApplicationData._vSyncCount        = vSyncDrp.value;
+        _gameStateManager.currentApplicationData._vSyncActive           = vSyncActive.isOn;
+        _gameStateManager.currentApplicationData._vSyncCount            = vSyncDrp.value;
+
+        _gameStateManager.currentApplicationData.shadowQuality          = shadowQualityDrp.value;
+        _gameStateManager.currentApplicationData.shadowResolution       = shadowResolutionDrp.value;
+
+        _gameStateManager.currentApplicationData.antialiasing           = antialisingQualityDrp.value;
+        _gameStateManager.currentApplicationData.anisotropicFiltering   = anisotropicQualityDrp.value;
+
+        _gameStateManager.currentApplicationData.qualityLevelIndex      = presetQualityDrp.value;
 
         _gameStateManager.SaveApplicationData();
+        LoadSettings();
         #endregion
     }
     public void ResetGraphicsSettings()
@@ -141,11 +160,11 @@ public class MenuSystem : MonoBehaviour
         _gameStateManager.currentApplicationData.ResetGraphicsSettings();
         _gameStateManager.SaveApplicationData();
 
-        LoadGraphicsSettings();
+        UpdateGraphicsUI();
     }
-    public void LoadGraphicsSettings()
+    public void UpdateGraphicsUI()
     {
-        UpdateResoluitonDrpd();
+        UpdateResolutionDrpd();
 
         if (_gameStateManager.currentApplicationData == null)
             return;
@@ -154,12 +173,55 @@ public class MenuSystem : MonoBehaviour
 
         vSyncActive.isOn    = _gameStateManager.currentApplicationData._vSyncActive;
         vSyncDrp.value      = _gameStateManager.currentApplicationData._vSyncCount;
+
+        presetQualityDrp.value      = _gameStateManager.currentApplicationData.qualityLevelIndex;
+
+        shadowQualityDrp.value      = _gameStateManager.currentApplicationData.shadowQuality;
+        shadowResolutionDrp.value   = _gameStateManager.currentApplicationData.shadowResolution;
+
+        antialisingQualityDrp.value = _gameStateManager.currentApplicationData.antialiasing;
+        anisotropicQualityDrp.value = _gameStateManager.currentApplicationData.anisotropicFiltering;      
     }
     #endregion
 
+    #region - Load General Settings -
 
+    // ----------------------------------------------------------------------
+    // Name: LoadSettings
+    // Desc: This method load all readed settings on the local serialized
+    //       data archieve.
+    // ----------------------------------------------------------------------
+    public void LoadSettings()
+    {
+        // Settings Load and Set
+        Screen.SetResolution(_gameStateManager.currentApplicationData._currentResolution.width,
+            _gameStateManager.currentApplicationData._currentResolution.height, _gameStateManager.currentApplicationData._isFullscreen);
 
-    public void StartGame()
+        QualitySettings.SetQualityLevel(_gameStateManager.currentApplicationData.qualityLevelIndex);
+
+        QualitySettings.shadows = (ShadowQuality)_gameStateManager.currentApplicationData.shadowQuality;
+        QualitySettings.shadowResolution = (ShadowResolution)_gameStateManager.currentApplicationData.shadowResolution;
+        QualitySettings.anisotropicFiltering = (AnisotropicFiltering)_gameStateManager.currentApplicationData.anisotropicFiltering;
+        QualitySettings.antiAliasing = _gameStateManager.currentApplicationData.antialiasing;
+
+        QualitySettings.vSyncCount = _gameStateManager.currentApplicationData._vSyncCount;
+    }
+    #endregion
+
+    #region - Gameplay Settings -
+
+    public void SetAndSaveGameplaySettings()
+    {
+
+    }
+    public void UpdateGameplaySettings()
+    {
+
+    }
+
+    #endregion
+
+    public void StartNewGame()
     {
         //Start a new game from the starting point
     }

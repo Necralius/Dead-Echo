@@ -22,13 +22,13 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
 
     #region - Movment Settings -
     [Header("Camera Look")]
-    [SerializeField, Range(1, 100)] private float   _sensX          = 10f;
-    [SerializeField, Range(1, 100)] private float   _sensY          = 10f;
+    [SerializeField, Range(1, 40)] private float    _sensX          = 10f;
+    [SerializeField, Range(1, 40)] private float    _sensY          = 10f;
 
     [SerializeField] private Transform              _orientation    = null;
     public Transform                                _cameraObject   = null;
-    float _xRotation    = 0; 
-    float _yRotation    = 0;
+    float _xRotation                                                = 0; 
+    float _yRotation                                                = 0;
 
     [Header("Player Movment")]
     [SerializeField, Range(1f, 100f)] private float     _walkSpeed      = 7f;
@@ -37,11 +37,11 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
     [SerializeField, Range(0f, 100f)] private float     _groundDrag     = 2f;
 
     [Header("Crouching")]
-    [SerializeField] private float _crouchYScale = 1.2f;
-    private float _startYScale;
+    [SerializeField] private float _crouchYScale    = 1.2f;
+    private float _startYScale                      = 0;
 
-    private Vector3     _moveDirection  = Vector3.zero;
-    private float       _targetSpeed = 7f;
+    private Vector3     _moveDirection              = Vector3.zero;
+    private float       _targetSpeed                = 7f;
 
     [Header("Jump Settings")]
     [SerializeField, Range(1f, 20f)] private float jumpForce        = 12f;
@@ -268,17 +268,35 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
             Invoke(nameof(ResetJump), jumpCooldown);
         }
 
-        if (_inptManager.crouchAction.WasPerformedThisFrame() && _isGrounded && !_isSprinting)
+        if (GameStateManager.Instance.currentApplicationData.crouchType == 0)//Crouch Type -> Hold
         {
-            transform.localScale = new Vector3(transform.localScale.x, _crouchYScale, transform.localScale.z);
-            _rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
-            _isCrouching = true;
-        }
+            if (_inptManager.crouchAction.WasPerformedThisFrame() && _isGrounded && !_isSprinting)
+            {
+                transform.localScale = new Vector3(transform.localScale.x, _crouchYScale, transform.localScale.z);
+                _rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
+                _isCrouching = true;
+            }
 
-        if (_inptManager.crouchAction.WasReleasedThisFrame() && _isGrounded)
+            if (_inptManager.crouchAction.WasReleasedThisFrame() && _isGrounded)
+            {
+                transform.localScale = new Vector3(transform.localScale.x, _startYScale, transform.localScale.z);
+                _isCrouching = false;
+            }
+        }
+        else if (GameStateManager.Instance.currentApplicationData.crouchType == 1)//Crouch Type -> Toggle
         {
-            transform.localScale = new Vector3(transform.localScale.x, _startYScale, transform.localScale.z);
-            _isCrouching = false;
+            if (_inptManager.crouchAction.WasPerformedThisFrame() && _isGrounded && !_isSprinting)
+            {
+                transform.localScale = new Vector3(transform.localScale.x, _crouchYScale, transform.localScale.z);
+                _rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
+                _isCrouching = true;
+            }
+
+            if (_inptManager.crouchAction.WasReleasedThisFrame() && _isGrounded && _isCrouching)
+            {
+                transform.localScale = new Vector3(transform.localScale.x, _startYScale, transform.localScale.z);
+                _isCrouching = false;
+            }
         }
 
         if (_isSprinting && _inptManager.crouchAction.WasPerformedThisFrame() && _isGrounded) 
@@ -336,8 +354,11 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
     // ----------------------------------------------------------------------
     void CameraHandler()
     {
-        float mouseX = _inptManager.Look.x * Time.deltaTime * _sensX;
-        float mouseY = _inptManager.Look.y * Time.deltaTime * _sensY;
+        bool xInverted = GameStateManager.Instance.currentApplicationData.invertX;
+        bool yInverted = GameStateManager.Instance.currentApplicationData.invertY;
+
+        float mouseX = (xInverted ? -_inptManager.Look.x : _inptManager.Look.x) * Time.deltaTime * _sensX;
+        float mouseY = (yInverted ? -_inptManager.Look.y : _inptManager.Look.y) * Time.deltaTime * _sensY;
 
         _yRotation  += mouseX;
 
@@ -611,8 +632,8 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
         transform.rotation = gameData.playerRotation;
         _gunIndex = gameData.GunID;
 
-        for (int i = 0; i < gameData.guns.Count; i++) 
-            _gunsInHand[i].GunData = gameData.guns[i];
+        for (int i = 0; i < gameData.guns.Count; i++)
+            _gunsInHand[i].GunData.LoadData(gameData.guns[i]);
     }
 
     public void Save(GameSaveData gameData)
@@ -622,6 +643,6 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
         gameData.GunID = _gunIndex;
 
         foreach(var gun in _gunsInHand) 
-            gameData.guns.Add(gun.GunData);
+            gameData.guns.Add(gun.GunData.ammoData);
     }
 }
