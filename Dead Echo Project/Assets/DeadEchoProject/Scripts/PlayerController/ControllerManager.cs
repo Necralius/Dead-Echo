@@ -126,10 +126,12 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
 
     #region - Dependencies -
     //Dependencies
-    [HideInInspector] public InputManager _inptManager = null;
-    Rigidbody _rb => GetComponent<Rigidbody>();
+    [HideInInspector] public InputManager       _inptManager        = null;
+    [HideInInspector] public Rigidbody          _rb                 => GetComponent<Rigidbody>();
     [Header("Player Instance")]
-    [SerializeField] private GameObject _playerInstance;
+    [SerializeField] private GameObject         _playerInstance;
+
+    private                  PlayerAudioManager _playerAudioManager = null;
     #endregion
 
     #region - Audio System -
@@ -149,8 +151,6 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
     public float dragMultiplier { get => _dragMultiplier; set => _dragMultiplier = Mathf.Min(value, _dragMultiplierLimit); }
     #endregion
 
-    public Animator     armsAnimator;
-
     public List<AnimationLayer> _animLayers;
 
     #region - Gun Change System -
@@ -163,6 +163,8 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
     public TextMeshProUGUI txt_bagAmmo;
     public TextMeshProUGUI txt_GunName;
     #endregion
+
+    public bool isDebugMode = true;
 
     // ---------------------------- Methods ----------------------------//
 
@@ -180,15 +182,16 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
         Cursor.lockState    = CursorLockMode.Locked;
 
         _playerCol          = GetComponentInChildren<CapsuleCollider>();
+        _playerAudioManager = GetComponent<PlayerAudioManager>();
         _playerHeight       = _playerCol.height;
 
         _inptManager        = InputManager.Instance;
         _startYScale        = transform.localScale.y;
 
-        armsAnimator        = AnimationLayer.GetAnimationLayer("AnimationsLayer", _animLayers).animator;
+        _armsAnimator       = AnimationLayer.GetAnimationLayer("AnimationsLayer", _animLayers).animator;
         _rockThrower        = AnimationLayer.GetAnimationLayer("RockThrowerLayer", _animLayers).layerObject.GetComponent<RockThrower>();
 
-        RegisterDataSaver();
+        if (GameStateManager.Instance != null) RegisterDataSaver();
     }
 
     // ----------------------------------------------------------------------
@@ -260,6 +263,8 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
     // ----------------------------------------------------------------------
     private void InputHandler()
     {
+        if (GameSceneManager.Instance._gameIsPaused) return;
+
         if (_inptManager.jumpAction.WasPressedThisFrame() && _canJump && _isGrounded)
         {
             _canJump = false;
@@ -268,7 +273,39 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
             Invoke(nameof(ResetJump), jumpCooldown);
         }
 
-        if (GameStateManager.Instance.currentApplicationData.crouchType == 0)//Crouch Type -> Hold
+        if (GameStateManager.Instance != null)
+        {
+            if (GameStateManager.Instance.currentApplicationData.crouchType == 0)//Crouch Type -> Hold
+            {
+                if (_inptManager.crouchAction.WasPerformedThisFrame() && _isGrounded && !_isSprinting)
+                {
+                    transform.localScale = new Vector3(transform.localScale.x, _crouchYScale, transform.localScale.z);
+                    _rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
+                    _isCrouching = true;
+                }
+
+                if (_inptManager.crouchAction.WasReleasedThisFrame() && _isGrounded)
+                {
+                    transform.localScale = new Vector3(transform.localScale.x, _startYScale, transform.localScale.z);
+                    _isCrouching = false;
+                }
+            }
+            else if (GameStateManager.Instance.currentApplicationData.crouchType == 1)//Crouch Type -> Toggle
+            {
+                if (_inptManager.crouchAction.WasPerformedThisFrame() && _isGrounded && !_isSprinting )
+                {
+                    transform.localScale = new Vector3(transform.localScale.x, _crouchYScale, transform.localScale.z);
+                    _rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
+                    _isCrouching = true;
+                }
+                else if (_inptManager.crouchAction.WasPerformedThisFrame() && _isCrouching)
+                {
+                    transform.localScale = new Vector3(transform.localScale.x, _startYScale, transform.localScale.z);
+                    _isCrouching = false;
+                }
+            }
+        }
+        else
         {
             if (_inptManager.crouchAction.WasPerformedThisFrame() && _isGrounded && !_isSprinting)
             {
@@ -278,21 +315,6 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
             }
 
             if (_inptManager.crouchAction.WasReleasedThisFrame() && _isGrounded)
-            {
-                transform.localScale = new Vector3(transform.localScale.x, _startYScale, transform.localScale.z);
-                _isCrouching = false;
-            }
-        }
-        else if (GameStateManager.Instance.currentApplicationData.crouchType == 1)//Crouch Type -> Toggle
-        {
-            if (_inptManager.crouchAction.WasPerformedThisFrame() && _isGrounded && !_isSprinting)
-            {
-                transform.localScale = new Vector3(transform.localScale.x, _crouchYScale, transform.localScale.z);
-                _rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
-                _isCrouching = true;
-            }
-
-            if (_inptManager.crouchAction.WasReleasedThisFrame() && _isGrounded && _isCrouching)
             {
                 transform.localScale = new Vector3(transform.localScale.x, _startYScale, transform.localScale.z);
                 _isCrouching = false;
@@ -342,7 +364,7 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
 
         _dragMultiplier = Mathf.Min(_dragMultiplier + Time.deltaTime, _dragMultiplierLimit);
     }
-    #endregion
+    #endregion  
 
     #region - Camera Movement Behavior -
     // ----------------------------------------------------------------------
@@ -354,11 +376,19 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
     // ----------------------------------------------------------------------
     void CameraHandler()
     {
-        bool xInverted = GameStateManager.Instance.currentApplicationData.invertX;
-        bool yInverted = GameStateManager.Instance.currentApplicationData.invertY;
+        float mouseX;
+        float mouseY;
 
-        float mouseX = (xInverted ? -_inptManager.Look.x : _inptManager.Look.x) * Time.deltaTime * _sensX;
-        float mouseY = (yInverted ? -_inptManager.Look.y : _inptManager.Look.y) * Time.deltaTime * _sensY;
+        if (GameStateManager.Instance != null)
+        {
+            mouseX = (GameStateManager.Instance.currentApplicationData.invertX ? -_inptManager.Look.x : _inptManager.Look.x) * Time.deltaTime * _sensX;
+            mouseY = (GameStateManager.Instance.currentApplicationData.invertY ? -_inptManager.Look.y : _inptManager.Look.y) * Time.deltaTime * _sensY;
+        }
+        else
+        {
+            mouseX = _inptManager.Look.x * Time.deltaTime * _sensX;
+            mouseY = _inptManager.Look.y * Time.deltaTime * _sensY;
+        }
 
         _yRotation  += mouseX;
 
@@ -616,10 +646,18 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
     #region - Flashlight System -
     private void ChangeFlashlightState()
     {
+        if (GameSceneManager.Instance != null) 
+            GameSceneManager.Instance.ForcedSaveGame();    
+
         _flashLightObject.SetActive(!_flashLightObject.activeInHierarchy);
         SS_Flashlight();
     }
     #endregion
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawLine(transform.position, (transform.position + -transform.up));
+    }
 
     public void RegisterDataSaver()
     {

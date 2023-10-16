@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MenuSystem : MonoBehaviour
 {
-
-
 
     //Volume Data
     [Header("Audio System")]
@@ -23,28 +20,38 @@ public class MenuSystem : MonoBehaviour
     [SerializeField] Toggle vSyncActive                         = null;
     [SerializeField] Toggle fullscreenActive                    = null;
 
-    private List<Resolution> resolutions                           = new List<Resolution>();
-    private int currentResolutionIndex                             = 0;
+    private List<Resolution> resolutions                            = new List<Resolution>();
+    private int currentResolutionIndex                              = 0;
     private Resolution currentResolution;
-    [SerializeField] private TMP_Dropdown resolutionDrp            = null;
+    [SerializeField] private TMP_Dropdown resolutionDrp             = null;
 
-    [SerializeField] private TMP_Dropdown vSyncDrp                 = null;
-    [SerializeField] private TMP_Dropdown presetQualityDrp         = null;
-    [SerializeField] private TMP_Dropdown textureQualityDrp        = null;
-    [SerializeField] private TMP_Dropdown antialisingQualityDrp    = null;
-    [SerializeField] private TMP_Dropdown anisotropicQualityDrp    = null;
-    [SerializeField] private TMP_Dropdown shadowQualityDrp         = null;
-    [SerializeField] private TMP_Dropdown shadowResolutionDrp      = null;
+    [SerializeField] private TMP_Dropdown   vSyncDrp                 = null;
+    [SerializeField] private TMP_Dropdown   presetQualityDrp         = null;
+    [SerializeField] private TMP_Dropdown   textureQualityDrp        = null;
+    [SerializeField] private TMP_Dropdown   antialisingQualityDrp    = null;
+    [SerializeField] private TMP_Dropdown   anisotropicQualityDrp    = null;
+    [SerializeField] private TMP_Dropdown   shadowQualityDrp         = null;
+    [SerializeField] private TMP_Dropdown   shadowResolutionDrp      = null;
 
-    //private List<>
+    [Header("Gameplay Settings")]
+    [SerializeField] private Toggle         tgl_InvertedX            = null;
+    [SerializeField] private Toggle         tgl_InvertedY            = null;
 
+    [SerializeField] private TMP_Dropdown   aimTypeDrp               = null;
+    [SerializeField] private TMP_Dropdown   crouchTypeDrp            = null;
+
+    [SerializeField] private SliderFloatField sensitivityX          = null;
+    [SerializeField] private SliderFloatField sensitivityY          = null;
 
     GameStateManager _gameStateManager;
 
+    [SerializeField] private LoadScreen loadingScreen;
+    [SerializeField] private float loadingTime = 0f;
+
     private void Start()
     {
-        _gameStateManager = GameStateManager.Instance;
-        resolutions = Screen.resolutions.ToList();
+        _gameStateManager   = GameStateManager.Instance;
+        resolutions         = Screen.resolutions.ToList();
 
         LoadSettings();
     }
@@ -188,47 +195,97 @@ public class MenuSystem : MonoBehaviour
 
     // ----------------------------------------------------------------------
     // Name: LoadSettings
-    // Desc: This method load all readed settings on the local serialized
+    // Desc: This method load all settings founded on the local serialized
     //       data archieve.
     // ----------------------------------------------------------------------
     public void LoadSettings()
     {
-        // Settings Load and Set
-        Screen.SetResolution(_gameStateManager.currentApplicationData._currentResolution.width,
-            _gameStateManager.currentApplicationData._currentResolution.height, _gameStateManager.currentApplicationData._isFullscreen);
+        if (_gameStateManager != null)
+        {
 
-        QualitySettings.SetQualityLevel(_gameStateManager.currentApplicationData.qualityLevelIndex);
+            // Settings Load and Set
+            Screen.SetResolution(_gameStateManager.currentApplicationData._currentResolution.width,
+                _gameStateManager.currentApplicationData._currentResolution.height, _gameStateManager.currentApplicationData._isFullscreen);
 
-        QualitySettings.shadows = (ShadowQuality)_gameStateManager.currentApplicationData.shadowQuality;
-        QualitySettings.shadowResolution = (ShadowResolution)_gameStateManager.currentApplicationData.shadowResolution;
-        QualitySettings.anisotropicFiltering = (AnisotropicFiltering)_gameStateManager.currentApplicationData.anisotropicFiltering;
-        QualitySettings.antiAliasing = _gameStateManager.currentApplicationData.antialiasing;
+            QualitySettings.SetQualityLevel(_gameStateManager.currentApplicationData.qualityLevelIndex);
 
-        QualitySettings.vSyncCount = _gameStateManager.currentApplicationData._vSyncCount;
+            QualitySettings.shadows                 = (ShadowQuality)_gameStateManager.currentApplicationData.shadowQuality;
+            QualitySettings.shadowResolution        = (ShadowResolution)_gameStateManager.currentApplicationData.shadowResolution;
+            QualitySettings.anisotropicFiltering    = (AnisotropicFiltering)_gameStateManager.currentApplicationData.anisotropicFiltering;
+            QualitySettings.antiAliasing            = _gameStateManager.currentApplicationData.antialiasing;
+
+            QualitySettings.vSyncCount              = _gameStateManager.currentApplicationData._vSyncCount;
+        }
     }
     #endregion
 
     #region - Gameplay Settings -
-
+    // -----------------------------------------------------------------------
+    // Name: SetAndSaveGameplaySettings
+    // Desc: This method set the current gameplay settings and save it in an
+    //       serialized file.
+    // ----------------------------------------------------------------------
     public void SetAndSaveGameplaySettings()
     {
+        if (_gameStateManager == null) return;
 
+        _gameStateManager.currentApplicationData.invertX        = tgl_InvertedX.isOn;
+        _gameStateManager.currentApplicationData.invertY        = tgl_InvertedY.isOn;
+
+        _gameStateManager.currentApplicationData.xSensitivity   = sensitivityX.GetValue();
+        _gameStateManager.currentApplicationData.ySensitivity   = sensitivityY.GetValue();
+
+        _gameStateManager.currentApplicationData.aimType        = aimTypeDrp.value;
+        _gameStateManager.currentApplicationData.crouchType     = crouchTypeDrp.value;
+
+        _gameStateManager.SaveApplicationData();
     }
+
+    // ----------------------------------------------------------------------
+    // Name: UpdateGameplaySettings
+    // Desc: This method updates the gameplay settings tab UI, using the data
+    //       saved on the serialized file.
+    // ----------------------------------------------------------------------
     public void UpdateGameplaySettings()
     {
+        tgl_InvertedX.isOn = _gameStateManager.currentApplicationData.invertX;
+        tgl_InvertedY.isOn = _gameStateManager.currentApplicationData.invertY;
 
+        sensitivityX.OverrideValue(_gameStateManager.currentApplicationData.xSensitivity);
+        sensitivityY.OverrideValue(_gameStateManager.currentApplicationData.ySensitivity);
+
+        aimTypeDrp.value        = _gameStateManager.currentApplicationData.aimType;
+        crouchTypeDrp.value     = _gameStateManager.currentApplicationData.crouchType;
     }
 
+    //
+    //
+    //
+    //
+    public void ResetGameplaySettings()
+    {
+        _gameStateManager.currentApplicationData.ResetGameplaySettings();
+        _gameStateManager.SaveApplicationData();
+
+        UpdateGameplaySettings();
+    }
     #endregion
 
-    public void StartNewGame()
+    #region - Game Data System -
+    public void SaveGameData() => GameStateManager.Instance.SaveGameData();
+
+    public void DeleteGameSave(int index)
     {
-        //Start a new game from the starting point
+        SaveConteiner.Instance.LoadGameSaves();
+        SaveConteiner.Instance.LoadNewGameSaves();
+        GameStateManager.Instance.currentApplicationData.DeleteSaveByIndex(index);
     }
-    public void LoadData() //TODO -> LoadData Type gonna be used as argument
+
+    public void LoadGameData(int saveIndex)
     {
-        //Load an Game data on the scene
+
     }
+    #endregion
 
     public void QuitGame()
     {
@@ -236,10 +293,31 @@ public class MenuSystem : MonoBehaviour
     }
     public void QuitToMenu()
     {
-        LoadScene(0);
+        StartSceneLoading("Scene_MainMenu");
     }
-    public void LoadScene(int sceneIndex)
+    public void StartSceneLoading(string sceneName)
     {
-        SceneManager.LoadScene(sceneIndex);
+        loadingScreen.gameObject.SetActive(true);
+        loadingTime = 0f;
+
+        StartCoroutine(LoadScene(sceneName));
+    }
+    private IEnumerator LoadScene(string sceneName)
+    {
+        SceneManager.LoadScene(sceneName);
+
+        string activeScene = SceneManager.GetActiveScene().name;
+
+        while (activeScene != sceneName)
+        {
+            loadingTime += Time.deltaTime;
+            loadingScreen.UpdateState(loadingTime);
+            activeScene = SceneManager.GetActiveScene().name;
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
+
+        loadingScreen.gameObject.SetActive(false);
+
+        yield return null;
     }
 }

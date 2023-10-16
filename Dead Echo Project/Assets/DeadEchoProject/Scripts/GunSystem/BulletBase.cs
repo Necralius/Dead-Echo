@@ -173,7 +173,7 @@ public class BulletBase : MonoBehaviour
             int damage = (int)Random.Range(_bulletDamage.x, _bulletDamage.y);
 
             // The method tries to get an valid AI Instance acessing the GameSceneManager and execute an hit action
-            AiStateMachine stateMachine = GameSceneManager.instance.GetAIStateMachine(hit.rigidbody.GetInstanceID());
+            AiStateMachine stateMachine = GameSceneManager.Instance.GetAIStateMachine(hit.rigidbody.GetInstanceID());
             if (stateMachine) 
                 stateMachine.TakeDamage(hit.point, 
                     -hit.normal * _bulletImpactForce, 

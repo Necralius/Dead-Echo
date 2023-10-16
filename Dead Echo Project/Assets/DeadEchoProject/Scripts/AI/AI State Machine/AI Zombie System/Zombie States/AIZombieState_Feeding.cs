@@ -65,11 +65,11 @@ public class AIZombieState_Feeding : AIZombieState
             _zombieStateMachine.satisfaction = Mathf.Min(_zombieStateMachine.satisfaction + 
                 ((Time.deltaTime * _zombieStateMachine.replenishRate) / 100), 1.0f);
 
-            if (GameSceneManager.instance && GameSceneManager.instance.bloodParticles && _bloodParticleMount)
+            if (GameSceneManager.Instance && GameSceneManager.Instance.bloodParticles && _bloodParticleMount)
             {
                 if (_timer > _bloodParticleFrequency)
                 {
-                    ParticleSystem blood = GameSceneManager.instance.bloodParticles;
+                    ParticleSystem blood = GameSceneManager.Instance.bloodParticles;
 
                     blood.transform.position = _bloodParticleMount.position;
                     blood.transform.rotation = _bloodParticleMount.rotation;

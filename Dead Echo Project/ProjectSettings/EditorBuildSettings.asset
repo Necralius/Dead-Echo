@@ -6,10 +6,10 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/DeadEchoProject/Scenes/MenuProgramming/Main Menu.unity
+    path: Assets/DeadEchoProject/Scenes/MenuProgramming/Scene_MainMenu.unity
     guid: d285b5e00c888174fabe71501dbcb9e3
   - enabled: 1
-    path: Assets/DeadEchoProject/Scenes/Level1/Level_1.unity
+    path: Assets/DeadEchoProject/Scenes/Level1/Scene_Level1.unity
     guid: b89ef2b21d16e4043a8d1cc360a9e3dd
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

@@ -134,7 +134,7 @@ public abstract class AIZombieState : AIState
             {
                 if (hit.transform.gameObject.layer == _bodyPartLayer)
                 {
-                    if (_stateMachine != GameSceneManager.instance.GetAIStateMachine(hit.rigidbody.GetInstanceID()))
+                    if (_stateMachine != GameSceneManager.Instance.GetAIStateMachine(hit.rigidbody.GetInstanceID()))
                     {
                         closesColliderDistance = hit.distance;
                         closestCollider = hit.collider;

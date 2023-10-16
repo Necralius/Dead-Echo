@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a42031bcf1f556439523fbbad2c0771, type: 3}
+  m_Name: PlayerFootsetps
+  m_EditorClassIdentifier: 
+  _audioGroup: Effects
+  _volume: 1
+  _spatialBlend: 1
+  _priority: 128
+  _audioClipBanks:
+  - Clips:
+    - {fileID: 8300000, guid: 897985663b0215a41a735a8348eeed74, type: 3}
+    - {fileID: 8300000, guid: 995c4bf0ab448b74694385eef704aa33, type: 3}
+    - {fileID: 8300000, guid: 22e62ea59b7dcf44393c77b2f06a9723, type: 3}
+    - {fileID: 8300000, guid: f1cd8033d0d886946b1f2e27bb0f7cbf, type: 3}
+    - {fileID: 8300000, guid: 88775ee38e511394ab4b2cd0e2639377, type: 3}
+    - {fileID: 8300000, guid: 1d0115d76d2ceca45bffa4a3d4ea3b2f, type: 3}
+    - {fileID: 8300000, guid: 625bd8685d45d9348a94299915193ce6, type: 3}
+    - {fileID: 8300000, guid: 4694ddaf9a793024394b1cecb08b2077, type: 3}
+    - {fileID: 8300000, guid: 1a08ec1681552b848b76c067080294c3, type: 3}
+    - {fileID: 8300000, guid: 72622e9643476b04882617c5b25b5a83, type: 3}
+    - {fileID: 8300000, guid: 7b73e3735623be04e959e69e89318fdc, type: 3}
+  - Clips:
+    - {fileID: 8300000, guid: b9eb613c9e80d8046a64ab9b9cadc840, type: 3}
+    - {fileID: 8300000, guid: a81c3279588d73743bc8d23fafd20c7b, type: 3}
+    - {fileID: 8300000, guid: 4af430a59b73d694b9a3772ab54cb013, type: 3}
+    - {fileID: 8300000, guid: fc5c4ed081509a042874ae8df9380f9e, type: 3}

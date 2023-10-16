@@ -6,12 +6,12 @@ public class MeleeZoneTrigger : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        AiStateMachine machine = GameSceneManager.instance.GetAIStateMachine(other.GetInstanceID());
+        AiStateMachine machine = GameSceneManager.Instance.GetAIStateMachine(other.GetInstanceID());
         if (machine) machine.inMeleeRange = true;
     }
     private void OnTriggerExit(Collider other)
     {
-        AiStateMachine machine = GameSceneManager.instance.GetAIStateMachine(other.GetInstanceID());
+        AiStateMachine machine = GameSceneManager.Instance.GetAIStateMachine(other.GetInstanceID());
         if (machine) machine.inMeleeRange = false;
     }
 }

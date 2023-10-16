@@ -36,7 +36,7 @@ public class CharacterManager : MonoBehaviour
     {
         _collider               = GetComponentInChildren<Collider>();
         _fpsController          = GetComponent<ControllerManager>();
-        _gameSceneManager       = GameSceneManager.instance;
+        _gameSceneManager       = GameSceneManager.Instance;
 
         if (_gameSceneManager != null)
         {
@@ -79,7 +79,7 @@ public class CharacterManager : MonoBehaviour
     //
     private void Die()
     {
-        GameSceneManager.instance.DeathScreen();
+        GameSceneManager.Instance.DeathScreen();
         Time.timeScale = 0f;
     }
 }

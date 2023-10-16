@@ -13,6 +13,8 @@ TagManager:
   - Upper Body
   - Head
   - Cloth
+  - MenuSystem
+  - Terrain
   layers:
   - Default
   - TransparentFX

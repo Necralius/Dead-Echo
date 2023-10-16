@@ -16733,7 +16733,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7812518331238378865
 Transform:
   m_ObjectHideFlags: 0
@@ -16810,15 +16810,6 @@ MonoBehaviour:
       _collisionMask:
         serializedVersion: 2
         m_Bits: 4227858560
-    gunAudioAsset:
-      ShootClip: {fileID: 8300000, guid: 34cb9be5d62dbdf4cb998f4f84d1c3db, type: 3}
-      AimClip: {fileID: 8300000, guid: 4c8628db2f8f3284caab565ef0bb81ce, type: 3}
-      DrawClip: {fileID: 0}
-      HolstClip: {fileID: 0}
-      ReloadClip: {fileID: 8300000, guid: b1596116f9fa31f498e3ba15e736b6dd, type: 3}
-      ReloadClipVar1: {fileID: 8300000, guid: 27a6421a8ca60ec49af482f6bdb078d9, type: 3}
-      FullReloadClip: {fileID: 8300000, guid: 9e3f41eeb402d014889023664764ce32, type: 3}
-      BoltActionClip: {fileID: 0}
     recoilData:
       _recoilX: -5
       _recoilY: 5
@@ -16827,11 +16818,21 @@ MonoBehaviour:
       _snappiness: 6
       _returnSpeed: 20
       _recoilReduction: 0.3
+    ammoData:
+      _bagMaxAmmo: 200
+      _magMaxAmmo: 31
+      _bagAmmo: 60
+      _magAmmo: 31
+  _gunAudioAsset:
+    ShootClip: {fileID: 8300000, guid: 34cb9be5d62dbdf4cb998f4f84d1c3db, type: 3}
+    AimClip: {fileID: 8300000, guid: 4c8628db2f8f3284caab565ef0bb81ce, type: 3}
+    DrawClip: {fileID: 0}
+    HolstClip: {fileID: 0}
+    ReloadClip: {fileID: 8300000, guid: b1596116f9fa31f498e3ba15e736b6dd, type: 3}
+    ReloadClipVar1: {fileID: 8300000, guid: 27a6421a8ca60ec49af482f6bdb078d9, type: 3}
+    FullReloadClip: {fileID: 8300000, guid: 9e3f41eeb402d014889023664764ce32, type: 3}
+    BoltActionClip: {fileID: 0}
   _muzzleFlash: {fileID: 4566294650103777783}
-  _bagMaxAmmo: 200
-  _magMaxAmmo: 31
-  _bagAmmo: 60
-  _magAmmo: 31
   _isEquiped: 1
   _isReloading: 0
   _isShooting: 0
@@ -17764,7 +17765,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5055280111584288783
 Transform:
   m_ObjectHideFlags: 0
@@ -17841,15 +17842,6 @@ MonoBehaviour:
       _collisionMask:
         serializedVersion: 2
         m_Bits: 4227858560
-    gunAudioAsset:
-      ShootClip: {fileID: 8300000, guid: 49182f7f6c11bda40bc100004a1a4f21, type: 3}
-      AimClip: {fileID: 8300000, guid: 6d18729c8b539aa4d800edeb0bd8dc1c, type: 3}
-      DrawClip: {fileID: 0}
-      HolstClip: {fileID: 8300000, guid: ba2ef8b9083c04742b864552507d7b60, type: 3}
-      ReloadClip: {fileID: 8300000, guid: 614dd3f89ac464643bf6edb2294c2f78, type: 3}
-      ReloadClipVar1: {fileID: 8300000, guid: 5816412c6ef38924896bc3afa4a9aead, type: 3}
-      FullReloadClip: {fileID: 8300000, guid: 4a7d28223cfbf344dbd0da062bf8f4ca, type: 3}
-      BoltActionClip: {fileID: 8300000, guid: 9b17d107f19588d4b9b42349dcbbad21, type: 3}
     recoilData:
       _recoilX: -10
       _recoilY: 3
@@ -17858,11 +17850,21 @@ MonoBehaviour:
       _snappiness: 6
       _returnSpeed: 20
       _recoilReduction: 0.3
+    ammoData:
+      _bagMaxAmmo: 200
+      _magMaxAmmo: 31
+      _bagAmmo: 60
+      _magAmmo: 31
+  _gunAudioAsset:
+    ShootClip: {fileID: 8300000, guid: 49182f7f6c11bda40bc100004a1a4f21, type: 3}
+    AimClip: {fileID: 8300000, guid: 6d18729c8b539aa4d800edeb0bd8dc1c, type: 3}
+    DrawClip: {fileID: 0}
+    HolstClip: {fileID: 8300000, guid: ba2ef8b9083c04742b864552507d7b60, type: 3}
+    ReloadClip: {fileID: 8300000, guid: 614dd3f89ac464643bf6edb2294c2f78, type: 3}
+    ReloadClipVar1: {fileID: 8300000, guid: 5816412c6ef38924896bc3afa4a9aead, type: 3}
+    FullReloadClip: {fileID: 8300000, guid: 4a7d28223cfbf344dbd0da062bf8f4ca, type: 3}
+    BoltActionClip: {fileID: 8300000, guid: 9b17d107f19588d4b9b42349dcbbad21, type: 3}
   _muzzleFlash: {fileID: 3005988149043259849}
-  _bagMaxAmmo: 100
-  _magMaxAmmo: 7
-  _bagAmmo: 50
-  _magAmmo: 7
   _isEquiped: 1
   _isReloading: 0
   _isShooting: 0
@@ -19666,15 +19668,6 @@ MonoBehaviour:
       _collisionMask:
         serializedVersion: 2
         m_Bits: 4227858560
-    gunAudioAsset:
-      ShootClip: {fileID: 8300000, guid: a35582ee317f52647b24f967b35bd72f, type: 3}
-      AimClip: {fileID: 8300000, guid: 7ca90acf69e44644e8410be881d87559, type: 3}
-      DrawClip: {fileID: 8300000, guid: 95d97949759e0a4459f36b95e0d8726c, type: 3}
-      HolstClip: {fileID: 8300000, guid: 573223e358a226147a358476cdd507ea, type: 3}
-      ReloadClip: {fileID: 8300000, guid: a0d010892f3812c4ab833fbf4bc0675f, type: 3}
-      ReloadClipVar1: {fileID: 8300000, guid: a0d010892f3812c4ab833fbf4bc0675f, type: 3}
-      FullReloadClip: {fileID: 8300000, guid: cd99c89aaf8cd7a4e881e2be8dbb1618, type: 3}
-      BoltActionClip: {fileID: 0}
     recoilData:
       _recoilX: -3
       _recoilY: 3
@@ -19683,11 +19676,21 @@ MonoBehaviour:
       _snappiness: 6
       _returnSpeed: 20
       _recoilReduction: 0.3
+    ammoData:
+      _bagMaxAmmo: 200
+      _magMaxAmmo: 31
+      _bagAmmo: 60
+      _magAmmo: 31
+  _gunAudioAsset:
+    ShootClip: {fileID: 8300000, guid: a35582ee317f52647b24f967b35bd72f, type: 3}
+    AimClip: {fileID: 8300000, guid: 7ca90acf69e44644e8410be881d87559, type: 3}
+    DrawClip: {fileID: 8300000, guid: 95d97949759e0a4459f36b95e0d8726c, type: 3}
+    HolstClip: {fileID: 8300000, guid: 573223e358a226147a358476cdd507ea, type: 3}
+    ReloadClip: {fileID: 8300000, guid: a0d010892f3812c4ab833fbf4bc0675f, type: 3}
+    ReloadClipVar1: {fileID: 8300000, guid: a0d010892f3812c4ab833fbf4bc0675f, type: 3}
+    FullReloadClip: {fileID: 8300000, guid: cd99c89aaf8cd7a4e881e2be8dbb1618, type: 3}
+    BoltActionClip: {fileID: 0}
   _muzzleFlash: {fileID: 1746412558015869425}
-  _bagMaxAmmo: 200
-  _magMaxAmmo: 12
-  _bagAmmo: 68
-  _magAmmo: 12
   _isEquiped: 1
   _isReloading: 0
   _isShooting: 0
@@ -42131,6 +42134,7 @@ GameObject:
   - component: {fileID: 3023870163909367248}
   - component: {fileID: 8226088956102218834}
   - component: {fileID: 4787949024690978449}
+  - component: {fileID: 8243046211191272204}
   m_Layer: 11
   m_Name: PlayerEntity
   m_TagString: Player
@@ -42147,7 +42151,7 @@ Transform:
   m_GameObject: {fileID: 8604599269109644813}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.65, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -42233,10 +42237,10 @@ MonoBehaviour:
   _flashlightActive: 0
   _armsAnimator: {fileID: 6646605579532032127}
   _shootPoint: {fileID: 5681356879887672185}
-  _equippedGun: {fileID: 403276682730542246}
+  _equippedGun: {fileID: 7115976737293289260}
   _gunsInHand:
   - {fileID: 403276682730542246}
-  - {fileID: 6097736607304772030}
+  - {fileID: 7115976737293289260}
   _objectThrowForce: 8
   _objectThrowUpForce: 5
   _rockThrowPosition: {fileID: 9202363127427422822}
@@ -42261,6 +42265,7 @@ MonoBehaviour:
   txt_magAmmo: {fileID: 0}
   txt_bagAmmo: {fileID: 0}
   txt_GunName: {fileID: 0}
+  isDebugMode: 1
 --- !u!114 &8226088956102218834
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42311,6 +42316,24 @@ MonoBehaviour:
   _damageManager: {fileID: 0}
   _currentHealth: 100
   _maxHealth: 100
+--- !u!114 &8243046211191272204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8604599269109644813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 581dcc42b0e7be149b83f7202e74a93f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _speedModifier: 2
+  _playerSpeed: 0
+  _floorData:
+    _type: 0
+    _terrainTextureDetector:
+      _textureAreas: []
 --- !u!1 &8618021971390830979
 GameObject:
   m_ObjectHideFlags: 0

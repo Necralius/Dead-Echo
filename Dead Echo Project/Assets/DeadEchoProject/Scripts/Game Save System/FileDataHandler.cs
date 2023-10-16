@@ -7,8 +7,8 @@ using static NekraByte.FPS_Utility.Core.DataTypes;
 
 public class FileDataHandler
 {
-    private string dataDirPath = "";
-    private string dataFileName = "";
+    private string dataDirPath      = "";
+    private string dataFileName     = "";
 
     public GameSaveData data;
 
@@ -17,13 +17,36 @@ public class FileDataHandler
         this.dataDirPath = dataDirPath;
         this.dataFileName = dataFileName;
     }
-
-    public void EncapsulateData(GameSaveData data)
+    public FileDataHandler()
     {
-        string fullPath = Path.Combine(dataDirPath, dataFileName);
+        dataDirPath     = "";
+        dataFileName    = "";
+    }
+
+    public SaveDirectoryData EncapsulateData(GameSaveData data)
+    {
+        if (data == null) return null;
+        SaveDirectoryData directoryData = new SaveDirectoryData();
+
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
+            data.UpdateSave(DateTime.Now.ToString("yyyyMMdd_HHmmss"));
+            string fullPath = string.Empty;
+            fullPath = Path.Combine(dataDirPath, dataFileName);
+
+            if (!Directory.Exists(fullPath)) 
+                Directory.CreateDirectory(fullPath);
+            directoryData.saveFolderPath = fullPath;
+
+            //data.lastScreenshotPath = ScreenshotTaker.Instance.SaveScreenshot(fullPath, dataFileName);
+
+            directoryData.screenshotPath = ScreenshotTaker.Instance.SaveScreenshot(fullPath, dataFileName);
+
+            fullPath = Path.Combine(fullPath, dataFileName + ".NBSV");
+
+            directoryData.savePath = fullPath;
+
+            //data.savePath = fullPath;
 
             string dataToStore = JsonUtility.ToJson(data, true);
 
@@ -31,16 +54,19 @@ public class FileDataHandler
             {
                 using (StreamWriter writer = new StreamWriter(stream)) writer.Write(dataToStore);
             }
+            return directoryData;
         }
         catch(Exception e)
         {
             Debug.LogError(e.ToString());
+            throw;
         }
     }
-    public GameSaveData LoadGameState()
+
+    public GameSaveData LoadGameState(string fullPath)
     {
-        string fullPath = Path.Combine(dataDirPath, dataFileName);
         GameSaveData loadedData = null;
+
         if (File.Exists(fullPath))
         {
             try
@@ -55,13 +81,14 @@ public class FileDataHandler
             }
             catch(Exception e)
             {
-                Debug.LogError(e.ToString());
+                Debug.LogWarning(e.ToString());
             }
         }
 
         return loadedData;
     }
 
+    #region - Application Data Handler -
     public ApplicationData LoadApplicationData()
     {
 
@@ -107,4 +134,5 @@ public class FileDataHandler
             Debug.LogError(e.ToString());
         }
     }
+    #endregion
 }

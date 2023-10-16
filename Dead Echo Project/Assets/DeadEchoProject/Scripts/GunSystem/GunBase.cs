@@ -154,16 +154,19 @@ public abstract class GunBase : MonoBehaviour
         if (!_playerController._isSprinting)
         {
             if (!_aimOverride)
-            {
-                if (GameStateManager.Instance.currentApplicationData.aimType == 0)
-                    _isAiming = _inputManager.aiming;
-                else if (GameStateManager.Instance.currentApplicationData.aimType == 1)
+            { 
+                if (GameStateManager.Instance != null)
                 {
-                    if (_inputManager.aimAction.WasPerformedThisFrame()) _isAiming = true;
-                    else if (_inputManager.aimAction.WasPerformedThisFrame() && _isAiming) _isAiming = false;
-
-                    if (!_aimOverride) _isAiming = _inputManager.aiming;
+                    if (GameStateManager.Instance.currentApplicationData.aimType == 0)
+                        _isAiming = _inputManager.aiming;
+                    else if (GameStateManager.Instance.currentApplicationData.aimType == 1)
+                    {
+                        if (_inputManager.aimAction.WasPerformedThisFrame()) _isAiming = true;
+                        else if (_inputManager.aimAction.WasPerformedThisFrame() && _isAiming) _isAiming = false;
+                    }
                 }
+
+                _isAiming = _inputManager.aiming;
             }
 
             _recoilAsset._isAiming = _isAiming;
@@ -265,9 +268,10 @@ public abstract class GunBase : MonoBehaviour
     // ----------------------------------------------------------------------
     protected virtual IEnumerator Shoot()
     {
-        if (_gunDataConteiner == null) yield break;
-        if (_muzzleFlash == null) yield break;
-        if (_recoilAsset == null) yield break;
+        if (_gunDataConteiner == null)                  yield break;
+        if (_muzzleFlash == null)                       yield break;
+        if (_recoilAsset == null)                       yield break;
+        if (GameSceneManager.Instance._gameIsPaused)    yield break;
 
         SS_Shoot();
 
@@ -425,17 +429,17 @@ public abstract class GunBase : MonoBehaviour
     private void SS_ChangeGunMode()
     {
         if (_playerController.changeGunMode != null) 
-            AudioSystem.Instance.PlayGunClip(_playerController.changeGunMode);
+            AudioManager.Instance.PlayOneShotSound("Effects", _playerController.changeGunMode, transform.position, 1f, 1f, 128);
     }
     private void SS_Aim()
     {
         if (_gunAudioAsset.AimClip != null)
-            AudioSystem.Instance.PlayGunClip(_gunAudioAsset.AimClip);
+            AudioManager.Instance.PlayOneShotSound("Effects", _gunAudioAsset.AimClip, transform.position, 1f, 1f, 128);
     }
     protected void SS_Shoot()
     {
-        if (_gunAudioAsset.ShootClip != null) 
-            AudioSystem.Instance.PlayGunClip(_gunAudioAsset.ShootClip, Vector2.zero, Vector2.zero);
+        if (_gunAudioAsset.ShootClip != null)
+            AudioManager.Instance.PlayOneShotSound("Effects", _gunAudioAsset.ShootClip, transform.position, 1f, 1f, 128);
     }
     protected void SS_Reload(int reloadIndex)
     {
@@ -443,35 +447,35 @@ public abstract class GunBase : MonoBehaviour
         {
             case 0:
 
-                if (_gunAudioAsset.ReloadClip != null) 
-                    AudioSystem.Instance.PlayGunClip(_gunAudioAsset.ReloadClip);
+                if (_gunAudioAsset.ReloadClip != null)
+                    AudioManager.Instance.PlayOneShotSound("Effects", _gunAudioAsset.ReloadClip, transform.position, 1f, 1f, 128);
                 break;
             case 1:
 
-                if (_gunAudioAsset.ReloadClipVar1 != null) 
-                    AudioSystem.Instance.PlayGunClip(_gunAudioAsset.ReloadClipVar1);
+                if (_gunAudioAsset.ReloadClipVar1 != null)
+                    AudioManager.Instance.PlayOneShotSound("Effects", _gunAudioAsset.ReloadClipVar1, transform.position, 1f, 1f, 128);
                 break;
             case 2:
 
-                if (_gunAudioAsset.FullReloadClip != null) 
-                    AudioSystem.Instance.PlayGunClip(_gunAudioAsset.FullReloadClip);
+                if (_gunAudioAsset.FullReloadClip != null)
+                    AudioManager.Instance.PlayOneShotSound("Effects", _gunAudioAsset.FullReloadClip, transform.position, 1f, 1f, 128);
                 break;
         }
     }
     private void SS_GunAwake()
     {
-        if (_gunAudioAsset.DrawClip != null) 
-            AudioSystem.Instance.PlayGunClip(_gunAudioAsset.DrawClip);   
+        if (_gunAudioAsset.DrawClip != null)
+            AudioManager.Instance.PlayOneShotSound("Effects", _gunAudioAsset.DrawClip, transform.position, 1f, 1f, 128);   
     }
     private void SS_GunHolst()
     {
-        if (_gunAudioAsset.HolstClip != null) 
-            AudioSystem.Instance.PlayGunClip(_gunAudioAsset.HolstClip);
+        if (_gunAudioAsset.HolstClip != null)
+            AudioManager.Instance.PlayOneShotSound("Effects", _gunAudioAsset.HolstClip, transform.position, 1f, 1f, 128);
     }
     private void SS_GunShootJam()
     {
         if (_playerController.gunShootJam != null)
-            AudioSystem.Instance.PlayGunClip(_playerController.gunShootJam);
+            AudioManager.Instance.PlayOneShotSound("Effects", _playerController.gunShootJam, transform.position, 1f, 1f, 128);
     }
     #endregion
 

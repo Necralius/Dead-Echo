@@ -6,6 +6,9 @@ using static NekraByte.FPS_Utility.Core.Enumerators;
 using static NekraByte.FPS_Utility.Core.DataTypes;
 using System.IO;
 using Unity.VisualScripting;
+using System.Collections;
+using UnityEngine.Audio;
+using UnityEngine.UI;
 
 namespace NekraByte
 {
@@ -30,6 +33,15 @@ namespace NekraByte
                 }
                 #endregion
 
+                #region - Data Saving System -
+                [Serializable]
+                public class SaveDirectoryData
+                {
+                    public string savePath          = string.Empty;
+                    public string saveFolderPath    = string.Empty;
+                    public string screenshotPath    = string.Empty;
+                }
+
                 #region - Game Save Data -
                 [Serializable]
                 public class GameSaveData
@@ -38,13 +50,12 @@ namespace NekraByte
                     {
                         this.saveName = saveName;
                         saveHour = DateTime.Now.ToString();
-
                     }
 
                     [Header("Save Data")]
-                    public string       saveName        = "";
-                    public string       saveHour        = "";
-                    public Texture2D    lastScreenshot  = null;
+                    public string               saveName                = string.Empty;
+                    public string               saveHour                = string.Empty;
+                    public SaveDirectoryData    saveDirectoryData       = null;
 
                     [Header("Player Data")]
                     public Vector3      playerPosition = Vector3.zero;
@@ -56,6 +67,8 @@ namespace NekraByte
                     public int GunID = 0;
 
                     public List<GunDataConteiner.AmmoData> guns = new List<GunDataConteiner.AmmoData>();
+
+                    public void UpdateSave(string hour) => saveHour = hour; 
                 }
                 #endregion
 
@@ -66,10 +79,14 @@ namespace NekraByte
                     public ApplicationData()
                     {
                         saveHour = DateTime.Now.ToString();
+
+                        for (int i = 0; i <= 3; i++) 
+                            saveDirectorys.Add(new SaveDirectoryData());
+
                         ResetToDefault();
                     }
 
-                    public Dictionary<int, string> saveDirectorys = new Dictionary<int, string>();
+                    public List<SaveDirectoryData> saveDirectorys = new List<SaveDirectoryData>();
 
                     public string saveHour = "";
 
@@ -118,7 +135,42 @@ namespace NekraByte
                     public int aimType              = 0;
                     public int crouchType           = 0;                 
 
-                    public void UpdateSave() => saveHour = DateTime.Now.ToString();
+                    public void StartNewSave(int saveIndex, SaveDirectoryData info)
+                    {
+                        saveDirectorys[saveIndex] = info;
+                    }
+                    public SaveDirectoryData GetSavePathByIndex(int saveIndexer)
+                    {
+                        if (saveDirectorys[saveIndexer] != null) 
+                            return saveDirectorys[saveIndexer];
+                        return null;
+                    }
+                    public bool ExistSaves() => saveDirectorys.Count > 0;
+
+                    public bool DeleteSaveByIndex(int saveIndex)
+                    {
+                        try
+                        {
+                            if (saveDirectorys[saveIndex] != null) DeleteData(saveDirectorys[saveIndex]);                           
+                            else return false;
+
+                            return true;
+                        }
+                        catch(Exception e)
+                        {
+                            Debug.LogWarning(e);
+                            return false;
+                        }
+                    }
+
+                    private void DeleteData(SaveDirectoryData data)
+                    {
+                        if (File.Exists(data.savePath))             File.Delete(data.savePath);
+                        if (File.Exists(data.screenshotPath))       File.Delete(data.screenshotPath);
+                        if (Directory.Exists(data.saveFolderPath))  Directory.Delete(data.saveFolderPath);
+                    }
+
+                    public void UpdateSave() => saveHour = DateTime.Now.ToString("yyyyMMdd_HHmmss");
 
                     public void ResetToDefault()
                     {
@@ -161,6 +213,17 @@ namespace NekraByte
                     }
 
                 }
+                #endregion
+
+                #region - Save System Interaction -
+                public interface IDataPersistence
+                {
+                    void RegisterDataSaver();
+                    void Load(GameSaveData gameData);
+                    void Save(GameSaveData gameData);
+                }
+                #endregion
+
                 #endregion
 
                 #region - Gun Data Main Conteiner -       
@@ -231,6 +294,7 @@ namespace NekraByte
                     #endregion
 
                     #region - Ammo Data -
+                    [Serializable]
                     public class AmmoData
                     {
                         [Header("Gun Ammo"), Tooltip("Gun ammo quantity settings")]
@@ -241,7 +305,6 @@ namespace NekraByte
                         public int                  _magAmmo        = 31;
                     }
                     #endregion
-
                 }
                 #endregion
 
@@ -348,12 +411,104 @@ namespace NekraByte
                 }
                 #endregion
 
-                public interface IDataPersistence
+                #region - Audio Pool Data -
+                // ----------------------------------------------------------
+                // Name: AudioPoolItem (Class)
+                // Desc: This class declares an data holder for an audio entity that is used in an audio pooling system.
+                // ----------------------------------------------------------
+                public class AudioPoolItem
                 {
-                    void RegisterDataSaver();
-                    void Load(GameSaveData gameData);
-                    void Save(GameSaveData gameData);
+                    public GameObject   GameObject  = null;
+                    public Transform    Transform   = null;
+                    public AudioSource  AudioSource = null;
+                    public float        Uniportance = float.MaxValue;
+                    public bool         Playing     = false;
+                    public IEnumerator  Coroutine   = null;
+                    public ulong        ID          = 0;
+
+
                 }
+                #endregion
+
+                #region - Audio Track Info -
+                // --------------------------------------------------------------------------
+                // Name: TrackInfo (Class)
+                // Desc: This class holds the AudioMixerGroup base information and holds an
+                //       Coroutine that executes the track fading system.
+                // --------------------------------------------------------------------------
+                public class TrackInfo
+                {
+                    public string Name = string.Empty;
+                    public AudioMixerGroup Group = null;
+                    public IEnumerator TrackFader = null;
+                }
+                #endregion
+
+                #region - Floor Data -
+                [Serializable]
+                public class FloorData
+                {
+                    //Data Types
+                    public enum FloorType       { Dirt, Stone, Metal, Wood, None}
+                    public enum FloorHolder     { Terrain, GameObject, None}
+
+                    //Private Data
+                    private FloorHolder             _holder                     = FloorHolder.GameObject;
+                    private GameObject              _objectToFindFloor          = null;
+
+                    [SerializeField] private FloorType               _type                       = FloorType.Dirt;
+                    [SerializeField] private TerrainTextureDetector  _terrainTextureDetector     = null;
+
+                    //Public Data
+                    public FloorType Type { get => _type = UpdateFloorType(_objectToFindFloor.transform); }
+
+                    public FloorData(GameObject objectToFindFloor, Collider objectCollider)
+                    {
+                        _objectToFindFloor      = objectToFindFloor;
+                        _terrainTextureDetector = new TerrainTextureDetector(objectToFindFloor, objectCollider);
+                    }
+
+                    public FloorType UpdateFloorType(Transform objectToFindFloor)
+                    {
+                        GameObject floorFinded = null;
+                        RaycastHit hit;
+
+                        if (Physics.Raycast(objectToFindFloor.position, -Vector3.down, out hit, 0.3f))
+                        {
+                            _holder = hit.transform.CompareTag("Terrain") ? FloorHolder.Terrain : FloorHolder.GameObject;
+
+                            floorFinded = hit.transform.gameObject;
+                        }
+                        else return FloorType.None;
+
+                        if (floorFinded == null) return FloorType.None;
+                        else if (_holder == FloorHolder.GameObject)
+                        {
+                            Debug.Log($"Floor Finded: {floorFinded.gameObject.name}, Tag: {floorFinded.tag}");
+                            switch(floorFinded.tag)
+                            {
+                                case "Dirt" : return FloorType.Dirt;
+                                case "Stone": return FloorType.Stone;
+                                case "Metal": return FloorType.Metal;
+                                case "Wood" : return FloorType.Wood;
+                                default     : return FloorType.None;
+                            }
+                        }
+                        else if (_holder == FloorHolder.Terrain)
+                        {
+                            switch (_terrainTextureDetector.GetCurrentTexture())
+                            {
+                                case "Dirt"     : return FloorType.Dirt;
+                                case "Grass"    : return FloorType.Dirt;
+                                case "Stone"    : return FloorType.Stone;
+                                case "StonePath": return FloorType.Stone;
+                                default         : return FloorType.None;
+                            }
+                        }
+                        return FloorType.None;
+                    }
+                }
+                #endregion
             }
 
             // --------------------------------------------------------------

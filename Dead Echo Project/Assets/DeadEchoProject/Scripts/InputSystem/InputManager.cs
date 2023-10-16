@@ -22,15 +22,16 @@ public class InputManager : MonoBehaviour
     public Vector2 Move { get; private set; }
     public Vector2 Look { get; private set; }
 
-    public bool sprint;
-    public bool reload;
-    public bool shooting;
-    public bool aiming;
-    public bool jumping;
-    public bool crouching;
-    public bool changingGunMode;
-    public bool isHoldingRock;
-    public bool flashlightActive;
+    public bool sprint              = false;
+    public bool reload              = false;
+    public bool shooting            = false;
+    public bool aiming              = false;
+    public bool jumping             = false;
+    public bool crouching           = false;
+    public bool changingGunMode     = false;
+    public bool isHoldingRock       = false;
+    public bool flashlightActive    = false;
+    public bool pauseMenu           = false;
 
     //Private Data
     public InputActionMap currentMap;
@@ -38,9 +39,9 @@ public class InputManager : MonoBehaviour
     //Movment Actions
     private InputAction moveAction;
     private InputAction lookAction;
-    public InputAction jumpAction;
-    public InputAction crouchAction;
-    public InputAction sprintAction;
+    public  InputAction jumpAction;
+    public  InputAction crouchAction;
+    public  InputAction sprintAction;
 
     //Gun Behavior Actions
     public InputAction reloadAction;
@@ -53,6 +54,8 @@ public class InputManager : MonoBehaviour
 
     public InputAction primaryGun;
     public InputAction secondaryGun;
+
+    public InputAction pauseMenuAction;
     #endregion
 
     // ---------------------------- Methods ----------------------------
@@ -88,7 +91,8 @@ public class InputManager : MonoBehaviour
         flashLightAction    = currentMap.FindAction("FlashLightAction");
 
         primaryGun          = currentMap.FindAction("PrimaryGun");
-        secondaryGun        = currentMap.FindAction("SecondaryGun"); 
+        secondaryGun        = currentMap.FindAction("SecondaryGun");
+        pauseMenuAction     = currentMap.FindAction("PauseMenu");
 
         moveAction.performed        += onMove;
         lookAction.performed        += onLook;
@@ -101,6 +105,7 @@ public class InputManager : MonoBehaviour
         gunModeAction.performed     += onModeChanged;
         throwRockAction.performed   += onThrowRocked;
         flashLightAction.performed  += onFlashlight;
+        pauseMenuAction.performed   += onPauseMenu;
 
         moveAction.canceled         += onMove;
         lookAction.canceled         += onLook;
@@ -113,6 +118,7 @@ public class InputManager : MonoBehaviour
         gunModeAction.canceled      += onModeChanged;
         throwRockAction.canceled    += onThrowRocked;
         flashLightAction.canceled   += onFlashlight;
+        pauseMenuAction.canceled    += onPauseMenu;
     }
     #endregion
 
@@ -128,5 +134,6 @@ public class InputManager : MonoBehaviour
     private void onModeChanged(InputAction.CallbackContext context) => changingGunMode  = context.ReadValueAsButton();
     private void onThrowRocked(InputAction.CallbackContext context) => isHoldingRock    = context.ReadValueAsButton();
     private void onFlashlight(InputAction.CallbackContext context)  => flashlightActive = context.ReadValueAsButton();
+    private void onPauseMenu(InputAction.CallbackContext context)   => pauseMenu        = context.ReadValueAsButton();
     #endregion
 }

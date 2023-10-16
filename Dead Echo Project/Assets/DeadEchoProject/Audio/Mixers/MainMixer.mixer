@@ -43,7 +43,17 @@ AudioMixerController:
   m_SuspendThreshold: -80
   m_EnableSuspend: 1
   m_UpdateMode: 0
-  m_ExposedParameters: []
+  m_ExposedParameters:
+  - guid: cd341dfd4cd3c9240b9428f2abd3e75b
+    name: Volume_Effects
+  - guid: 0d29a42773bbf1b48a199f38695f9b14
+    name: Volume_Guns
+  - guid: dfc2f262b2fab6d4ebf87fc6680596a0
+    name: Volume_Master
+  - guid: 1c71dea2d15be0e49b9d3182afcc0e5d
+    name: Volume_Music
+  - guid: 5ea5463a9094c6c4995b3bd102118bab
+    name: Volume_Zombies
   m_AudioMixerGroupViews:
   - guids:
     - ca8e34721b0767f4ab10d0c255bf6a8b
@@ -106,7 +116,7 @@ AudioMixerGroupController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ZombieAudio
+  m_Name: Zombies
   m_AudioMixer: {fileID: 24100000}
   m_GroupID: 5cbec8c5e075def47a7a6833a1343bc4
   m_Children: []
@@ -193,7 +203,7 @@ AudioMixerGroupController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: GunAudio
+  m_Name: Gun
   m_AudioMixer: {fileID: 24100000}
   m_GroupID: 7851b0b4ec06fdb4899fa90c8d529468
   m_Children: []

@@ -16,7 +16,7 @@ public class GameSceneManager : MonoBehaviour
 {
     #region - Singleton Pattern -
     private static GameSceneManager _instance = null;
-    public static GameSceneManager instance
+    public static GameSceneManager Instance
     {
         get
         {
@@ -33,14 +33,33 @@ public class GameSceneManager : MonoBehaviour
     [SerializeField] private ParticleSystem _bloodParticles = null;
 
     [SerializeField] private GameObject deathScreen = null;
-    
+
     //Public
+    [SerializeField] private GameObject _pauseMenu = null;
+    public bool _gameIsPaused;
+
     public ParticleSystem bloodParticles { get => _bloodParticles; }
     //Public Methods
 
     private void Awake()
     {
         Time.timeScale = 1f;
+    }
+    
+    public void PauseMenuSystem()
+    {
+        if (_pauseMenu == null) return;
+
+        _gameIsPaused = !_gameIsPaused;
+
+        Cursor.lockState = _gameIsPaused ? CursorLockMode.None : CursorLockMode.Locked;
+        Time.timeScale = _gameIsPaused ? 0f : 1f;
+        _pauseMenu.SetActive(!_pauseMenu.activeInHierarchy);
+    }
+    public void ForcedSaveGame()
+    {
+        if (GameStateManager.Instance != null)
+            _pauseMenu.GetComponentInChildren<MenuSystem>().SaveGameData();
     }
 
     // ----------------------------------------------------------------------
@@ -74,13 +93,12 @@ public class GameSceneManager : MonoBehaviour
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Y)) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        if (Input.GetKeyDown(KeyCode.F1))
+
+        if (InputManager.Instance != null)
         {
-            if (Cursor.lockState == CursorLockMode.Locked) Cursor.lockState = CursorLockMode.None;
-            else Cursor.lockState = CursorLockMode.Locked;
+            if (InputManager.Instance.pauseMenuAction.WasPressedThisFrame()) PauseMenuSystem();
         }
     }
-
 
     // ----------------------------------------------------------------------
     // Name : GetAIStateMachine

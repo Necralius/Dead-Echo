@@ -156,6 +156,7 @@ public class AIZombieStateMachine : AiStateMachine
     // ---------------------------------------------------------------------- 
     protected override void Update()
     {
+        if (GameSceneManager.Instance._gameIsPaused) return;
         base.Update();
 
         if (_animator != null)
@@ -269,9 +270,9 @@ public class AIZombieStateMachine : AiStateMachine
     // ----------------------------------------------------------------------
     public override void TakeDamage(Vector3 position, Vector3 force, int damage, Rigidbody bodyPart, CharacterManager characterManager, int hitDirection)
     {
-        if (GameSceneManager.instance != null && GameSceneManager.instance.bloodParticles != null)
+        if (GameSceneManager.Instance != null && GameSceneManager.Instance.bloodParticles != null)
         {
-            ParticleSystem blood = GameSceneManager.instance.bloodParticles;
+            ParticleSystem blood = GameSceneManager.Instance.bloodParticles;
             blood.transform.position = position;
 
             var main = blood.main;

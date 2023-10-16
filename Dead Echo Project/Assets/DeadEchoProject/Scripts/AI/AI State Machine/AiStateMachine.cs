@@ -159,11 +159,11 @@ public abstract class AiStateMachine : MonoBehaviour
         _aiBodyPartLayer = LayerMask.NameToLayer("AI Body Part");
 
         //Check if has any valid GameSceneManager instance on the scene
-        if (GameSceneManager.instance != null)
+        if (GameSceneManager.Instance != null)
         {
             //Register State Machines with Scene Database
-            if (_collider) GameSceneManager.instance.RegisterAIStateMachine(_collider.GetInstanceID(), this);
-            if (_sensorTrigger) GameSceneManager.instance.RegisterAIStateMachine(_sensorTrigger.GetInstanceID(), this);
+            if (_collider) GameSceneManager.Instance.RegisterAIStateMachine(_collider.GetInstanceID(), this);
+            if (_sensorTrigger) GameSceneManager.Instance.RegisterAIStateMachine(_sensorTrigger.GetInstanceID(), this);
         }
 
         if (_rootBone != null)
@@ -177,7 +177,7 @@ public abstract class AiStateMachine : MonoBehaviour
                     bodyPart.isKinematic = true;
 
                     _bodyParts.Add(bodyPart);
-                    GameSceneManager.instance.RegisterAIStateMachine(bodyPart.GetInstanceID(), this);
+                    GameSceneManager.Instance.RegisterAIStateMachine(bodyPart.GetInstanceID(), this);
                 }
             }
         }

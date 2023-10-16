@@ -10,7 +10,7 @@ public class StickinessDetector : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        AiStateMachine machine = GameSceneManager.instance.GetAIStateMachine(other.GetInstanceID());
+        AiStateMachine machine = GameSceneManager.Instance.GetAIStateMachine(other.GetInstanceID());
         if (machine != null && _controller != null)
         {
             _controller.DoStickiness();

@@ -19,7 +19,7 @@ public class AIDamageTrigger : MonoBehaviour
     {
         _stateMachine       = GetComponentInParent<AiStateMachine>();
         _parameterHash      = Animator.StringToHash( _paramenter );
-        _gameSceneManager   = GameSceneManager.instance;
+        _gameSceneManager   = GameSceneManager.Instance;
         if (_stateMachine != null) _animator = _stateMachine.animator;
     }
 

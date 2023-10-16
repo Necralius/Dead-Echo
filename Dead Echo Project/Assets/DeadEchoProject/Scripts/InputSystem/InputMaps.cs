@@ -143,6 +143,15 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PauseMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""252d593d-605f-46ce-b5ee-c9e80c81d652"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -332,6 +341,17 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
                     ""action"": ""FlashLightAction"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8b8e4862-53a9-468b-8f93-b075768971fa"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PauseMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -353,6 +373,7 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
         m_PC_Map_SecondaryGun = m_PC_Map.FindAction("SecondaryGun", throwIfNotFound: true);
         m_PC_Map_ThrowRockAction = m_PC_Map.FindAction("ThrowRockAction", throwIfNotFound: true);
         m_PC_Map_FlashLightAction = m_PC_Map.FindAction("FlashLightAction", throwIfNotFound: true);
+        m_PC_Map_PauseMenu = m_PC_Map.FindAction("PauseMenu", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -427,6 +448,7 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
     private readonly InputAction m_PC_Map_SecondaryGun;
     private readonly InputAction m_PC_Map_ThrowRockAction;
     private readonly InputAction m_PC_Map_FlashLightAction;
+    private readonly InputAction m_PC_Map_PauseMenu;
     public struct PC_MapActions
     {
         private @InputMaps m_Wrapper;
@@ -444,6 +466,7 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
         public InputAction @SecondaryGun => m_Wrapper.m_PC_Map_SecondaryGun;
         public InputAction @ThrowRockAction => m_Wrapper.m_PC_Map_ThrowRockAction;
         public InputAction @FlashLightAction => m_Wrapper.m_PC_Map_FlashLightAction;
+        public InputAction @PauseMenu => m_Wrapper.m_PC_Map_PauseMenu;
         public InputActionMap Get() { return m_Wrapper.m_PC_Map; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -492,6 +515,9 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
             @FlashLightAction.started += instance.OnFlashLightAction;
             @FlashLightAction.performed += instance.OnFlashLightAction;
             @FlashLightAction.canceled += instance.OnFlashLightAction;
+            @PauseMenu.started += instance.OnPauseMenu;
+            @PauseMenu.performed += instance.OnPauseMenu;
+            @PauseMenu.canceled += instance.OnPauseMenu;
         }
 
         private void UnregisterCallbacks(IPC_MapActions instance)
@@ -535,6 +561,9 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
             @FlashLightAction.started -= instance.OnFlashLightAction;
             @FlashLightAction.performed -= instance.OnFlashLightAction;
             @FlashLightAction.canceled -= instance.OnFlashLightAction;
+            @PauseMenu.started -= instance.OnPauseMenu;
+            @PauseMenu.performed -= instance.OnPauseMenu;
+            @PauseMenu.canceled -= instance.OnPauseMenu;
         }
 
         public void RemoveCallbacks(IPC_MapActions instance)
@@ -567,5 +596,6 @@ public partial class @InputMaps: IInputActionCollection2, IDisposable
         void OnSecondaryGun(InputAction.CallbackContext context);
         void OnThrowRockAction(InputAction.CallbackContext context);
         void OnFlashLightAction(InputAction.CallbackContext context);
+        void OnPauseMenu(InputAction.CallbackContext context);
     }
 }
