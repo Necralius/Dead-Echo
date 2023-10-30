@@ -1,25 +1,34 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using static NekraByte.FPS_Utility.Core.DataTypes;
 
 [RequireComponent(typeof(Slider))]
 public class SliderFloatField : MonoBehaviour
 {
-    Slider          _sld     = null;
-    TMP_InputField  _inpt    = null;
+    Slider          _sld        = null;
+    TMP_InputField  _inpt       = null;
+    public string   _fieldName  = string.Empty;
+    public TextMeshProUGUI _label = null;
 
     private void OnEnable()
     {
         _sld    = GetComponent<Slider>();
         _inpt   = GetComponentInChildren<TMP_InputField>();
 
-        _sld.onValueChanged.AddListener(delegate    { OnSliderChange(); });
-        _inpt.onValueChanged.AddListener(delegate   { OnInputChange();  });
+        _sld.onValueChanged.AddListener     (delegate { OnSliderChange(); });
+        _inpt.onValueChanged.AddListener    (delegate { OnInputChange();  });
 
         OnSliderChange();
         OnInputChange();
+    }
+
+    public void SetUp(AudioTrackVolume trackData)
+    {
+        _label.text = trackData.Name;
+        _fieldName = trackData.Name;
+
+        OverrideValue(trackData.Volume);
     }
 
     private void OnSliderChange()

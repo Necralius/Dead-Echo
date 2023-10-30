@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a42031bcf1f556439523fbbad2c0771, type: 3}
+  m_Name: MC_MainMenu
+  m_EditorClassIdentifier: 
+  _audioGroup: Music
+  _volume: 1
+  _spatialBlend: 0
+  _priority: 256
+  _audioClipBanks:
+  - Clips:
+    - {fileID: 8300000, guid: 294e6c901fc21214581296e3b87cab33, type: 3}
+    - {fileID: 8300000, guid: 16f7a2072ccc047468731cadc5c82031, type: 3}
+    - {fileID: 8300000, guid: 1d2e088031e582a49a1e68f0a947a98a, type: 3}
+  floorTag: 

@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf2c29f0dfe18604a971993d4c1964e1, type: 3}
+  m_Name: HitEffects
+  m_EditorClassIdentifier: 
+  _audioGroup: Effects
+  _volume: 1
+  _spatialBlend: 1
+  _priority: 256
+  _audioClipBanks: []
+  floorTag: 
+  Clips:
+  - Tag: AI Body Part
+    Clip:
+    - {fileID: 8300000, guid: 533ed93f928db8e4b948c530467812ee, type: 3}
+    - {fileID: 8300000, guid: bfe9ca37b37583945ac4e422d13879ac, type: 3}
+    - {fileID: 8300000, guid: fa0fdd37e1484754ab96df031df8a682, type: 3}
+  - Tag: Flesh
+    Clip:
+    - {fileID: 8300000, guid: 533ed93f928db8e4b948c530467812ee, type: 3}
+    - {fileID: 8300000, guid: bfe9ca37b37583945ac4e422d13879ac, type: 3}
+    - {fileID: 8300000, guid: fa0fdd37e1484754ab96df031df8a682, type: 3}
+  - Tag: Concrete
+    Clip:
+    - {fileID: 8300000, guid: 775649c6987e217429952690f62831b5, type: 3}
+    - {fileID: 8300000, guid: 7e6e9654032b22747bbe16ba5c34481c, type: 3}
+    - {fileID: 8300000, guid: 9f5c342dfe66fd649b6853a28612df3c, type: 3}
+  - Tag: Terrain
+    Clip:
+    - {fileID: 8300000, guid: 6731b49f72a818d41bac63977737515d, type: 3}
+    - {fileID: 8300000, guid: 872c8eec1c0681e46aa8709c04d0bbcb, type: 3}
+    - {fileID: 8300000, guid: 1d18a898b5c4ec24293fdb2a465b5ce5, type: 3}
+  - Tag: Metal
+    Clip:
+    - {fileID: 8300000, guid: 9e53711506413384997bb4e191bd367c, type: 3}
+    - {fileID: 8300000, guid: 3b016e25486ebad4a8e60f16aaced2be, type: 3}
+    - {fileID: 8300000, guid: 342dac64b7f73cd49a4c33be36a6ceea, type: 3}
+    - {fileID: 8300000, guid: 2fe9d00a68a02d347b326569414cf799, type: 3}
+    - {fileID: 8300000, guid: dc1adb942dee0774d9a2776f9a592e55, type: 3}
+  - Tag: Glass
+    Clip:
+    - {fileID: 8300000, guid: 27bd55ce8ca49bc43a884f84b2c71c33, type: 3}
+    - {fileID: 8300000, guid: 8e25a313cd590844192e8e521bccfd7c, type: 3}
+    - {fileID: 8300000, guid: 9ed57e8af06a83d49886e86a24d00df3, type: 3}
+  - Tag: Water
+    Clip:
+    - {fileID: 8300000, guid: 3f62d6daa4e760d46a99079e6b5def67, type: 3}
+    - {fileID: 8300000, guid: d1cdf3d3d808b50418eea8083ae4d414, type: 3}
+    - {fileID: 8300000, guid: 6fb65584626cf36409591c34f153187e, type: 3}
+  - Tag: Wood
+    Clip:
+    - {fileID: 8300000, guid: 7c7639485e60fd446aa0c38633666fee, type: 3}
+    - {fileID: 8300000, guid: 814eb60eeb76bd64da53fdbd49b7ad5e, type: 3}
+    - {fileID: 8300000, guid: 6c4fa3719b44dfa4d95a2a17326bc862, type: 3}

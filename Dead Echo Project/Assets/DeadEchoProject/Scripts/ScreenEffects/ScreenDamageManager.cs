@@ -11,7 +11,7 @@ public class ScreenDamageManager : MonoBehaviour
     [SerializeField] private bool       _autoFade           = true;
     [SerializeField] private float      _fadeSpeed          = 0.05f;
 
-    [SerializeField] private AudioClip  _heartBeat          = null;
+    [SerializeField] private AudioCollection  _heartBeat          = null;
     [SerializeField] private float      _soundFadeValue = 0.5f;
     private bool _fadeSound = false;
     private float _currentVolume = 1;
@@ -36,29 +36,11 @@ public class ScreenDamageManager : MonoBehaviour
         }
         _canvasGroupd.alpha = _bloodAmount;
 
-        if (_fadeSound)
-        {
-            _currentVolume -= _soundFadeValue * Time.deltaTime;
-            if (_currentVolume <= 0)
-            {
-                AudioSystem.Instance.GetEffectsSource().Stop();
-                _fadeSound = false;
-            }
-        }
-        AudioSystem.Instance.GetEffectsSource().volume = _currentVolume;
     }
 
-    public void SetCriticalHealth(bool isCritical)
+    public void SetCriticalHealth()
     {
-        if (isCritical)
-        {
-            if (_heartBeat != null)
-            {
-                if (AudioSystem.Instance.GetEffectsSource().isPlaying) return;
-                AudioSystem.Instance.PlayEffectSound(_heartBeat, Vector2.zero, Vector2.zero);
-                _currentVolume = 1f;
-            }
-        }
-        else _fadeSound = true;
+        if (AudioManager.Instance != null) return;
+        AudioManager.Instance.PlayOneShotSound(_heartBeat.audioClip, transform.position, _heartBeat);
     }
 }

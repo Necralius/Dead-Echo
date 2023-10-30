@@ -72,7 +72,8 @@ public abstract class AiStateMachine : MonoBehaviour
     protected bool                              _isTargetReached                = false;
     protected List<Rigidbody>                   _bodyParts                      = new List<Rigidbody>();
     protected int                               _aiBodyPartLayer                = -1;
-    protected bool                              _cinematicEnabled               = false;
+
+    protected Dictionary<string, bool>          _animLayersActive = new Dictionary<string, bool>();
 
     //Protected Inspector Assigned
     [Header("Dependencies")]
@@ -86,11 +87,13 @@ public abstract class AiStateMachine : MonoBehaviour
 
     [SerializeField, Range(0, 15)] protected float  _stoppingDistance           = 1f;
 
+    protected ILayeredAudioSource _layeredAudioSource = null;
+
     // Dependencies Cache
-    protected Animator      _animator   = null;
-    protected NavMeshAgent  _navAgent   = null;
-    protected Collider      _collider   = null;
-    protected Transform     _transform  = null;
+    protected   Animator      _animator   = null;
+    protected   NavMeshAgent  _navAgent   = null;
+    public      Collider      _collider   = null;
+    protected   Transform     _transform  = null;
 
     //IK
     [Header("Iverse Kinematics")]
@@ -134,35 +137,69 @@ public abstract class AiStateMachine : MonoBehaviour
     public AITargetType targetType  { get => _target.type;                                              }
     public Vector3 targetPosition   { get => _target.position;                                          }
     public int targetColliderID     { get => _target.collider ? _target.collider.GetInstanceID() : -1;  }
-    public bool CinematicEnabled    { get => _cinematicEnabled; set => _cinematicEnabled = value;       }
     public bool UseIK               { get => _useIK; set => _useIK = value; }
     public bool UseFootIK           { get => _footIK; set => _footIK = value; }
     public PatrolType patrolType    { get => _patrolType; }
     public bool RandomWaypointPatrol { get => _randomWaypointPatrol; set => _randomWaypointPatrol = value; }
 
-    // ------------------------------------------ Methods ------------------------------------------//
+    public void SetLayerActive(string layerName, bool active)
+    {
+        _animLayersActive[layerName] = active;
+        if (active == false && _layeredAudioSource != null) 
+            _layeredAudioSource.Stop(_animator.GetLayerIndex(layerName));
+    }
+
+    public bool IsLayerActive(string layerName)
+    {
+        bool result;
+        if (_animLayersActive.TryGetValue(layerName, out result)) 
+            return result;
+        return false;
+    }
+
+    public bool PlayAudio(AudioCollection clipPool, int bank, int layer, bool looping = true)
+    {
+        if (_layeredAudioSource == null) return false;
+        return _layeredAudioSource.Play(clipPool, bank, layer, looping);
+    }
+    public void StopAudio(int layer)
+    {
+        if (_layeredAudioSource != null) 
+            _layeredAudioSource.Stop(layer);
+    }
+
+    public void MuteAudio(bool mute)
+    {
+        if (_layeredAudioSource != null) 
+            _layeredAudioSource.Mute(mute);
+    }
+
+    // ------------------------------------------ Methods ------------------------------------------ //
 
     #region - BuiltIn Methods -
-    // ---------------------------------
+    // ----------------------------------------------------------------------
     // Name : Awake
-    // Desc : Cache Components 
-    // ---------------------------------
+    // Desc : Cache all needed components. 
+    // ----------------------------------------------------------------------
     protected virtual void Awake()
     {
-        //Get and store all frequently acessed components
-        _transform = transform;
-        _animator = GetComponent<Animator>();
-        _navAgent = GetComponent<NavMeshAgent>();
-        _collider = GetComponent<Collider>();
+        //Get and store all frequently acessed components.
+        _transform  = transform;
+        _animator   = GetComponent<Animator>();
+        _navAgent   = GetComponent<NavMeshAgent>();
+        _collider   = GetComponent<Collider>();
+
+        //Cache the audio source reference for the layered AI audio.
+        AudioSource audioSource = GetComponent<AudioSource>();
 
         //Get bodyPart correct layer
         _aiBodyPartLayer = LayerMask.NameToLayer("AI Body Part");
 
-        //Check if has any valid GameSceneManager instance on the scene
+        //Check if has any valid GameSceneManager instance on the scene.
         if (GameSceneManager.Instance != null)
         {
-            //Register State Machines with Scene Database
-            if (_collider) GameSceneManager.Instance.RegisterAIStateMachine(_collider.GetInstanceID(), this);
+            //Register State Machines with Scene Database.
+            if (_collider)      GameSceneManager.Instance.RegisterAIStateMachine(_collider.GetInstanceID(), this);
             if (_sensorTrigger) GameSceneManager.Instance.RegisterAIStateMachine(_sensorTrigger.GetInstanceID(), this);
         }
 
@@ -181,6 +218,10 @@ public abstract class AiStateMachine : MonoBehaviour
                 }
             }
         }
+
+        // Register the Layered Audio Source
+        if (_animator && audioSource && AudioManager.Instance) 
+            _layeredAudioSource = AudioManager.Instance.RegisterLayeredAudioSource(audioSource, _animator.layerCount);      
     }
 
     // ---------------------------------------------------------
@@ -215,7 +256,11 @@ public abstract class AiStateMachine : MonoBehaviour
         if (_animator)
         {
             AIStateMachineLink[] _scripts = _animator.GetBehaviours<AIStateMachineLink>();
-            foreach(AIStateMachineLink link in _scripts) link.stateMachine = this;
+            foreach (AIStateMachineLink link in _scripts)
+            {
+                link.stateMachine = this;
+                link.instanceAudioManager = GetComponent<ZombieInstanceAudioManager>();
+            }
         }
     }
 
@@ -502,5 +547,11 @@ public abstract class AiStateMachine : MonoBehaviour
     public virtual void TakeDamage(Vector3 position, Vector3 force, int damage, Rigidbody bodyPart, CharacterManager characterManager, int hitDirection)
     {
         
+    }
+
+    protected virtual void OnDestroy()
+    {
+        if (_layeredAudioSource != null && AudioManager.Instance) 
+            AudioManager.Instance.UnregisterLayeredAudioSource(_layeredAudioSource);
     }
 }

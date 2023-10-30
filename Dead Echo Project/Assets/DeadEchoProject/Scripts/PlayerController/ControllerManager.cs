@@ -13,11 +13,6 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
 {
     #region - Singleton Pattern -
     public static ControllerManager Instance { get; private set; }
-    private void Awake()
-    {
-        if (Instance != null) Destroy(Instance);
-        Instance = this;
-    }
     #endregion
 
     #region - Movment Settings -
@@ -25,10 +20,10 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
     [SerializeField, Range(1, 40)] private float    _sensX          = 10f;
     [SerializeField, Range(1, 40)] private float    _sensY          = 10f;
 
-    [SerializeField] private Transform              _orientation    = null;
-    public Transform                                _cameraObject   = null;
-    float _xRotation                                                = 0; 
-    float _yRotation                                                = 0;
+    [SerializeField] private Transform      _orientation    = null;
+    public                   Transform      _cameraObject   = null;
+    private                  float          _xRotation      = 0;
+    private                  float          _yRotation      = 0;
 
     [Header("Player Movment")]
     [SerializeField, Range(1f, 100f)] private float     _walkSpeed      = 7f;
@@ -37,8 +32,8 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
     [SerializeField, Range(0f, 100f)] private float     _groundDrag     = 2f;
 
     [Header("Crouching")]
-    [SerializeField] private float _crouchYScale    = 1.2f;
-    private float _startYScale                      = 0;
+    [SerializeField] private    float _crouchYScale    = 1.2f;
+    private                     float _startYScale     = 0f;
 
     private Vector3     _moveDirection              = Vector3.zero;
     private float       _targetSpeed                = 7f;
@@ -49,12 +44,12 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
     [SerializeField, Range(0f, 20f)] private float airMultiplier    = 0.4f;
 
     [Header("Ground Check")]
-    private float                               _playerHeight   = 2f;
-    [HideInInspector] public CapsuleCollider    _playerCol      = null;
-    [SerializeField] private LayerMask          _groundMask;
+    private                     float              _playerHeight   = 2f;
+    [HideInInspector] public    CapsuleCollider    _playerCol      = null;
+    [SerializeField]  private   LayerMask          _groundMask;
 
     [Header("Slope Handling")]
-    public float        _maxSlopeAngle = 40f;
+    public  float       _maxSlopeAngle = 40f;
     private RaycastHit  _slopeHit;
 
     [Header("Sliding System")]
@@ -80,6 +75,7 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
     public bool     _duringCrouch       = false;
     public bool     _isMoving           = false;
     public bool     _isGrounded         = true;
+    public bool     _inAir              = false;
     public bool     _canJump            = true;
     public bool     _onSlope            = false;
     private bool    _walkingBackwards   = false;
@@ -96,11 +92,10 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
     [Header("Gun System Dependencies")]
     public Animator     _armsAnimator   = null;
     public GameObject   _shootPoint     = null;
-    //public GameObject   _aimHolder      = null;
 
     [Header("Gun System")]
     public GunBase _equippedGun;
-    public List<GunBase> _gunsInHand;
+    public List<GunBase> _gunsInHand = new List<GunBase>();
     #endregion
 
     #region - Animation Hashes -
@@ -127,7 +122,7 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
     #region - Dependencies -
     //Dependencies
     [HideInInspector] public InputManager       _inptManager        = null;
-    [HideInInspector] public Rigidbody          _rb                 => GetComponent<Rigidbody>();
+    [HideInInspector] public Rigidbody          _rb = null;
     [Header("Player Instance")]
     [SerializeField] private GameObject         _playerInstance;
 
@@ -166,42 +161,61 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
 
     public bool isDebugMode = true;
 
+    [SerializeField] private bool isLoadingSave = false;
+
     // ---------------------------- Methods ----------------------------//
 
     #region - BuiltIn Methods -
     // ----------------------------------------------------------------------
-    // Name: Start
-    // Desc: This method is called on the game start, mainly he 
+    // Name: Awake (Method)
+    // Desc: This method is called on the very first frame of the scene,
+    //       mainly the method get all the class dependencies, declares some
+    //       values and declares the singleton value instance of this class.
     // ----------------------------------------------------------------------
-    private void Start()
+    private void Awake()
     {
+        if (Instance != null) Destroy(Instance);
+        Instance = this;
+
         AnimationLayer[] layers     = _playerInstance.GetComponentsInChildren<AnimationLayer>();
         _animLayers                 = layers.ToList();
 
-        InGame_UIManager.Instance.UpdatePlayerState(this);
-        Cursor.lockState    = CursorLockMode.Locked;
-
+        _rb                 = GetComponent<Rigidbody>();
         _playerCol          = GetComponentInChildren<CapsuleCollider>();
         _playerAudioManager = GetComponent<PlayerAudioManager>();
         _playerHeight       = _playerCol.height;
-
-        _inptManager        = InputManager.Instance;
-        _startYScale        = transform.localScale.y;
-
+        
         _armsAnimator       = AnimationLayer.GetAnimationLayer("AnimationsLayer", _animLayers).animator;
         _rockThrower        = AnimationLayer.GetAnimationLayer("RockThrowerLayer", _animLayers).layerObject.GetComponent<RockThrower>();
+
+        _startYScale        = transform.localScale.y;
+    }
+
+    // ----------------------------------------------------------------------
+    // Name: Start (Method)
+    // Desc: This method is called on the game start, mainly the method get
+    //       some values, updates the player state, and register the data
+    //       saver object.
+    // ----------------------------------------------------------------------
+    private void Start()
+    {
+        InGame_UIManager.Instance.UpdatePlayerState(this);
+        Cursor.lockState    = CursorLockMode.Locked;
+
+        _inptManager        = InputManager.Instance;
 
         if (GameStateManager.Instance != null) RegisterDataSaver();
     }
 
     // ----------------------------------------------------------------------
-    // Name: Update
+    // Name: Update (Method)
     // Desc: This method is called every frame, mainly the method handle the
     //       input actions, the movment complete system, the flashlight and
     //       the object throwing system.
     // ----------------------------------------------------------------------
     private void Update()
     {
+        if (isLoadingSave) return;
         if (_orientation == null) return;
         if (_inptManager == null) return;
         if (_rb          == null) return;
@@ -211,7 +225,7 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
     }
 
     // ----------------------------------------------------------------------
-    // Name: FixedUpdate
+    // Name: FixedUpdate (Method)
     // Desc: This method is called an certain times on an frame, mainly the
     //       method handle the physics system, like the movement system and
     //       any physics update.
@@ -231,7 +245,7 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
 
     #region - Update Actions -
     // ----------------------------------------------------------------------
-    // Name : UpdateCalls
+    // Name : UpdateCalls (Method)
     // Desc : This method manage all data tha need to be updated
     //        every frame call.
     // ----------------------------------------------------------------------
@@ -242,6 +256,7 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
         _isWalking      = _inptManager.Move != Vector2.zero;
         _isGrounded     = Physics.Raycast(transform.position, Vector3.down, _playerHeight * 0.5f + 0.3f, _groundMask);
         _onSlope        = OnSlope();
+        _inAir          = !_isGrounded;
 
         if (_isGrounded) _rb.drag = _groundDrag;
         else _rb.drag = 0f;
@@ -267,6 +282,8 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
 
         if (_inptManager.jumpAction.WasPressedThisFrame() && _canJump && _isGrounded)
         {
+            _playerAudioManager.JumpAudioAction();
+            _inAir = true;
             _canJump = false;
             JumpHandler();
 
@@ -326,7 +343,7 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
 
         if (_gunsInHand.Count > 0)
         {
-            if (_inptManager.primaryGun.WasPressedThisFrame() && !_changingWeapon) EquipGun(0);
+            if (_inptManager.primaryGun.WasPressedThisFrame()   && !_changingWeapon) EquipGun(0);
             if (_inptManager.secondaryGun.WasPressedThisFrame() && !_changingWeapon) EquipGun(1);
         }
 
@@ -646,9 +663,6 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
     #region - Flashlight System -
     private void ChangeFlashlightState()
     {
-        if (GameSceneManager.Instance != null) 
-            GameSceneManager.Instance.ForcedSaveGame();    
-
         _flashLightObject.SetActive(!_flashLightObject.activeInHierarchy);
         SS_Flashlight();
     }
@@ -659,28 +673,60 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
         Gizmos.DrawLine(transform.position, (transform.position + -transform.up));
     }
 
+    #region - Saving System -
     public void RegisterDataSaver()
     {
         GameStateManager.Instance.RegisterDataHandler(this);
     }
+    public IEnumerator LoadWithTime(GameSaveData gameData)
+    {
+        _rb.velocity    = Vector3.zero;
+
+        yield return new WaitForSeconds(0.05f);
+
+        gameObject.transform.position   = gameData.playerPosition;
+        _rb.velocity                        = gameData.currentVelocity;
+        _orientation.rotation               = gameData.playerRotation;
+        _cameraObject.transform.rotation    = gameData.cameraRotation;
+
+        isLoadingSave = false;
+    }
 
     public void Load(GameSaveData gameData)
     {
-        transform.position = gameData.playerPosition;
-        transform.rotation = gameData.playerRotation;
+        isLoadingSave = true;
+
+        Debug.Log("CM -> Loading Data");
+        StartCoroutine(LoadWithTime(gameData));
+
         _gunIndex = gameData.GunID;
+        EquipGun(_gunIndex);
 
         for (int i = 0; i < gameData.guns.Count; i++)
+        {
+            if (_gunsInHand[i].Equals(null))
+            {
+                Debug.Log("Gun is Null!");
+                continue;
+            }
             _gunsInHand[i].GunData.LoadData(gameData.guns[i]);
+        }
+            
     }
 
     public void Save(GameSaveData gameData)
     {
-        gameData.playerPosition = transform.position;
-        gameData.playerRotation = transform.rotation;
+        Debug.Log("CM -> Saving Data");
+        gameData.playerPosition     = gameObject.transform.position;
+        gameData.currentVelocity    = _rb.velocity;
+        gameData.playerRotation     = _orientation.rotation;
+        gameData.cameraRotation     = _cameraObject.transform.rotation;
+
         gameData.GunID = _gunIndex;
 
+        gameData.guns.Clear();
         foreach(var gun in _gunsInHand) 
             gameData.guns.Add(gun.GunData.ammoData);
     }
+    #endregion
 }

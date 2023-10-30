@@ -47,9 +47,11 @@ public class AIZombieState_Pursuit1 : AIZombieState
         _timer += Time.deltaTime;
         _repathTimer += Time.deltaTime;
 
-        if (_timer > _maxDuration) return AIStateType.Patrol;
+        if (_timer > _maxDuration) 
+            return AIStateType.Patrol;
 
-        if (_stateMachine.targetType == AITargetType.Visual_Player && _zombieStateMachine.inMeleeRange) return AIStateType.Attack;
+        if (_stateMachine.targetType == AITargetType.Visual_Player && _zombieStateMachine.inMeleeRange) 
+            return AIStateType.Attack;
 
         if (_zombieStateMachine.isTargetReached)
         {
@@ -65,9 +67,9 @@ public class AIZombieState_Pursuit1 : AIZombieState
         }
 
         if (_zombieStateMachine.navAgent.isPathStale ||
-            (!_zombieStateMachine.navAgent.hasPath && 
+            (!_zombieStateMachine.navAgent.hasPath &&
             !_zombieStateMachine.navAgent.pathPending) ||
-            _zombieStateMachine.navAgent.pathStatus != 
+            _zombieStateMachine.navAgent.pathStatus !=
             NavMeshPathStatus.PathComplete) return AIStateType.Alerted;
 
         if (_zombieStateMachine.navAgent.pathPending) _zombieStateMachine.speed = 0;

@@ -15,9 +15,34 @@ public class SaveUIManager : MonoBehaviour
 
     [SerializeField] private GameSaveData   _gameData = null;
 
+    [SerializeField] private bool isLoadable = false;
+    [SerializeField] private int loadIndex = -1;
+
+    MenuSystem _menuSystem = null;
+
+    private void ButtonAction()
+    {
+        if (loadIndex <= -1) return;
+
+        _menuSystem.LoadGameSave(loadIndex);
+    }
+
     private void Start()
     {
+        _menuSystem = GameObject.FindGameObjectWithTag("MenuSystem").GetComponent<MenuSystem>();
         SetUpGameSave(_gameData);
+        GetComponent<Button>().onClick.AddListener(delegate { ButtonAction(); });
+    }
+    public void OnGameDelete()
+    {
+        _saveName.text          = "Empty Save";
+        _lastScreenshot.sprite  = GameStateManager.Instance.noSaveImage;
+
+        _saveName.gameObject.SetActive(true);
+        _saveHour.gameObject.SetActive(false);
+
+        loadIndex   = -1;
+        isLoadable  = false;
     }
 
     public void SetUpGameSave(GameSaveData gameData)
@@ -32,14 +57,18 @@ public class SaveUIManager : MonoBehaviour
             _saveName.gameObject.SetActive(true);
             _saveHour.gameObject.SetActive(false);
 
+            loadIndex   = -1;
+            isLoadable  = false;
+
             return;
         }
 
-        _saveName.text = _gameData.saveName;
-        _saveHour.text = _gameData.saveHour;
-
         _gameData = gameData;
-        Texture2D lastScreenshot = null; // gameData.GetSavedImage();
+
+        _saveName.text = _gameData.saveName;
+        _saveHour.text = $"Game Saved at: {_gameData.saveTime.Hour}:{_gameData.saveTime.Minute} - {_gameData.saveTime.Day}/{_gameData.saveTime.Month}/{_gameData.saveTime.Year}";
+
+        Texture2D lastScreenshot = gameData.GetImage();
 
         if (lastScreenshot == null) return;
         else
@@ -49,5 +78,8 @@ public class SaveUIManager : MonoBehaviour
             Sprite lastScreenshotSprite = Sprite.Create(lastScreenshot, rect, new Vector2(0, 0), 1);
             _lastScreenshot.sprite = lastScreenshotSprite;
         }
+
+        isLoadable = true;
+        loadIndex = gameData.saveIndex;
     }
 }

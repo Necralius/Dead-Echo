@@ -30,6 +30,8 @@ public class BulletBase : MonoBehaviour
 
     Func<Vector3, string> _hitInteraction;
 
+    [SerializeField] private AudioCollectionTag collection;
+
     // ----------------------------------------------------------------------
     // Name: Initialize
     // Desc: This method is called on the bullet activation, the method
@@ -76,15 +78,18 @@ public class BulletBase : MonoBehaviour
     // ----------------------------------------------------------------------
     private void ResetBullet()
     {
-        _startPosition          = Vector3.zero;
+        transform.position      = _startPosition;
         _startForward           = Vector3.zero;
-        
         _direction              = Vector3.zero;
+        
         _bulletSpeed            = 0f;
         _bulletGravity          = 0f;
         _bulletLifeTime         = 0f;
-        _collisionLayerMask     = LayerMask.NameToLayer("Default");
         _isInitialized          = false;
+        _collisionLayerMask     = LayerMask.NameToLayer("Default");
+
+        //Finally, after all interactions, the bullet will self deactivate to return to the Object Pooler object library.
+        gameObject.SetActive(false);
     }
 
     // ----------------------------------------------------------------------
@@ -115,7 +120,11 @@ public class BulletBase : MonoBehaviour
     // ----------------------------------------------------------------------
     private void FixedUpdate()
     {
-        if (!_isInitialized) return;
+        if (!_isInitialized)
+        {
+            ResetBullet();
+            return;
+        }
         if (_startTime < 0) _startTime = Time.time;
 
         RaycastHit hit;
@@ -142,8 +151,12 @@ public class BulletBase : MonoBehaviour
     // ----------------------------------------------------------------------
     private void Update()
     {
-        if (!_isInitialized || _startTime < 0) return;
-        if (_deactiveTimer >= _bulletLifeTime) gameObject.SetActive(false);
+        if (_deactiveTimer >= _bulletLifeTime) ResetBullet();
+        if (!_isInitialized || _startTime < 0)
+        {
+            ResetBullet();
+            return;
+        }
 
         float currentTime       = Time.time - _startTime;
         Vector3 currentPoint    = FindPointOnParabola(currentTime);
@@ -162,10 +175,14 @@ public class BulletBase : MonoBehaviour
     // ----------------------------------------------------------------------
     public virtual void OnHit(RaycastHit hit)
     {
-        if (_hitInteraction != null) _hitInteraction(hit.point);
+        if (_hitInteraction != null) 
+            _hitInteraction(hit.point);
 
         ObjectPooler.Instance.SpawnFromPool(LayerMask.LayerToName(hit.collider.gameObject.layer) + "Hit", hit.point + hit.normal * 0.001f, Quaternion.LookRotation(hit.normal));
         ObjectPooler.Instance.SpawnFromPool(LayerMask.LayerToName(hit.collider.gameObject.layer) + "Decal", hit.point + hit.normal * 0.001f, Quaternion.LookRotation(hit.normal));
+        
+        if (collection[hit.transform.tag] != null)
+            AudioManager.Instance.PlayOneShotSound(collection[hit.transform.tag], hit.point, collection);
 
         // In this code section the bullet verifies if the hit has finded an object of type AI Body Part and executes an aditional actions on the hit.
         if (hit.transform.gameObject.layer == LayerMask.NameToLayer("AI Body Part"))
@@ -183,9 +200,6 @@ public class BulletBase : MonoBehaviour
                     0);
         }
         // This code section resets the bullet data after its impact interactions
-        ResetBullet();
-
-        //Finally, after all interactions, the bullet will self deactivate to return to the Object Pooler object library.
-        gameObject.SetActive(false);
+        ResetBullet();       
     }
 }

@@ -1,21 +1,24 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static NekraByte.FPS_Utility.Core.DataTypes;
+using static UnityEngine.Rendering.DebugUI;
 
 public class MenuSystem : MonoBehaviour
 {
-
     //Volume Data
     [Header("Audio System")]
-    [SerializeField] private SliderFloatField _generalVolume    = null;
-    [SerializeField] private SliderFloatField _effectsVolume    = null;
-    [SerializeField] private SliderFloatField _musicVolume      = null;
-    [SerializeField] private SliderFloatField _zombiesVolume    = null;
+    [SerializeField] private List<SliderFloatField> _volumesSliders = new List<SliderFloatField>();
+    [SerializeField] private Transform _volumeSlidersContent = null;
+    [SerializeField] private GameObject SliderFloatFieldPrefab = null;
 
+    #region - Graphics Data -
     [Header("Graphics System")]
     [SerializeField] Toggle vSyncActive                         = null;
     [SerializeField] Toggle fullscreenActive                    = null;
@@ -32,7 +35,9 @@ public class MenuSystem : MonoBehaviour
     [SerializeField] private TMP_Dropdown   anisotropicQualityDrp    = null;
     [SerializeField] private TMP_Dropdown   shadowQualityDrp         = null;
     [SerializeField] private TMP_Dropdown   shadowResolutionDrp      = null;
+    #endregion
 
+    #region - Gameplay Data -
     [Header("Gameplay Settings")]
     [SerializeField] private Toggle         tgl_InvertedX            = null;
     [SerializeField] private Toggle         tgl_InvertedY            = null;
@@ -42,50 +47,139 @@ public class MenuSystem : MonoBehaviour
 
     [SerializeField] private SliderFloatField sensitivityX          = null;
     [SerializeField] private SliderFloatField sensitivityY          = null;
+    #endregion
 
     GameStateManager _gameStateManager;
 
     [SerializeField] private LoadScreen loadingScreen;
-    [SerializeField] private float loadingTime = 0f;
+    [SerializeField] private float loadingProgress = 0f;
+
+    private void Awake()
+    {
+        _gameStateManager = GameStateManager.Instance;
+    }
 
     private void Start()
     {
-        _gameStateManager   = GameStateManager.Instance;
         resolutions         = Screen.resolutions.ToList();
 
         LoadSettings();
     }
 
     #region - Volume System -
+    // ----------------------------------------------------------------------
+    // Name: LoadVolumeSettings (Method)
+    // Desc: This method
+    // ----------------------------------------------------------------------
     public void LoadVolumeSettings()
     {
-        if (_gameStateManager.currentApplicationData == null) 
-            return;
+        if (_gameStateManager == null || _gameStateManager.currentApplicationData == null) return;
 
-        _generalVolume.OverrideValue(_gameStateManager.currentApplicationData._generalVolume);
-        _effectsVolume.OverrideValue(_gameStateManager.currentApplicationData._effectsVolume);
-        _musicVolume.OverrideValue(_gameStateManager.currentApplicationData._musicVolume);
-        _zombiesVolume.OverrideValue(_gameStateManager.currentApplicationData._zombiesVolume);
+        if (_gameStateManager.currentApplicationData._volumes.Count <= 0)
+        {
+            _gameStateManager.currentApplicationData._volumes.Clear();
+            foreach (Transform child in _volumeSlidersContent) Destroy(child.gameObject);
 
+            foreach (var track in AudioManager.Instance._tracks)
+            {
+                SliderFloatField obj = Instantiate(SliderFloatFieldPrefab, _volumeSlidersContent).GetComponentInChildren<SliderFloatField>();
+                AudioTrackVolume trackVolumeInfo = new AudioTrackVolume(track.Key, DecibelsToVolume(AudioManager.Instance.GetTrackVolume(obj._fieldName)));
+
+                obj.SetUp(trackVolumeInfo);
+                _volumesSliders.Add(obj);
+
+                _gameStateManager.currentApplicationData._volumes.Add(trackVolumeInfo);
+                _gameStateManager.SaveApplicationData();
+            }
+        }
+        else if (_volumesSliders.Count <= 0)
+        {
+            foreach (Transform child in _volumeSlidersContent) Destroy(child.gameObject);
+
+            for (int i = 0; i < _gameStateManager.currentApplicationData._volumes.Count; i++)
+            {
+                SliderFloatField obj = Instantiate(SliderFloatFieldPrefab, _volumeSlidersContent).GetComponentInChildren<SliderFloatField>();
+                obj.SetUp(_gameStateManager.currentApplicationData._volumes[i]);
+                _volumesSliders.Add(obj);
+            }
+        }
+
+        SetVolumeData();
     }
-    public void SetAndSaveVolumeSettings()
+
+    // ----------------------------------------------------------------------
+    // Name: SetVolumeData (Method)
+    // Desc: This method sets the volume on the mixer, gettting the saved
+    //       volume data from the current application data.
+    // ----------------------------------------------------------------------
+    public void SetVolumeData()
     {
-        //TODO -> Set Volume settings
-
-        if (_gameStateManager.currentApplicationData == null) 
-            return;
-
-        _gameStateManager.currentApplicationData._generalVolume    = _generalVolume.GetValue();
-        _gameStateManager.currentApplicationData._effectsVolume    = _effectsVolume.GetValue();
-        _gameStateManager.currentApplicationData._musicVolume      = _musicVolume.GetValue();
-        _gameStateManager.currentApplicationData._zombiesVolume    = _zombiesVolume.GetValue();
-
-        _gameStateManager.SaveApplicationData();
+        for (int i = 0; i < _volumesSliders.Count; i++) 
+            AudioManager.Instance.SetTrackVolume(_volumesSliders[i]._fieldName, ConvertToDecibels(_volumesSliders[i].GetValue()));
     }
+
+    public void LoadVolumeDataFromFile()
+    {
+        if (_gameStateManager == null || _gameStateManager.currentApplicationData == null) return;
+
+        ApplicationData currentApplData = _gameStateManager.currentApplicationData;
+
+        for (int i = 0; i < currentApplData._volumes.Count; i++) 
+            AudioManager.Instance.SetTrackVolume(currentApplData._volumes[i].Name, ConvertToDecibels(currentApplData._volumes[i].Volume));
+    }
+
+    // ----------------------------------------------------------------------
+    // Name: SaveVolume (Method)
+    // Desc: this method saves the current volumes in the volumes sliders,
+    //       encapsulating them in the the current application data.
+    // ----------------------------------------------------------------------
+    public void SaveVolume()
+    {
+        for (int i = 0; i < _volumesSliders.Count; i++) 
+            _gameStateManager.currentApplicationData._volumes[i].Volume = _volumesSliders[i].GetValue();
+       
+        _gameStateManager.SaveApplicationData();
+
+        SetVolumeData();
+    }
+
+    // ----------------------------------------------------------------------
+    // Name: ConvertToDecibels (Method)
+    // Desc: This method convert an range of 1.0f to 0.1f to decibels from an
+    //       range that starts from -80 DB to +10 DB.
+    // ----------------------------------------------------------------------
+    public float ConvertToDecibels(float Volume)
+    {
+        if (Volume < 0 || Volume > 1) return 0;
+
+        int decibels = Mathf.FloorToInt((Volume * 100) - 100);
+        //Debug.Log($" Converting to decibels: Volume: {Volume}, Decibels: {decibels}"); -> Debug Line
+        return decibels;
+    }
+
+    // ----------------------------------------------------------------------
+    // Name: DecibelsToVolume (Method)
+    // Desc: This method converts decibels to an range of 1.0 to 0.1f.
+    // ----------------------------------------------------------------------
+    public float DecibelsToVolume(float Decibels)
+    {
+        float volume = (Decibels + 100) / 100;
+        //Debug.Log($" DTV -> Volume: {volume} , Decibels: {Decibels}"); -> Debug Line
+        return volume;
+    }
+
+    // ----------------------------------------------------------------------
+    // Name: ResetVolumeSettings (Methods)
+    // Desc: This method resets the volume settings on the game application
+    //       data, and on the UI.
+    // ----------------------------------------------------------------------
     public void ResetVolumeSettings()
     {
+        _volumesSliders.Clear();
+        foreach (Transform child in _volumeSlidersContent) Destroy(child.gameObject);
+
         _gameStateManager.currentApplicationData.ResetVolumeSettings();
-        _gameStateManager.SaveApplicationData();
+
         LoadVolumeSettings();
     }
     #endregion
@@ -143,12 +237,12 @@ public class MenuSystem : MonoBehaviour
         if (_gameStateManager.currentApplicationData == null) 
             return;
 
-        _gameStateManager.currentApplicationData._currentResolution     = currentResolution;
-        _gameStateManager.currentApplicationData._resolutionIndex       = currentResolutionIndex;
-        _gameStateManager.currentApplicationData._isFullscreen          = fullscreenActive.isOn;
+        _gameStateManager.currentApplicationData.currentResolution     = currentResolution;
+        _gameStateManager.currentApplicationData.resolutionIndex       = currentResolutionIndex;
+        _gameStateManager.currentApplicationData.isFullscreen          = fullscreenActive.isOn;
 
-        _gameStateManager.currentApplicationData._vSyncActive           = vSyncActive.isOn;
-        _gameStateManager.currentApplicationData._vSyncCount            = vSyncDrp.value;
+        _gameStateManager.currentApplicationData.vSyncActive           = vSyncActive.isOn;
+        _gameStateManager.currentApplicationData.vSyncCount            = vSyncDrp.value;
 
         _gameStateManager.currentApplicationData.shadowQuality          = shadowQualityDrp.value;
         _gameStateManager.currentApplicationData.shadowResolution       = shadowResolutionDrp.value;
@@ -176,10 +270,10 @@ public class MenuSystem : MonoBehaviour
         if (_gameStateManager.currentApplicationData == null)
             return;
 
-        resolutionDrp.value = _gameStateManager.currentApplicationData._resolutionIndex;
+        resolutionDrp.value = _gameStateManager.currentApplicationData.resolutionIndex;
 
-        vSyncActive.isOn    = _gameStateManager.currentApplicationData._vSyncActive;
-        vSyncDrp.value      = _gameStateManager.currentApplicationData._vSyncCount;
+        vSyncActive.isOn    = _gameStateManager.currentApplicationData.vSyncActive;
+        vSyncDrp.value      = _gameStateManager.currentApplicationData.vSyncCount;
 
         presetQualityDrp.value      = _gameStateManager.currentApplicationData.qualityLevelIndex;
 
@@ -204,8 +298,8 @@ public class MenuSystem : MonoBehaviour
         {
 
             // Settings Load and Set
-            Screen.SetResolution(_gameStateManager.currentApplicationData._currentResolution.width,
-                _gameStateManager.currentApplicationData._currentResolution.height, _gameStateManager.currentApplicationData._isFullscreen);
+            Screen.SetResolution(_gameStateManager.currentApplicationData.currentResolution.width,
+                _gameStateManager.currentApplicationData.currentResolution.height, _gameStateManager.currentApplicationData.isFullscreen);
 
             QualitySettings.SetQualityLevel(_gameStateManager.currentApplicationData.qualityLevelIndex);
 
@@ -214,7 +308,9 @@ public class MenuSystem : MonoBehaviour
             QualitySettings.anisotropicFiltering    = (AnisotropicFiltering)_gameStateManager.currentApplicationData.anisotropicFiltering;
             QualitySettings.antiAliasing            = _gameStateManager.currentApplicationData.antialiasing;
 
-            QualitySettings.vSyncCount              = _gameStateManager.currentApplicationData._vSyncCount;
+            QualitySettings.vSyncCount              = _gameStateManager.currentApplicationData.vSyncCount;
+
+            SetVolumeData();
         }
     }
     #endregion
@@ -258,10 +354,11 @@ public class MenuSystem : MonoBehaviour
         crouchTypeDrp.value     = _gameStateManager.currentApplicationData.crouchType;
     }
 
-    //
-    //
-    //
-    //
+    // ----------------------------------------------------------------------
+    // Name: ResetGameplaySettings (Method)
+    // Desc: This method resets the gameplay settings on the application dada
+    //       file.
+    // ----------------------------------------------------------------------
     public void ResetGameplaySettings()
     {
         _gameStateManager.currentApplicationData.ResetGameplaySettings();
@@ -276,9 +373,11 @@ public class MenuSystem : MonoBehaviour
 
     public void DeleteGameSave(int index)
     {
+        GameStateManager.Instance.currentApplicationData.DeleteSaveByIndex(index);
+        GameStateManager.Instance.SaveApplicationData();
+
         SaveConteiner.Instance.LoadGameSaves();
         SaveConteiner.Instance.LoadNewGameSaves();
-        GameStateManager.Instance.currentApplicationData.DeleteSaveByIndex(index);
     }
 
     public void LoadGameData(int saveIndex)
@@ -286,6 +385,11 @@ public class MenuSystem : MonoBehaviour
 
     }
     #endregion
+
+    public void SetMusicEvent(string eventTag)
+    {       
+        AudioManager.Instance.CallMusicEvent(eventTag);
+    }
 
     public void QuitGame()
     {
@@ -297,23 +401,28 @@ public class MenuSystem : MonoBehaviour
     }
     public void StartSceneLoading(string sceneName)
     {
+        if (loadingScreen == null) return;
+
         loadingScreen.gameObject.SetActive(true);
-        loadingTime = 0f;
+        loadingProgress = 0f;
 
         StartCoroutine(LoadScene(sceneName));
     }
+    public void LoadGameSave(int saveIndex)
+    {
+        GameStateManager.Instance.SetSaveToLoad(saveIndex);
+
+        StartSceneLoading("Scene_Level1");
+    }
     private IEnumerator LoadScene(string sceneName)
     {
-        SceneManager.LoadScene(sceneName);
+        AsyncOperation opr = SceneManager.LoadSceneAsync(sceneName);
 
-        string activeScene = SceneManager.GetActiveScene().name;
-
-        while (activeScene != sceneName)
+        while (!opr.isDone)
         {
-            loadingTime += Time.deltaTime;
-            loadingScreen.UpdateState(loadingTime);
-            activeScene = SceneManager.GetActiveScene().name;
-            yield return new WaitForSeconds(Time.deltaTime);
+            loadingProgress = opr.progress;
+            loadingScreen.UpdateState(loadingProgress);
+            yield return null;
         }
 
         loadingScreen.gameObject.SetActive(false);

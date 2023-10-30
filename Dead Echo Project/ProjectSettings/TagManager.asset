@@ -15,6 +15,9 @@ TagManager:
   - Cloth
   - MenuSystem
   - Terrain
+  - Concrete
+  - Wood
+  - Metal
   layers:
   - Default
   - TransparentFX

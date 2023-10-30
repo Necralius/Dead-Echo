@@ -22,8 +22,14 @@ public class SaveConteiner : MonoBehaviour
     public List<SaveUIManager>  _newGameSaves   = new List<SaveUIManager>();
     public List<SaveUIManager>  _gameSaveLoads  = new List<SaveUIManager>();
 
+    private void Start()
+    {
+        LoadNewGameSaves();
+        LoadGameSaves();
+    }
     private void LoadAllSaves()
     {
+        //_saves = new List<GameSaveData>();
         if (GameStateManager.Instance) 
             _saves = GameStateManager.Instance.GetAllGameSaves();
     }
@@ -31,7 +37,8 @@ public class SaveConteiner : MonoBehaviour
     public void LoadNewGameSaves()
     {
         LoadAllSaves();
-        if (_saves.Count <= 0 || _saves == null) return;
+
+        if (_saves == null || _saves.Count <= 0 ) return;
 
         for (int i = 0; i < _saves.Count; i++)
         {
@@ -43,7 +50,8 @@ public class SaveConteiner : MonoBehaviour
     public void LoadGameSaves()
     {
         LoadAllSaves();
-        if (_saves.Count <= 0 || _saves == null) return;
+
+        if (_saves == null || _saves.Count <= 0) return;
 
         for (int i = 0; i < _saves.Count; i++)
         {

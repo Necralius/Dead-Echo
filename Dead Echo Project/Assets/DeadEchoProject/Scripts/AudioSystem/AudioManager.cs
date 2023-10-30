@@ -15,23 +15,28 @@ public class AudioManager : MonoBehaviour
     public static AudioManager Instance;
     private void Awake()
     {
-        if (Instance != null) Destroy(Instance);
+        if (Instance != null) Destroy(Instance.gameObject);
         Instance = this;
     }
     #endregion
 
     //Inspector assingned
     [SerializeField] private AudioMixer _mainMixer  = null;
-    [SerializeField] private int        _maxSounds = 10;
+    [SerializeField] private int        _maxSounds  = 256;
 
     //Private Data
-    Dictionary<string, TrackInfo>       _tracks     = new Dictionary<string, TrackInfo>();
+    public Dictionary<string, TrackInfo>    _tracks         = new Dictionary<string, TrackInfo>();
 
-    List<AudioPoolItem>                 _pool       = new List<AudioPoolItem>();
-    Dictionary<ulong, AudioPoolItem>    _activePool = new Dictionary<ulong, AudioPoolItem>();
+    List<AudioPoolItem>                     _pool           = new List<AudioPoolItem>();
+    Dictionary<ulong, AudioPoolItem>        _activePool     = new Dictionary<ulong, AudioPoolItem>();
 
-    ulong                               _idGiver    = 0;
-    Transform _listenerPos                          =  null;
+    List<LayeredAudioSource>                _layeredAudio   = new List<LayeredAudioSource>(); 
+
+    private     ulong                       _idGiver        = 0;
+    private     Transform                   _listenerPos    = null;
+
+    public      MusicManager                musicManager = null;
+
     // ------------------------------------------ Methods ------------------------------------------ //
 
     #region - BuiltIn Methods -
@@ -45,6 +50,7 @@ public class AudioManager : MonoBehaviour
     void Start()
     {
         DontDestroyOnLoad(gameObject);
+        musicManager.AudioManager = this;
 
         if (!_mainMixer) return;
 
@@ -76,6 +82,50 @@ public class AudioManager : MonoBehaviour
             go.SetActive(false);
             _pool.Add(poolItem);
         }
+    }
+
+    // ----------------------------------------------------------------------
+    // Name: OnEnable (Class)
+    // Desc: This method is called when the object is enabled, mainly the
+    //       method register an method in the sceneLoaded event.
+    // ----------------------------------------------------------------------
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    // ----------------------------------------------------------------------
+    // Name: OnDisable (Class)
+    // Desc: This method is called when the object is disabled, mainly the
+    //       method unregister an method in the sceneLoaded event.
+    // ----------------------------------------------------------------------
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    // ----------------------------------------------------------------------
+    // Name: OnSceneLoaded (Class)
+    // Desc: This method represents an action that will happens in the scene
+    //       load event, basically the method get the current updated audio
+    //       listener on the scene.
+    // ----------------------------------------------------------------------
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        _listenerPos = FindFirstObjectByType<AudioListener>().transform;
+    }
+
+    // ----------------------------------------------------------------------
+    // Name: Update (Method)
+    // Desc: 
+    // ----------------------------------------------------------------------
+    private void Update()
+    {
+        foreach(var las in _layeredAudio) 
+            if (las != null) las.Update();
+
+        if (musicManager != null) 
+            musicManager.OnUpdate();
     }
     #endregion
 
@@ -120,12 +170,11 @@ public class AudioManager : MonoBehaviour
     public void SetTrackVolume(string track, float volume, float fadeTime = 0f)
     {
         if (!_mainMixer) return;
-
         TrackInfo trackInfo;
 
         if (_tracks.TryGetValue(track, out trackInfo))
         {
-            if(trackInfo.TrackFader != null) StopCoroutine(trackInfo.TrackFader);
+            if (trackInfo.TrackFader != null) StopCoroutine(trackInfo.TrackFader);
 
             if (fadeTime == 0f) _mainMixer.SetFloat(track, volume);
             else
@@ -160,36 +209,9 @@ public class AudioManager : MonoBehaviour
 
     #region - Audio Pooling System -
     // ----------------------------------------------------------------------
-    // Name: OnEnable (Class)
-    // Desc: This method is called when the object is enabled, mainly the
-    //       method register an method in the sceneLoaded event.
+    // Name: ConfigurePoolObject (Method)
+    // Desc: This method register an audio pool instance.
     // ----------------------------------------------------------------------
-    private void OnEnable()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
-    // ----------------------------------------------------------------------
-    // Name: OnDisable (Class)
-    // Desc: This method is called when the object is disabled, mainly the
-    //       method unregister an method in the sceneLoaded event.
-    // ----------------------------------------------------------------------
-    private void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-
-    // ----------------------------------------------------------------------
-    // Name: OnSceneLoaded (Class)
-    // Desc: This method represents an action that will happens in the scene
-    //       load event, basically the method get the current updated audio
-    //       listener on the scene.
-    // ----------------------------------------------------------------------
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        _listenerPos = FindFirstObjectByType<AudioListener>().transform;
-    }
-
     protected ulong ConfigurePoolObject(int poolIndex, string track, AudioClip clip, Vector3 position, float volume, float spatialBlend, float uniportance)
     {
         //Verify if the request is out of the list bounds
@@ -307,15 +329,94 @@ public class AudioManager : MonoBehaviour
         return 0;
     }
 
+    public void PlayOneShotSound(AudioClip clip, Vector3 position, AudioCollection audioCollection)
+    {
+        PlayOneShotSound(audioCollection.audioGroup, clip, position, audioCollection.volume, audioCollection.spatialBlend, audioCollection.priority);
+    }
+
     // ----------------------------------------------------------------------
     // Name: PlayOneshotSound (Method)
     // Desc: Queue up an sound that will be played only after a few number of
     //       seconds.
     // ----------------------------------------------------------------------
-    public IEnumerator PlayOneShotSound(string track, AudioClip clip, Vector3 position, float volume, float spatialBlend, float duration, int priority = 128)
+    public IEnumerator PlayOneShotSoundDelayed(string track, AudioClip clip, Vector3 position, float volume, float spatialBlend, float duration, int priority = 128)
     {
         yield return new WaitForSeconds(duration);
         PlayOneShotSound(track, clip, position, volume, spatialBlend, priority);
+    }
+    #endregion
+
+    #region - Layered Audio System -
+    // -------------------------------------------------------------------------------
+    // Name: RegisterLayeredAudioSource
+    // Desc: This method register an LayeredAudioSource on the list.
+    // -------------------------------------------------------------------------------
+    public ILayeredAudioSource RegisterLayeredAudioSource(AudioSource source, int layers)
+    {
+        if (source != null && layers > 0)
+        {
+            // First check it doesn't exist already and if so just return the source
+            for (int i = 0; i < _layeredAudio.Count; i++)
+            {
+                LayeredAudioSource item = _layeredAudio[i];
+                if (item != null)
+                    if (item.audioSource == source) return item;
+            }
+
+            // Create a new layered audio item and add it to the managed list
+            LayeredAudioSource newLayeredAudio = new LayeredAudioSource(source, layers);
+            _layeredAudio.Add(newLayeredAudio);
+
+            return newLayeredAudio;
+        }
+
+        return null;
+    }
+
+    // -------------------------------------------------------------------------------
+    // Name: UnregisterLayeredAudioSource (Overload)
+    // Desc: This method Unregister an layered audio source, preventing the system to
+    //       break after scenes transitions, using as reference an LayeredAudioSource.
+    // -------------------------------------------------------------------------------
+    public void UnregisterLayeredAudioSource(ILayeredAudioSource source)
+    {
+        _layeredAudio.Remove((LayeredAudioSource)source);
+    }
+
+    // -------------------------------------------------------------------------------
+    // Name: UnregisterLayeredAudioSource (Overload)
+    // Desc: This method unregister the layered audio source, preventing the system
+    //       to break after scenes transitions, using as reference an AudioSource.
+    // -------------------------------------------------------------------------------
+    public void UnregisterLayeredAudioSource(AudioSource source)
+    {
+        for (int i = 0; i < _layeredAudio.Count; i++)
+        {
+            LayeredAudioSource item = _layeredAudio[i];
+            if (item != null)
+            {
+                if (item.audioSource == source)
+                {
+                    _layeredAudio.Remove(item);
+                    return;
+                }
+            }
+        }
+    }
+    #endregion
+
+    #region - Music Events -
+    public void CallMusicEvent(MusicEvent eventType)
+    {
+        musicManager.SelectMusicEvent(eventType);
+    }
+    public void CallMusicEvent(int eventType)
+    {
+        musicManager.SelectMusicEvent((MusicEvent)eventType);
+    }
+    public void CallMusicEvent(string eventType)
+    {
+        musicManager.SelectMusicEvent(eventType);
     }
     #endregion
 }

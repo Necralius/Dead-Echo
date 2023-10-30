@@ -167,7 +167,7 @@ public class AIZombieStateMachine : AiStateMachine
             _animator.SetInteger(_attackHash, _attackType);
             _animator.SetInteger(_stateHash, (int)_currentStateType);
 
-            _isScreaming = _cinematicEnabled ? 0f : _animator.GetFloat(_screamingHash);
+            _isScreaming = IsLayerActive("Cinematic") ? 0f : _animator.GetFloat(_screamingHash);
         }
 
         _satisfaction = Mathf.Max(0, _satisfaction - ((_depletionRate * Time.deltaTime)/ 100f) * Mathf.Pow(_speed, 3f));
@@ -261,6 +261,10 @@ public class AIZombieStateMachine : AiStateMachine
             _animator.SetBool(_crawlingHash, isCrawling);
             _animator.SetInteger(_lowerBodyDamageHash, _lowerBodyDamage);
             _animator.SetInteger(_upperBodyDamageHash, _upperBodyDamage);
+
+            SetLayerActive("Lower Body", _lowerBodyDamage > _limpThreshold && _lowerBodyDamage < _crawlThreshold);
+            SetLayerActive("Upper Body", _upperBodyDamage > _upperBodyThreshold && _lowerBodyDamage < _crawlThreshold);
+
         }
     }
     // ----------------------------------------------------------------------
@@ -283,13 +287,29 @@ public class AIZombieStateMachine : AiStateMachine
 
         float hitStrenght = force.magnitude;
 
-        //Debug.Log($"Hit Strenght: {hitStrenght}, Force: {force}");
+        //Debug.Log($"AI_ZSM Hit Strenght: {hitStrenght}, Force: {force}");
 
         if (_boneControllType == AIBoneControlType.Ragdoll)
         {
             if (bodyPart != null)
             {
                 if (hitStrenght > 20f) bodyPart.AddForce(force, ForceMode.Impulse);
+
+                switch (bodyPart.tag)
+                {
+                    case "Head":
+                        _health -= damage * 10;
+                        HitMarkerManager.Instance.OnHit(new HitInfo((HitInfo.HitType)1, position));
+                        break;
+                    case "Upper Body":
+                        _upperBodyDamage += damage * 10;
+                        HitMarkerManager.Instance.OnHit(new HitInfo(0, position));
+                        break;
+                    case "Lower Body":
+                        _lowerBodyDamage += damage * 10;
+                        HitMarkerManager.Instance.OnHit(new HitInfo(0, position));
+                        break;
+                }
 
                 if (bodyPart.CompareTag("Head")) _health -= damage * 10;
                 else if (bodyPart.CompareTag("Upper Body")) _upperBodyDamage += damage * 10;
@@ -336,7 +356,7 @@ public class AIZombieStateMachine : AiStateMachine
             }
         }
 
-        if (_boneControllType != AIBoneControlType.Animated || isCrawling || CinematicEnabled || attackerLocPos.z < 0) shouldRagdoll = true;
+        if (_boneControllType != AIBoneControlType.Animated || isCrawling || IsLayerActive("Cinematic") || attackerLocPos.z < 0) shouldRagdoll = true;
 
         if (!shouldRagdoll)
         {
@@ -411,7 +431,7 @@ public class AIZombieStateMachine : AiStateMachine
     public bool Scream()
     {
         if (isScreaming) return true;
-        if (_animator == null || _cinematicEnabled || _screamPrefab == null || isCrawling) return false;
+        if (_animator == null || IsLayerActive("Cinematic") || _screamPrefab == null || isCrawling) return false;
 
         _animator.SetTrigger(_screamHash);
         Vector3 spawnPos = _screamPosition == AIScreamPosition.Entity ? transform.position : VisualThreat.position;

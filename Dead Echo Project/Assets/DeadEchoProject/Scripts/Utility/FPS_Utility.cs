@@ -1,14 +1,12 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
-using System.Linq;
 using static NekraByte.FPS_Utility.Core.Enumerators;
 using static NekraByte.FPS_Utility.Core.DataTypes;
 using System.IO;
-using Unity.VisualScripting;
 using System.Collections;
 using UnityEngine.Audio;
-using UnityEngine.UI;
+using UnityEditor;
 
 namespace NekraByte
 {
@@ -48,27 +46,40 @@ namespace NekraByte
                 {
                     public GameSaveData(string saveName)
                     {
-                        this.saveName = saveName;
-                        saveHour = DateTime.Now.ToString();
+                        this.saveName   = saveName;
+                        saveTime        = new DateTimeSerialized(DateTime.Now);
                     }
 
                     [Header("Save Data")]
                     public string               saveName                = string.Empty;
-                    public string               saveHour                = string.Empty;
+                    public DateTimeSerialized   saveTime                = null;
                     public SaveDirectoryData    saveDirectoryData       = null;
+                    public int                  saveIndex               = 0;
 
                     [Header("Player Data")]
-                    public Vector3      playerPosition = Vector3.zero;
-                    public Quaternion   playerRotation = Quaternion.identity;
+                    public Vector3      playerPosition      = Vector3.zero;
+                    public Vector3      currentVelocity     = Vector3.zero;
+                    public Quaternion   playerRotation      = Quaternion.identity;
+                    public Quaternion   cameraRotation      = Quaternion.identity;
 
-                    public float        playerHealth    = 0f;
+                    public float        playerHealth        = 0f;
 
                     [Header("Gun Data")]
                     public int GunID = 0;
 
                     public List<GunDataConteiner.AmmoData> guns = new List<GunDataConteiner.AmmoData>();
 
-                    public void UpdateSave(string hour) => saveHour = hour; 
+                    public void UpdateSave(string hour) => saveTime = new DateTimeSerialized(DateTime.Now);
+
+                    public Texture2D GetImage()
+                    {
+                        Texture2D newText = new Texture2D(2, 2);
+
+                        if (File.Exists(saveDirectoryData.screenshotPath)) 
+                            newText.LoadImage(File.ReadAllBytes(saveDirectoryData.screenshotPath));
+
+                        return newText;
+                    }
                 }
                 #endregion
 
@@ -78,9 +89,9 @@ namespace NekraByte
                 {
                     public ApplicationData()
                     {
-                        saveHour = DateTime.Now.ToString();
+                        saveTime = new DateTimeSerialized(DateTime.Now);
 
-                        for (int i = 0; i <= 3; i++) 
+                        for (int i = 0; i < 3; i++)
                             saveDirectorys.Add(new SaveDirectoryData());
 
                         ResetToDefault();
@@ -88,30 +99,27 @@ namespace NekraByte
 
                     public List<SaveDirectoryData> saveDirectorys = new List<SaveDirectoryData>();
 
-                    public string saveHour = "";
+                    public DateTimeSerialized saveTime;
 
                     [Header("Game Settings")]
 
                     [Space]
 
                     [Header("Audio Settings")]
-                    public float _generalVolume;
-                    public float _effectsVolume;
-                    public float _musicVolume;
-                    public float _zombiesVolume;
+                    public List<AudioTrackVolume> _volumes = new List<AudioTrackVolume>();
 
                     [Space]
 
                     [Header("Graphics Settings")]
 
                     [Header("Resolution")]
-                    public Resolution   _currentResolution;
-                    public int          _resolutionIndex    = 0;
+                    public Resolution   currentResolution;
+                    public int          resolutionIndex    = 0;
 
-                    public bool         _isFullscreen       = true;
+                    public bool         isFullscreen       = true;
                     [Header("vSync")]
-                    public bool         _vSyncActive        = false;
-                    public int          _vSyncCount         = 0;
+                    public bool         vSyncActive        = false;
+                    public int          vSyncCount         = 0;
 
                     [Header("Shadows")]
                     public int shadowQuality        = 1;
@@ -139,11 +147,16 @@ namespace NekraByte
                     {
                         saveDirectorys[saveIndex] = info;
                     }
-                    public SaveDirectoryData GetSavePathByIndex(int saveIndexer)
+
+                    public bool GetSavePathByIndex(int saveIndexer, out SaveDirectoryData directory)
                     {
-                        if (saveDirectorys[saveIndexer] != null) 
-                            return saveDirectorys[saveIndexer];
-                        return null;
+                        if (saveIndexer >= saveDirectorys.Count || saveIndexer < 0)
+                        {
+                            directory = null;
+                            return false;
+                        }
+                        directory = saveDirectorys[saveIndexer];
+                        return true;
                     }
                     public bool ExistSaves() => saveDirectorys.Count > 0;
 
@@ -151,7 +164,8 @@ namespace NekraByte
                     {
                         try
                         {
-                            if (saveDirectorys[saveIndex] != null) DeleteData(saveDirectorys[saveIndex]);                           
+                            if (saveDirectorys[saveIndex] != null) 
+                                saveDirectorys[saveIndex] = new SaveDirectoryData();                         
                             else return false;
 
                             return true;
@@ -170,7 +184,7 @@ namespace NekraByte
                         if (Directory.Exists(data.saveFolderPath))  Directory.Delete(data.saveFolderPath);
                     }
 
-                    public void UpdateSave() => saveHour = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                    public void UpdateSave() => saveTime = new DateTimeSerialized(DateTime.Now);
 
                     public void ResetToDefault()
                     {
@@ -178,21 +192,20 @@ namespace NekraByte
                         ResetGraphicsSettings();
                         ResetGameplaySettings();
                     }
+
                     public void ResetVolumeSettings()
                     {
-                        _generalVolume  = 1f;
-                        _effectsVolume  = 1f;
-                        _musicVolume    = 1f;
-                        _zombiesVolume  = 1f;
+                        _volumes.Clear();
                     }
+
                     public void ResetGraphicsSettings()
                     {
-                        _resolutionIndex    = 0;
+                        resolutionIndex    = 0;
 
-                        _isFullscreen       = true;
+                        isFullscreen       = true;
 
-                        _vSyncCount         = 0;
-                        _vSyncActive        = false;
+                        vSyncCount         = 0;
+                        vSyncActive        = false;
 
                         shadowQuality       = 1;
                         shadowResolution    = 1;
@@ -211,8 +224,28 @@ namespace NekraByte
                         aimType         = 0;
                         crouchType      = 0;
                     }
-
                 }
+
+                [Serializable]
+                public class DateTimeSerialized
+                {
+                    public string Hour      = "00";
+                    public string Minute    = "00";
+
+                    public string Day       = "00";
+                    public string Month     = "00";
+                    public string Year      = "00";
+
+                    public DateTimeSerialized(DateTime dateTime)
+                    {
+                        Hour    = dateTime.Hour.    ToString();
+                        Minute  = dateTime.Minute.  ToString();
+                        Day     = dateTime.Day.     ToString();
+                        Month   = dateTime.Month.   ToString();
+                        Year    = dateTime.Year.    ToString();
+                    }
+                }
+
                 #endregion
 
                 #region - Save System Interaction -
@@ -411,6 +444,8 @@ namespace NekraByte
                 }
                 #endregion
 
+                #region - Audio Data -
+
                 #region - Audio Pool Data -
                 // ----------------------------------------------------------
                 // Name: AudioPoolItem (Class)
@@ -438,10 +473,24 @@ namespace NekraByte
                 // --------------------------------------------------------------------------
                 public class TrackInfo
                 {
-                    public string Name = string.Empty;
-                    public AudioMixerGroup Group = null;
-                    public IEnumerator TrackFader = null;
+                    public string           Name        = string.Empty;
+                    public AudioMixerGroup  Group       = null;
+                    public IEnumerator      TrackFader  = null;
                 }
+
+                [Serializable]
+                public class AudioTrackVolume
+                {
+                    public string   Name    = string.Empty;
+                    public float    Volume  = 0f;
+                    public AudioTrackVolume(string name, float volume)
+                    {
+                        Name = name;
+                        Volume = volume;
+                    }
+                }
+                #endregion
+
                 #endregion
 
                 #region - Floor Data -
@@ -449,12 +498,14 @@ namespace NekraByte
                 public class FloorData
                 {
                     //Data Types
-                    public enum FloorType       { Dirt, Stone, Metal, Wood, None}
+                    public enum FloorType       { Grass, Dirt, Stone, Metal, Wood, None}
                     public enum FloorHolder     { Terrain, GameObject, None}
 
                     //Private Data
-                    private FloorHolder             _holder                     = FloorHolder.GameObject;
-                    private GameObject              _objectToFindFloor          = null;
+                    private FloorHolder             _holder                 = FloorHolder.GameObject;
+                    private GameObject              _objectToFindFloor      = null;
+                    private Collider                _objectCollider         = null;
+                    private GameObject              _findedFloor            = null;
 
                     [SerializeField] private FloorType               _type                       = FloorType.Dirt;
                     [SerializeField] private TerrainTextureDetector  _terrainTextureDetector     = null;
@@ -465,7 +516,8 @@ namespace NekraByte
                     public FloorData(GameObject objectToFindFloor, Collider objectCollider)
                     {
                         _objectToFindFloor      = objectToFindFloor;
-                        _terrainTextureDetector = new TerrainTextureDetector(objectToFindFloor, objectCollider);
+                        _objectCollider         = objectCollider;
+                        _terrainTextureDetector = new TerrainTextureDetector(objectToFindFloor, _objectCollider);
                     }
 
                     public FloorType UpdateFloorType(Transform objectToFindFloor)
@@ -473,35 +525,46 @@ namespace NekraByte
                         GameObject floorFinded = null;
                         RaycastHit hit;
 
-                        if (Physics.Raycast(objectToFindFloor.position, -Vector3.down, out hit, 0.3f))
+                        if (Physics.Raycast(objectToFindFloor.position, Vector3.down, out hit, _objectCollider.bounds.extents.y + 0.5f))
                         {
                             _holder = hit.transform.CompareTag("Terrain") ? FloorHolder.Terrain : FloorHolder.GameObject;
 
                             floorFinded = hit.transform.gameObject;
+                            //Debug.Log($"FD -> Finded the object: {floorFinded.gameObject.name}");
                         }
-                        else return FloorType.None;
+                        else
+                        {
+                            _findedFloor = null;
+                            Debug.Log("FD -> Floor object not finded!");
+                            return FloorType.None;
+                        }
+
+                        _findedFloor = floorFinded;
 
                         if (floorFinded == null) return FloorType.None;
                         else if (_holder == FloorHolder.GameObject)
                         {
-                            Debug.Log($"Floor Finded: {floorFinded.gameObject.name}, Tag: {floorFinded.tag}");
+                            //Debug.Log($"Floor Finded: {floorFinded.gameObject.name}, Tag: {floorFinded.tag}");
                             switch(floorFinded.tag)
                             {
-                                case "Dirt" : return FloorType.Dirt;
-                                case "Stone": return FloorType.Stone;
-                                case "Metal": return FloorType.Metal;
-                                case "Wood" : return FloorType.Wood;
-                                default     : return FloorType.None;
+                                case "Dirt"     : return FloorType.Dirt;
+                                case "Stone"    : return FloorType.Stone;
+                                case "Concrete" : return FloorType.Stone;
+                                case "Metal"    : return FloorType.Metal;
+                                case "Wood"     : return FloorType.Wood;
+                                default         : return FloorType.None;
                             }
                         }
                         else if (_holder == FloorHolder.Terrain)
                         {
+                            //Debug.Log($"FD -> Terrain Texture Finded: {_terrainTextureDetector.GetCurrentTexture()}");
                             switch (_terrainTextureDetector.GetCurrentTexture())
                             {
                                 case "Dirt"     : return FloorType.Dirt;
-                                case "Grass"    : return FloorType.Dirt;
+                                case "Grass"    : return FloorType.Grass;
                                 case "Stone"    : return FloorType.Stone;
                                 case "StonePath": return FloorType.Stone;
+                                case "None"     : return FloorType.None;
                                 default         : return FloorType.None;
                             }
                         }

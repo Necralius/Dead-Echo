@@ -16804,7 +16804,7 @@ MonoBehaviour:
       _bulletSpeed: 200
       _bulletGravity: 2
       _bulletSpread: 0.001
-      _bulletLifeTime: 5
+      _bulletLifeTime: 2
       _bulletsPerShoot: 1
       _bulletImpactForce: 10
       _collisionMask:
@@ -17835,8 +17835,8 @@ MonoBehaviour:
       _bulletTag: RifleBullet
       _bulletSpeed: 200
       _bulletGravity: 2
-      _bulletSpread: 0.4
-      _bulletLifeTime: 5
+      _bulletSpread: 0.3
+      _bulletLifeTime: 2
       _bulletsPerShoot: 5
       _bulletImpactForce: 25
       _collisionMask:
@@ -17851,10 +17851,10 @@ MonoBehaviour:
       _returnSpeed: 20
       _recoilReduction: 0.3
     ammoData:
-      _bagMaxAmmo: 200
-      _magMaxAmmo: 31
-      _bagAmmo: 60
-      _magAmmo: 31
+      _bagMaxAmmo: 80
+      _magMaxAmmo: 8
+      _bagAmmo: 80
+      _magAmmo: 8
   _gunAudioAsset:
     ShootClip: {fileID: 8300000, guid: 49182f7f6c11bda40bc100004a1a4f21, type: 3}
     AimClip: {fileID: 8300000, guid: 6d18729c8b539aa4d800edeb0bd8dc1c, type: 3}
@@ -18437,6 +18437,37 @@ Transform:
   - {fileID: 276128646683944302}
   m_Father: {fileID: 4623462987336966244}
   m_LocalEulerAnglesHint: {x: 18.243937, y: -14.435589, z: 40.593784}
+--- !u!1 &2587687454438937258
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 862491767854304300}
+  m_Layer: 11
+  m_Name: Footstep
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &862491767854304300
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2587687454438937258}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.93, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8167043111998427338}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2593687730761766306
 GameObject:
   m_ObjectHideFlags: 0
@@ -19677,10 +19708,10 @@ MonoBehaviour:
       _returnSpeed: 20
       _recoilReduction: 0.3
     ammoData:
-      _bagMaxAmmo: 200
-      _magMaxAmmo: 31
-      _bagAmmo: 60
-      _magAmmo: 31
+      _bagMaxAmmo: 130
+      _magMaxAmmo: 13
+      _bagAmmo: 130
+      _magAmmo: 13
   _gunAudioAsset:
     ShootClip: {fileID: 8300000, guid: a35582ee317f52647b24f967b35bd72f, type: 3}
     AimClip: {fileID: 8300000, guid: 7ca90acf69e44644e8410be881d87559, type: 3}
@@ -33272,7 +33303,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layerBehavior: 2
   layerName: AnimationsLayer
-  animator: {fileID: 0}
+  animator: {fileID: 6646605579532032127}
 --- !u!1 &5339338825095576130
 GameObject:
   m_ObjectHideFlags: 0
@@ -42159,6 +42190,7 @@ Transform:
   - {fileID: 5668357067771406628}
   - {fileID: 3129210913266672447}
   - {fileID: 4903229159188367252}
+  - {fileID: 862491767854304300}
   m_Father: {fileID: 888219147773308863}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &4165759266729906969
@@ -42230,6 +42262,7 @@ MonoBehaviour:
   _duringCrouch: 0
   _isMoving: 0
   _isGrounded: 0
+  _inAir: 0
   _canJump: 1
   _onSlope: 0
   _changingWeapon: 0
@@ -42247,12 +42280,12 @@ MonoBehaviour:
   _rockThrower: {fileID: 0}
   _flashLightObject: {fileID: 4202796272395287159}
   _inptManager: {fileID: 0}
+  _rb: {fileID: 0}
   _playerInstance: {fileID: 4675711470498316918}
   gunShootJam: {fileID: 8300000, guid: bf88a3d6f1a793745bca5263a2f8d632, type: 3}
   changeGunMode: {fileID: 8300000, guid: bb68c15c2b84ff943880d31f4da04df1, type: 3}
   flashlightSound: {fileID: 8300000, guid: 3cdfb66223dbab04286b6d3276ef3f59, type: 3}
   _npcStickiness: 0.485
-  armsAnimator: {fileID: 0}
   _animLayers:
   - {fileID: 1659073204254935888}
   - {fileID: 8103434903351474543}
@@ -42266,6 +42299,7 @@ MonoBehaviour:
   txt_bagAmmo: {fileID: 0}
   txt_GunName: {fileID: 0}
   isDebugMode: 1
+  isLoadingSave: 0
 --- !u!114 &8226088956102218834
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42329,11 +42363,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speedModifier: 2
-  _playerSpeed: 0
+  _distacePerStep: 4
+  _airTime: 0
   _floorData:
     _type: 0
     _terrainTextureDetector:
       _textureAreas: []
+  _footstepArea: {fileID: 862491767854304300}
+  _footstepCollection:
+  - {fileID: 11400000, guid: b9390b31d82849c45a0ae9727cf02c5c, type: 2}
+  - {fileID: 11400000, guid: 4ec60820585c14f41be0dac76c0dbb0d, type: 2}
+  - {fileID: 11400000, guid: 373cc5944cf61b647a39e5b233ef04b0, type: 2}
+  - {fileID: 11400000, guid: 3aba6dc2f6422af4c8b5ae5b1f747383, type: 2}
 --- !u!1 &8618021971390830979
 GameObject:
   m_ObjectHideFlags: 0

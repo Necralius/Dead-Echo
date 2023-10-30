@@ -88,7 +88,7 @@ namespace NekraliusDevelopmentStudio
         private void SetReticleState()
         {
             if (isAiming)                                   currentState = ReticleState.Aiming;
-            else if(isCrouching)                            currentState = ReticleState.Crouching;
+            else if (isCrouching)                           currentState = ReticleState.Crouching;
             else if (isReloading)                           currentState = ReticleState.Reloading;
             else if (inAir)                                 currentState = ReticleState.InAir;
             else if (isShooting)                            currentState = ReticleState.Shooting;
@@ -113,7 +113,7 @@ namespace NekraliusDevelopmentStudio
                 case ReticleState.Walking   :   targetReticleSize = movingSize;         break;
                 case ReticleState.Spriting  :   targetReticleSize = runningSize;        break;
                 case ReticleState.Crouching :   targetReticleSize = crouchSize;         break;
-                case ReticleState.Shooting  :   targetReticleSize = shoottingSize;         break;
+                case ReticleState.Shooting  :   targetReticleSize = shoottingSize;      break;
                 case ReticleState.Aiming    :   targetReticleSize = aimSize;            break;
                 case ReticleState.InAir     :   targetReticleSize = inAirSize;          break;
                 case ReticleState.Reloading :   targetReticleSize = isReloadingSize;    break;

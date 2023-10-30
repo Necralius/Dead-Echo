@@ -20,11 +20,12 @@ public class AudioCollection : ScriptableObject
     [SerializeField, Range(0, 256)] int             _priority       = 128;
     [SerializeField]                List<ClipBank>  _audioClipBanks = new List<ClipBank>();
 
-    public string audioGroup   { get => _audioGroup;            }
-    public float volume        { get => _volume;                }
-    public float spatialBlend  { get => _spatialBlend;          }
-    public int priority         { get => _priority;             }
-    public int bankCount        { get => _audioClipBanks.Count; }
+    public string   audioGroup      { get => _audioGroup;           }
+    public float    volume          { get => _volume;               }
+    public float    spatialBlend    { get => _spatialBlend;         }
+    public int      priority        { get => _priority;             }
+    public int      bankCount       { get => _audioClipBanks.Count; }
+    public string   floorTag        = "Grass";
     
     public AudioClip this[int i]
     {

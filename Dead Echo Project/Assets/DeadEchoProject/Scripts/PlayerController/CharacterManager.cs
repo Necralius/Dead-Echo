@@ -66,9 +66,11 @@ public class CharacterManager : MonoBehaviour
             _damageManager.minBloodAmount   = (1.0f - (_currentHealth / 100f));
             _damageManager.bloodAmount      = Mathf.Min(_damageManager.minBloodAmount + 0.3f, 1f);
         }
-        if (_currentHealth <= (_maxHealth / 4)) _damageManager.SetCriticalHealth(true);
-        else _damageManager.SetCriticalHealth(false);
+        if (_currentHealth <= (_maxHealth / 4)) _damageManager.SetCriticalHealth();
+        else _damageManager.SetCriticalHealth();
+
         InGame_UIManager.Instance.UpdatePlayerState(_fpsController, this);
+
         if (_currentHealth <= 0) Die();
     }
     #endregion

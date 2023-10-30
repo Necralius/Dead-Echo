@@ -9,19 +9,23 @@ using static NekraByte.FPS_Utility.Core.DataTypes;
 
 public class GameStateManager : MonoBehaviour
 {
+    #region - Singleton Pattern -
     public static GameStateManager Instance;
+    #endregion
 
     public Sprite noSaveImage;
 
-    [SerializeField] private string permanentSaveName;
-    [SerializeField] private string saveName;
+    #region - Save Names -
+    [SerializeField] private string permanentSaveName   = "ApplicationData";
+    [SerializeField] private string saveName            = "GameSave";
+    #endregion
 
+    //Data Writers
     private FileDataHandler dynamicDataHandler;// -> This file handler, only is active for the game save data, he is very mutable.
     private FileDataHandler staticDataHandler; // -> This file handler, only is active for the application data file, this variable is imutable.
 
-    private List<IDataPersistence> dataPersistenceObjects = new List<IDataPersistence>();
-
-    private List<GameSaveData> gameDatas = new List<GameSaveData>();   
+    //An list of all savable objects in the game scene.
+    private List<IDataPersistence> dataPersistenceObjects = new List<IDataPersistence>(); 
 
     public GameSaveData currentGameData;
 
@@ -29,17 +33,18 @@ public class GameStateManager : MonoBehaviour
 
     MenuSystem menuSystem;
 
+    private int saveIndexer = 0;
+
+    // ------------------------------------------ Methods ------------------------------------------ //
+
     #region - Built In Methods -
     private void Awake()
     {
-        if (Instance != null) Destroy(Instance);
+        if (Instance != null) Destroy(gameObject);
         Instance = this;
 
         DontDestroyOnLoad(gameObject);       
-    }
 
-    private void Start()
-    {
         staticDataHandler = new FileDataHandler(Application.persistentDataPath, permanentSaveName);
         
         currentApplicationData = staticDataHandler.LoadApplicationData();
@@ -49,61 +54,80 @@ public class GameStateManager : MonoBehaviour
             staticDataHandler.EncapsulateApplicationData(new ApplicationData());
             currentApplicationData = staticDataHandler.LoadApplicationData();
         }
+    }
+
+    private void Start()
+    {
         menuSystem = GameObject.FindGameObjectWithTag("MenuSystem").GetComponent<MenuSystem>();
     }
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.P)) 
             SaveGameData();
+
+        if (Input.GetKeyDown(KeyCode.V)) 
+            LoadGame(0);
     }
 
     private void OnEnable()
     {
-        SceneManager.sceneLoaded += SaveGameData;
+        SceneManager.sceneLoaded += LoadSave;
     }
 
     private void OnDisable()
     {
-        SceneManager.sceneLoaded -= SaveGameData;
+        SceneManager.sceneLoaded -= LoadSave;
     }
     #endregion
 
     #region - Data Load -
+    public void SetSaveToLoad(int loadSave) => saveIndexer = loadSave;
+    public void LoadSave(Scene scene, LoadSceneMode loadSceneMode)
+    {
+        if (saveIndexer <= -1) return;
+        if (menuSystem == null) return;
+
+        menuSystem.StartSceneLoading("Scene_Level1");
+        LoadGame(saveIndexer);
+    }
     public void LoadGame(int saveIndex)
     {
-        currentGameData = dynamicDataHandler.LoadGameState(currentApplicationData.GetSavePathByIndex(saveIndex).savePath);
+        if (dynamicDataHandler == null) return;
+        SaveDirectoryData fullPath; 
+
+        if (currentApplicationData.GetSavePathByIndex(saveIndex, out fullPath))
+
+        currentGameData = dynamicDataHandler.LoadGameState(fullPath.savePath);
 
         if (currentGameData == null)
         {
             Debug.Log("No data found.");
             return;
         }
-        Debug.Log("Game Loaded");
 
+        if (dataPersistenceObjects.Count <= 0 || dataPersistenceObjects == null) return;
+
+        Debug.Log("Game Loaded");
+        
         foreach (IDataPersistence dataPersistence in dataPersistenceObjects)
             dataPersistence.Load(currentGameData);
     }
     #endregion
 
     #region - Data Save -
-    public void SaveGameData(Scene scene, LoadSceneMode loadSceneMode)
-    {
-        if (currentGameData == null) 
-            return;
-        if (dataPersistenceObjects.Equals(null) || dataPersistenceObjects.Count == 0) 
-            return;
-        
-        foreach(IDataPersistence dataPersistence in dataPersistenceObjects) 
-            dataPersistence.Save(currentGameData);
-
-        dynamicDataHandler.EncapsulateData(currentGameData);
-    }
     public void SaveGameData()
     {
         if (currentGameData == null) 
             return;
 
-        foreach(IDataPersistence dataPersistence in dataPersistenceObjects) dataPersistence.Save(currentGameData);
+        if (dataPersistenceObjects.Equals(null) || dataPersistenceObjects.Count == 0)
+        {
+            Debug.Log("Don't exist persistence objects!");
+            return;
+        }
+            
+        foreach (IDataPersistence dataPersistence in dataPersistenceObjects) 
+            dataPersistence.Save(currentGameData);
 
         dynamicDataHandler.EncapsulateData(currentGameData);
     }
@@ -112,6 +136,7 @@ public class GameStateManager : MonoBehaviour
     {
         dynamicDataHandler = new FileDataHandler(Application.persistentDataPath, saveName + saveIndex.ToString());
         currentGameData = new GameSaveData(saveName + saveIndex.ToString());
+        currentGameData.saveIndex = saveIndex;
 
         currentGameData.saveDirectoryData = dynamicDataHandler.EncapsulateData(currentGameData);
         currentApplicationData.StartNewSave(saveIndex, currentGameData.saveDirectoryData);
@@ -127,15 +152,20 @@ public class GameStateManager : MonoBehaviour
 
         List<string>        paths = new List<string>();
 
-        if (currentApplicationData == null)         return null;
-        if (!currentApplicationData.ExistSaves())    return null;
+        if (currentApplicationData == null)             return null;
+        if (!currentApplicationData.ExistSaves())       return null;
 
-        for (int i = 0; i <= 3; i++)
+        for (int i = 0; i < 3; i++)
         {
-            string path = currentApplicationData.GetSavePathByIndex(i).savePath;
-
-            if (path == null || path.Equals(string.Empty)) continue;
-            else paths.Add(path);
+            SaveDirectoryData path;
+            if (currentApplicationData.GetSavePathByIndex(i, out path))
+            {
+                if (path.Equals(null) || 
+                    path.Equals(string.Empty) || 
+                    path.savePath == "" || 
+                    path.savePath.Equals(string.Empty)) continue;
+                else paths.Add(path.savePath);
+            }
         }
 
         if (paths.Count > 0)
@@ -148,6 +178,7 @@ public class GameStateManager : MonoBehaviour
                 if (save != null) datas.Add(save);
             }
         }
+        else return null;
         return datas;
     }
 
