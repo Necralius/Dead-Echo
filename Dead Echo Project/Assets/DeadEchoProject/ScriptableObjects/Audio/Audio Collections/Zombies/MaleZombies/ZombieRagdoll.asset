@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a42031bcf1f556439523fbbad2c0771, type: 3}
+  m_Name: ZombieRagdoll
+  m_EditorClassIdentifier: 
+  _audioGroup: Zombies
+  _volume: 0.9
+  _spatialBlend: 1
+  _priority: 128
+  _audioClipBanks:
+  - Clips:
+    - {fileID: 8300000, guid: 8c471ddda9d57aa4a8b2b52d59a1fa98, type: 3}
+    - {fileID: 8300000, guid: 33d001b57d52b4e4dbf1a7e015abc11b, type: 3}
+    - {fileID: 8300000, guid: 0962faf14f10ee743bece10995b9624c, type: 3}
+    - {fileID: 8300000, guid: 8528df5f8ed21ad4ead7dcbea41d9a4c, type: 3}
+    - {fileID: 8300000, guid: aaeed71e9a520ef48b88f95825dbb2ac, type: 3}
+    - {fileID: 8300000, guid: abe9387b7876f3242baad1bd3f41b751, type: 3}
+    - {fileID: 8300000, guid: c06f161f1a734534da45e5523cdfd612, type: 3}
+    - {fileID: 8300000, guid: ee94b99c89e115446bfd5a154315ceaf, type: 3}
+    - {fileID: 8300000, guid: 8f6cb79750a204c488608b2be5770d4e, type: 3}
+  floorTag: Grass

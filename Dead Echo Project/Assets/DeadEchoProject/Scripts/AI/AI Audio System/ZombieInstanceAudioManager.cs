@@ -4,15 +4,8 @@ using UnityEngine;
 
 public class ZombieInstanceAudioManager : StateMachineAudioManager
 {
-
-
-
-    public void OnScream()
+    public void OnRagdoll(Vector3 hitPos)
     {
-
+        AudioManager.Instance.PlayOneShotSound(_onRagdoll.audioClip, hitPos, _onRagdoll);  
     }
-    public void OnAttack()
-    {
-
-    } 
 }

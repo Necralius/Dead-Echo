@@ -28,18 +28,18 @@ MonoBehaviour:
       m_SchemaId:
         m_Id: With3Levels
     supportVolumetrics: 1
-    supportVolumetricClouds: 1
+    supportVolumetricClouds: 0
     supportLightLayers: 1
     renderingLayerMaskBuffer: 0
     supportWater: 1
     waterSimulationResolution: 128
     supportWaterExclusion: 1
     supportWaterDeformation: 1
-    deformationAtlasSize: 512
+    deformationAtlasSize: 64
     maximumDeformerCount: 64
     supportWaterFoam: 0
     foamAtlasSize: 512
-    waterCPUSimulation: 1
+    waterCPUSimulation: 0
     supportComputeThickness: 0
     computeThicknessResolution: 1
     computeThicknessLayerMask:
@@ -70,7 +70,7 @@ MonoBehaviour:
     msaaSampleCount: 1
     supportMotionVectors: 1
     supportScreenSpaceLensFlare: 1
-    supportDataDrivenLensFlare: 1
+    supportDataDrivenLensFlare: 0
     supportRuntimeAOVAPI: 0
     supportDitheringCrossFade: 1
     supportTerrainHole: 0
@@ -148,7 +148,7 @@ MonoBehaviour:
       maxScreenSpaceShadowSlots: 4
       screenSpaceShadowBufferFormat: 48
     decalSettings:
-      drawDistance: 150
+      drawDistance: 50
       atlasWidth: 2048
       atlasHeight: 2048
       perChannelMask: 1
@@ -157,7 +157,7 @@ MonoBehaviour:
       lutFormat: 48
       bufferFormat: 74
     dynamicResolutionSettings:
-      enabled: 0
+      enabled: 1
       useMipBias: 0
       enableDLSS: 0
       DLSSPerfQualitySetting: 0
@@ -167,7 +167,7 @@ MonoBehaviour:
       fsrOverrideSharpness: 0
       fsrSharpness: 0.92
       maxPercentage: 100
-      minPercentage: 100
+      minPercentage: 65
       dynResType: 1
       upsampleFilter: 1
       forceResolution: 0
@@ -175,7 +175,7 @@ MonoBehaviour:
       lowResTransparencyMinimumThreshold: 0
       rayTracingHalfResThreshold: 50
     lowresTransparentSettings:
-      enabled: 1
+      enabled: 0
       checkerboardDepthBuffer: 1
       upsampleType: 1
     xrSettings:

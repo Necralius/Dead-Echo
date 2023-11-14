@@ -61,3 +61,12 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 7c7639485e60fd446aa0c38633666fee, type: 3}
     - {fileID: 8300000, guid: 814eb60eeb76bd64da53fdbd49b7ad5e, type: 3}
     - {fileID: 8300000, guid: 6c4fa3719b44dfa4d95a2a17326bc862, type: 3}
+  - Tag: Head
+    Clip:
+    - {fileID: 8300000, guid: e038aa91061c1594c8db424cbc5cfa98, type: 3}
+  - Tag: Upper Body
+    Clip:
+    - {fileID: 8300000, guid: 11a3b8e44f8564d43909f9f6b4f24df1, type: 3}
+  - Tag: Lower Body
+    Clip:
+    - {fileID: 8300000, guid: 11a3b8e44f8564d43909f9f6b4f24df1, type: 3}

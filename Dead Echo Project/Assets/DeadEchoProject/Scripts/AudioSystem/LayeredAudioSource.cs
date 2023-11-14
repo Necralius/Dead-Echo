@@ -82,6 +82,7 @@ public class LayeredAudioSource : ILayeredAudioSource
         audioLayer.Duration = 0.0f;
         audioLayer.Muted = false;
         audioLayer.Clip = null;
+        Mute(false);
 
         return true;
     }
@@ -103,10 +104,9 @@ public class LayeredAudioSource : ILayeredAudioSource
     {
         if (layerIndex >= _audioLayers.Count) return;
         AudioLayer layer = _audioLayers[layerIndex];
-        if (layer != null)
-        {
+
+        if (layer != null) 
             layer.Muted = mute;
-        }
     }
 
     public void Mute(bool mute)
@@ -134,7 +134,7 @@ public class LayeredAudioSource : ILayeredAudioSource
             // Layer being processed
             AudioLayer layer = _audioLayers[i];
 
-            // Ignore unassigned layers
+            // Ignore invalid layers
             if (layer.Collection == null) continue;
 
             // Update the internal playhead of the layer		
@@ -151,14 +151,20 @@ public class LayeredAudioSource : ILayeredAudioSource
                     // Fetch a new clip from the pool
                     AudioClip clip = layer.Collection[layer.Bank];
 
+                    if (clip == null)
+                    {
+                        layer.Muted = true;
+                        return;
+                    }
+
                     // Calculate the play position based on the time of the layer and store duration
                     if (clip == layer.Clip)
                         layer.Time = layer.Time % layer.Clip.length;
                     else
                         layer.Time = 0.0f;
 
-                    layer.Duration = clip.length;
-                    layer.Clip = clip;
+                    layer.Duration  = clip.length;
+                    layer.Clip      = clip;
 
                     // This is a layer that has focus so we need to chose and play
                     // a new clip from the pool

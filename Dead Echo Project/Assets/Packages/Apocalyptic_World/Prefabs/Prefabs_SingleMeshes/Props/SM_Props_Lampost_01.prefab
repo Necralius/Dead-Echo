@@ -370,9 +370,9 @@ GameObject:
   - component: {fileID: 1593787304099776508}
   - component: {fileID: 1026158466370014228}
   - component: {fileID: 8000363048055767700}
-  m_Layer: 0
+  m_Layer: 30
   m_Name: SM_Props_Lampost_01_LOD0
-  m_TagString: Untagged
+  m_TagString: Metal
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

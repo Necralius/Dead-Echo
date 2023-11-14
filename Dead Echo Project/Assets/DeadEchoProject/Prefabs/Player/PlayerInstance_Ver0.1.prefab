@@ -16809,7 +16809,7 @@ MonoBehaviour:
       _bulletImpactForce: 10
       _collisionMask:
         serializedVersion: 2
-        m_Bits: 4227858560
+        m_Bits: 4227858576
     recoilData:
       _recoilX: -5
       _recoilY: 5
@@ -17841,7 +17841,7 @@ MonoBehaviour:
       _bulletImpactForce: 25
       _collisionMask:
         serializedVersion: 2
-        m_Bits: 4227858560
+        m_Bits: 4227858576
     recoilData:
       _recoilX: -10
       _recoilY: 3
@@ -19698,7 +19698,7 @@ MonoBehaviour:
       _bulletImpactForce: 6
       _collisionMask:
         serializedVersion: 2
-        m_Bits: 4227858560
+        m_Bits: 4227858576
     recoilData:
       _recoilX: -3
       _recoilY: 3
@@ -42369,6 +42369,7 @@ MonoBehaviour:
     _type: 0
     _terrainTextureDetector:
       _textureAreas: []
+    _footDistance: 0.5
   _footstepArea: {fileID: 862491767854304300}
   _footstepCollection:
   - {fileID: 11400000, guid: b9390b31d82849c45a0ae9727cf02c5c, type: 2}

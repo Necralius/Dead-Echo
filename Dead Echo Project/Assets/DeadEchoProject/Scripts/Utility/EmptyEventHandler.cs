@@ -16,9 +16,4 @@ public class EmptyEventHandler : MonoBehaviour
     }
     public void CostumCallEvent() => onCostumCall.Invoke();
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

@@ -12,15 +12,15 @@ public class ScreenDamageManager : MonoBehaviour
     [SerializeField] private float      _fadeSpeed          = 0.05f;
 
     [SerializeField] private AudioCollection  _heartBeat          = null;
-    [SerializeField] private float      _soundFadeValue = 0.5f;
+    [SerializeField] private float           _soundFadeValue = 0.5f;
     private bool _fadeSound = false;
     private float _currentVolume = 1;
 
     // Properties
-    public float bloodAmount { get { return _bloodAmount; } set { _bloodAmount = value; } }
-    public float minBloodAmount { get { return _minBloodAmount; } set { _minBloodAmount = value; } }
-    public float fadeSpeed { get { return _fadeSpeed; } set { _fadeSpeed = value; } }
-    public bool autoFade { get { return _autoFade; } set { _autoFade = value; } }
+    public float    bloodAmount     { get   => _bloodAmount;        set => _bloodAmount     = value;  }
+    public float    minBloodAmount  { get   => _minBloodAmount;     set => _minBloodAmount  = value;  }
+    public float    fadeSpeed       { get   => _fadeSpeed;          set => _fadeSpeed       = value;  }
+    public bool     autoFade        { get   => _autoFade;           set => _autoFade        = value;  }
 
     private void Start()
     {
@@ -35,7 +35,6 @@ public class ScreenDamageManager : MonoBehaviour
             _bloodAmount = Mathf.Max(_bloodAmount, _minBloodAmount);
         }
         _canvasGroupd.alpha = _bloodAmount;
-
     }
 
     public void SetCriticalHealth()

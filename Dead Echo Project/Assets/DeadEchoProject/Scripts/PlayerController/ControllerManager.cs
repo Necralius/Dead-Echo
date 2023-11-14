@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
-using UnityEditor.Animations;
 using UnityEngine;
 using static NekraByte.FPS_Utility.Core.Enumerators;
 using static NekraByte.FPS_Utility.Core.DataTypes;
@@ -161,8 +160,6 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
 
     public bool isDebugMode = true;
 
-    [SerializeField] private bool isLoadingSave = false;
-
     // ---------------------------- Methods ----------------------------//
 
     #region - BuiltIn Methods -
@@ -215,7 +212,6 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
     // ----------------------------------------------------------------------
     private void Update()
     {
-        if (isLoadingSave) return;
         if (_orientation == null) return;
         if (_inptManager == null) return;
         if (_rb          == null) return;
@@ -656,7 +652,8 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
     #region - Sound System -
     private void SS_Flashlight()
     {
-        if (!flashlightSound.Equals(null)) AudioSystem.Instance.PlayGunClip(flashlightSound);
+        if (!flashlightSound.Equals(null))
+            AudioManager.Instance.PlayOneShotSound("Effects", flashlightSound, transform.position, 1f, 0, 128);
     }
     #endregion
 
@@ -668,35 +665,34 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
     }
     #endregion
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawLine(transform.position, (transform.position + -transform.up));
-    }
 
-    #region - Saving System -
+    #region - Saving and Load System -
     public void RegisterDataSaver()
     {
         GameStateManager.Instance.RegisterDataHandler(this);
     }
+
     public IEnumerator LoadWithTime(GameSaveData gameData)
     {
         _rb.velocity    = Vector3.zero;
 
         yield return new WaitForSeconds(0.05f);
 
-        gameObject.transform.position   = gameData.playerPosition;
+        gameObject.transform.position       = gameData.playerPosition;
         _rb.velocity                        = gameData.currentVelocity;
         _orientation.rotation               = gameData.playerRotation;
         _cameraObject.transform.rotation    = gameData.cameraRotation;
 
-        isLoadingSave = false;
+        _moveDirection = gameData.currentVelocity;
+
+        _xRotation = gameData.cameraRotation.eulerAngles.x;
+        _yRotation = gameData.cameraRotation.eulerAngles.y;
     }
 
     public void Load(GameSaveData gameData)
     {
-        isLoadingSave = true;
+        //Debug.Log("CM -> Loading Data"); -> Debug Line
 
-        Debug.Log("CM -> Loading Data");
         StartCoroutine(LoadWithTime(gameData));
 
         _gunIndex = gameData.GunID;
@@ -710,13 +706,13 @@ public class ControllerManager : MonoBehaviour, IDataPersistence
                 continue;
             }
             _gunsInHand[i].GunData.LoadData(gameData.guns[i]);
-        }
-            
+        }    
     }
 
     public void Save(GameSaveData gameData)
     {
-        Debug.Log("CM -> Saving Data");
+        //Debug.Log("CM -> Saving Data"); -> Debug Line
+
         gameData.playerPosition     = gameObject.transform.position;
         gameData.currentVelocity    = _rb.velocity;
         gameData.playerRotation     = _orientation.rotation;

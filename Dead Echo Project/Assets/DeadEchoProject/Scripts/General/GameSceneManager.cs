@@ -96,7 +96,8 @@ public class GameSceneManager : MonoBehaviour
 
         if (InputManager.Instance != null)
         {
-            if (InputManager.Instance.pauseMenuAction.WasPressedThisFrame()) PauseMenuSystem();
+            if (InputManager.Instance.pauseMenuAction.WasPressedThisFrame() && !CharacterManager.Instance.isDead) 
+                PauseMenuSystem();
         }
     }
 
@@ -113,8 +114,8 @@ public class GameSceneManager : MonoBehaviour
         return null;
     }
 
-    public void DeathScreen()
+    public void DeathScreen(bool state)
     {
-        deathScreen.SetActive(true);
+        deathScreen.SetActive(state);
     }
 }

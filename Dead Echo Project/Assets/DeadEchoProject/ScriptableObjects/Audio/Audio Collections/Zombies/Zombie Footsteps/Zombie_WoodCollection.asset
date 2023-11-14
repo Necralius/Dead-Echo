@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Zombie_WoodCollection
   m_EditorClassIdentifier: 
   _audioGroup: Zombies
-  _volume: 1
+  _volume: 0.8
   _spatialBlend: 1
   _priority: 128
   _audioClipBanks:
@@ -38,10 +38,6 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 7f31ac62883f78b4ba610e164f57f879, type: 3}
     - {fileID: 8300000, guid: 2c37f11b2d56b374ebf354853c6ad643, type: 3}
     - {fileID: 8300000, guid: 75d4e54cf94712d4e8de7ce385abceb2, type: 3}
-  - Clips:
-    - {fileID: 8300000, guid: 7d22997c3222c124d91d351ddc1c6ee4, type: 3}
-    - {fileID: 8300000, guid: fcbaf164018fc614a9729400cf40f9de, type: 3}
-  - Clips:
-    - {fileID: 8300000, guid: bb5ec83ccc5c69f43b31f100278bff91, type: 3}
-    - {fileID: 8300000, guid: 623ad07c146cedd4db6b902fd1612618, type: 3}
+  - Clips: []
+  - Clips: []
   floorTag: Wood

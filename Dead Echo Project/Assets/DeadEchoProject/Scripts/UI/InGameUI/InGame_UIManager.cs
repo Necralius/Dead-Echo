@@ -36,7 +36,7 @@ public class InGame_UIManager : MonoBehaviour
     {
         UpdatePlayerState(controller);
         lifeText.text           = lifeSlider.value.ToString("F0") + "%";
-        lifeSlider.value        = manager._currentHealth;
+        lifeSlider.value        = manager.CurrentHealth;
         lifeSlider.maxValue     = manager._maxHealth;
     }
 

@@ -69,7 +69,7 @@ namespace NekraByte
 
                     public List<GunDataConteiner.AmmoData> guns = new List<GunDataConteiner.AmmoData>();
 
-                    public void UpdateSave(string hour) => saveTime = new DateTimeSerialized(DateTime.Now);
+                    public void UpdateSaveHour() => saveTime = new DateTimeSerialized(DateTime.Now);
 
                     public Texture2D GetImage()
                     {
@@ -89,11 +89,18 @@ namespace NekraByte
                 {
                     public ApplicationData()
                     {
+                        //Updates the save time hour.
                         saveTime = new DateTimeSerialized(DateTime.Now);
 
+                        //Create defaul save directorys holders 
                         for (int i = 0; i < 3; i++)
                             saveDirectorys.Add(new SaveDirectoryData());
 
+                        //Create a default resolution
+                        currentResolution.width = 1920;
+                        currentResolution.height = 1080;
+
+                        //Reset all settings to default
                         ResetToDefault();
                     }
 
@@ -130,6 +137,7 @@ namespace NekraByte
 
                     public int anisotropicFiltering = 1;
                     public int antialiasing         = 1;
+                    public int globalTextureQuality = 1;
 
                     public float brightness         = 1f;
 
@@ -164,8 +172,11 @@ namespace NekraByte
                     {
                         try
                         {
-                            if (saveDirectorys[saveIndex] != null) 
-                                saveDirectorys[saveIndex] = new SaveDirectoryData();                         
+                            if (saveDirectorys[saveIndex] != null)
+                            {
+                                DeleteData(saveDirectorys[saveIndex]);
+                                saveDirectorys[saveIndex] = new SaveDirectoryData();
+                            }                       
                             else return false;
 
                             return true;
@@ -507,8 +518,9 @@ namespace NekraByte
                     private Collider                _objectCollider         = null;
                     private GameObject              _findedFloor            = null;
 
-                    [SerializeField] private FloorType               _type                       = FloorType.Dirt;
-                    [SerializeField] private TerrainTextureDetector  _terrainTextureDetector     = null;
+                    [SerializeField] private FloorType               _type                      = FloorType.None;
+                    [SerializeField] private TerrainTextureDetector  _terrainTextureDetector    = null;
+                    [SerializeField] private float                   _footDistance              = 0.5f;
 
                     //Public Data
                     public FloorType Type { get => _type = UpdateFloorType(_objectToFindFloor.transform); }
@@ -525,7 +537,7 @@ namespace NekraByte
                         GameObject floorFinded = null;
                         RaycastHit hit;
 
-                        if (Physics.Raycast(objectToFindFloor.position, Vector3.down, out hit, _objectCollider.bounds.extents.y + 0.5f))
+                        if (Physics.Raycast(objectToFindFloor.position, Vector3.down, out hit, _objectCollider.bounds.extents.y + _footDistance))
                         {
                             _holder = hit.transform.CompareTag("Terrain") ? FloorHolder.Terrain : FloorHolder.GameObject;
 

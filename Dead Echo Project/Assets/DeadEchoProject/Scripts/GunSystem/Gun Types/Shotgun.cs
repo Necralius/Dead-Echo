@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class Shotgun : Mode_Semi
 {
-    private int endReloadHash = Animator.StringToHash("EndReload");
-    private int cancelReloadHash = Animator.StringToHash("CancelReload");
+    //Private Data
+    private int endReloadHash       = Animator.StringToHash("EndReload");
+    private int cancelReloadHash    = Animator.StringToHash("CancelReload");
+
 
     protected override void Update()
     {
@@ -22,7 +24,7 @@ public class Shotgun : Mode_Semi
         if (_isShooting || !_canShoot) yield return null;
 
         _isShooting = true;
-        _canShoot = false;
+        _canShoot   = false;
 
         for (int i = 0; i < _gunDataConteiner.gunBulletSettings._bulletsPerShoot; i++)
         {            
@@ -75,16 +77,16 @@ public class Shotgun : Mode_Semi
     private void SS_Reload()
     {
         if (_gunAudioAsset.ReloadClip != null)
-            AudioSystem.Instance.PlayGunClip(_gunAudioAsset.ReloadClip);
+            AudioManager.Instance.PlayOneShotSound("Effects", _gunAudioAsset.AimClip, transform.position, 1f, 0f, 128);
     }
     public void SS_BulletTrigger()
     {
         if (_gunAudioAsset.ReloadClipVar1 != null)
-            AudioSystem.Instance.PlayGunClip(_gunAudioAsset.ReloadClipVar1);
+            AudioManager.Instance.PlayOneShotSound("Effects", _gunAudioAsset.ReloadClipVar1, transform.position, 1f, 0f, 128);
     }
     public void SS_PumpAction()
     {
         if (_gunAudioAsset.BoltActionClip != null)
-            AudioSystem.Instance.PlayGunClip(_gunAudioAsset.BoltActionClip);
+            AudioManager.Instance.PlayOneShotSound("Effects", _gunAudioAsset.BoltActionClip, transform.position, 1f, 0f, 128);
     }
 }

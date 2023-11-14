@@ -11,8 +11,9 @@ public class StateMachineAudioManager : MonoBehaviour
     [SerializeField] private bool   _humanoid           = true;
     [SerializeField] private bool   _stepBehavior       = true;
 
-    [SerializeField] private List<AudioCollection>  _collectionBases    = new List<AudioCollection>();
-
+    [SerializeField] private    List<AudioCollection>  _collectionBases    = new List<AudioCollection>();
+    [SerializeField] protected  AudioCollection _onRagdoll;
+    
     [SerializeField] private FloorData              _floorData          = null;
 
     // ----------------------------------------------------------------------

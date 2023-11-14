@@ -45,6 +45,7 @@ public class AIZombieStateMachine : AiStateMachine
     [SerializeField, Range(0, 100)]         int                 _upperBodyThreshold     = 30;
     [SerializeField, Range(0, 100)]         int                 _limpThreshold          = 30;
     [SerializeField, Range(0, 100)]         int                 _crawlThreshold         = 90;
+    [SerializeField]                        bool                _isDead                 = false;
 
     [Header("Scream System")]
     [SerializeField, Range(0f, 1f)]         float               _screamChance           = 1f;
@@ -96,6 +97,8 @@ public class AIZombieStateMachine : AiStateMachine
     private IEnumerator                 _reanimationCoroutine   = null;
     private float                       _mecanimTransitionTime  = 0.1f;
 
+    private ZombieInstanceAudioManager  _zombieAudioManager     = null;
+
     #region - Encapsulated Data -
     // Public Encapsulated Data
     public float    replenishRate   { get => _replenishRate;    }
@@ -114,6 +117,19 @@ public class AIZombieStateMachine : AiStateMachine
     public bool     isCrawling      { get => _lowerBodyDamage >= _crawlThreshold; }
     public bool     isScreaming     { get => _isScreaming > 0.1f; }
     public float    screamChance    { get => _screamChance; }
+    public bool IsDead
+    {
+        get => _isDead;
+        set
+        {
+            if (health < 0)
+            {
+                if (_layeredAudioSource != null) _layeredAudioSource.Mute(true);
+                _isDead = true;
+            }
+            else IsDead = false;
+        }
+    }
     #endregion
 
     // ------------------------------------------ Methods ------------------------------------------ //
@@ -126,6 +142,8 @@ public class AIZombieStateMachine : AiStateMachine
     // ----------------------------------------------------------------------
     protected override void Start()
     {
+        if (IsDead) return;
+        _zombieAudioManager = GetComponent<ZombieInstanceAudioManager>();
         base.Start();
 
         if (_animator != null)
@@ -156,7 +174,7 @@ public class AIZombieStateMachine : AiStateMachine
     // ---------------------------------------------------------------------- 
     protected override void Update()
     {
-        if (GameSceneManager.Instance._gameIsPaused) return;
+        if (GameSceneManager.Instance._gameIsPaused || IsDead) return;
         base.Update();
 
         if (_animator != null)
@@ -181,6 +199,7 @@ public class AIZombieStateMachine : AiStateMachine
     // ----------------------------------------------------------------------
     protected virtual void LateUpdate()
     {
+        if (IsDead) return;
         if (_boneControllType == AIBoneControlType.RagdollToAnim)
         {
             if (Time.time <= _ragdollEndTime + _mecanimTransitionTime)
@@ -251,6 +270,7 @@ public class AIZombieStateMachine : AiStateMachine
     // ----------------------------------------------------------------------
     protected void UpdateAnimatorDamage()
     {
+        if (IsDead) return;
         if (_animator != null)
         {
             if (_lowerBodyLayer != -1) 
@@ -274,6 +294,8 @@ public class AIZombieStateMachine : AiStateMachine
     // ----------------------------------------------------------------------
     public override void TakeDamage(Vector3 position, Vector3 force, int damage, Rigidbody bodyPart, CharacterManager characterManager, int hitDirection)
     {
+        if (IsDead) return;
+
         if (GameSceneManager.Instance != null && GameSceneManager.Instance.bloodParticles != null)
         {
             ParticleSystem blood = GameSceneManager.Instance.bloodParticles;
@@ -298,22 +320,22 @@ public class AIZombieStateMachine : AiStateMachine
                 switch (bodyPart.tag)
                 {
                     case "Head":
-                        _health -= damage * 10;
+                        //_health -= damage * 10;
                         HitMarkerManager.Instance.OnHit(new HitInfo((HitInfo.HitType)1, position));
                         break;
                     case "Upper Body":
-                        _upperBodyDamage += damage * 10;
+                        //_upperBodyDamage += damage * 10;
                         HitMarkerManager.Instance.OnHit(new HitInfo(0, position));
                         break;
                     case "Lower Body":
-                        _lowerBodyDamage += damage * 10;
+                        //_lowerBodyDamage += damage * 10;
                         HitMarkerManager.Instance.OnHit(new HitInfo(0, position));
                         break;
                 }
 
-                if (bodyPart.CompareTag("Head")) _health -= damage * 10;
-                else if (bodyPart.CompareTag("Upper Body")) _upperBodyDamage += damage * 10;
-                else if (bodyPart.CompareTag("Lower Body")) _lowerBodyDamage += damage * 10;
+                if (bodyPart.CompareTag("Head")) _health -= damage * 8;
+                else if (bodyPart.CompareTag("Upper Body")) _upperBodyDamage += damage * 5;
+                else if (bodyPart.CompareTag("Lower Body")) _lowerBodyDamage += damage * 5;
 
                 UpdateAnimatorDamage();
 
@@ -340,17 +362,17 @@ public class AIZombieStateMachine : AiStateMachine
         {
             if (bodyPart.CompareTag("Head"))
             {
-                _health -= damage * 10;
+                _health -= damage * 5;
                 if (_health <= 0) shouldRagdoll = true;
             }
             else if (bodyPart.CompareTag("Upper Body"))
             {
-                _upperBodyDamage += damage * 10;
+                _upperBodyDamage += damage * 5;
                 UpdateAnimatorDamage();
             }
             else if (bodyPart.CompareTag("Lower Body"))
             {
-                _lowerBodyDamage += damage * 10;
+                _lowerBodyDamage += damage * 5;
                 UpdateAnimatorDamage();
                 shouldRagdoll = true;
             }
@@ -400,6 +422,10 @@ public class AIZombieStateMachine : AiStateMachine
             if (_animator) _animator.enabled = false;
             if (_collider) _collider.enabled = false;
 
+            //Mute the layered audio while ragdoll
+            if (_layeredAudioSource != null) 
+                _layeredAudioSource.Mute(true);
+
             inMeleeRange = false;
 
             foreach (Rigidbody body in _bodyParts) if (body) body.isKinematic = false;
@@ -415,6 +441,8 @@ public class AIZombieStateMachine : AiStateMachine
                 _reanimationCoroutine = Reanimate();
                 StartCoroutine(Reanimate());
             }
+            else 
+                _zombieAudioManager.OnRagdoll(position);
         }
     }
     #endregion

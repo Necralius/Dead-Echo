@@ -55,11 +55,8 @@ public class AILayeredAudioSourcePlayer : AIStateMachineLink
         // If its changes we might need to start or stop the audio layer assigned to it
         if (layerWeight != _prevLayerWeight && _collection != null)
         {
-            if (layerWeight > 0.5f)
-            {
-                Debug.Log($"ALASP -> Playing the audio collection: {_collection.name}");
+            if (layerWeight > 0.5f) 
                 _stateMachine.PlayAudio(_collection, _bank, layerIndex, true);
-            }
             else _stateMachine.StopAudio(layerIndex);
         }
 

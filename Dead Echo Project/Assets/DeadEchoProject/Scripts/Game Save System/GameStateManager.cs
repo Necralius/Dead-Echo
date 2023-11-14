@@ -33,7 +33,7 @@ public class GameStateManager : MonoBehaviour
 
     MenuSystem menuSystem;
 
-    private int saveIndexer = 0;
+    public int saveIndexer = 0;
 
     // ------------------------------------------ Methods ------------------------------------------ //
 
@@ -60,42 +60,49 @@ public class GameStateManager : MonoBehaviour
     {
         menuSystem = GameObject.FindGameObjectWithTag("MenuSystem").GetComponent<MenuSystem>();
     }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.P)) 
             SaveGameData();
 
         if (Input.GetKeyDown(KeyCode.V)) 
-            LoadGame(0);
+            LoadGame(saveIndexer);
     }
 
     private void OnEnable()
     {
-        SceneManager.sceneLoaded += LoadSave;
+        SceneManager.sceneLoaded += LoadSaveOnSceneLoad;
+        SceneManager.sceneLoaded += SaveGameOnSceneLoad;
     }
 
     private void OnDisable()
     {
-        SceneManager.sceneLoaded -= LoadSave;
+        SceneManager.sceneLoaded -= LoadSaveOnSceneLoad;
+        SceneManager.sceneLoaded -= SaveGameOnSceneLoad;
     }
     #endregion
 
     #region - Data Load -
-    public void SetSaveToLoad(int loadSave) => saveIndexer = loadSave;
-    public void LoadSave(Scene scene, LoadSceneMode loadSceneMode)
+    private void SaveGameOnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
+    {
+        SaveGameData();
+    }
+    private void LoadSaveOnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
     {
         if (saveIndexer <= -1) return;
         if (menuSystem == null) return;
 
-        menuSystem.StartSceneLoading("Scene_Level1");
         LoadGame(saveIndexer);
     }
     public void LoadGame(int saveIndex)
     {
         if (dynamicDataHandler == null) return;
-        SaveDirectoryData fullPath; 
+        SaveDirectoryData fullPath;
 
         if (currentApplicationData.GetSavePathByIndex(saveIndex, out fullPath))
+
+        saveIndexer = saveIndex;
 
         currentGameData = dynamicDataHandler.LoadGameState(fullPath.savePath);
 
@@ -107,12 +114,19 @@ public class GameStateManager : MonoBehaviour
 
         if (dataPersistenceObjects.Count <= 0 || dataPersistenceObjects == null) return;
 
-        Debug.Log("Game Loaded");
-        
-        foreach (IDataPersistence dataPersistence in dataPersistenceObjects)
-            dataPersistence.Load(currentGameData);
+        StartCoroutine(LoadWithTime(0.5f));
     }
     #endregion
+
+    IEnumerator LoadWithTime(float time)
+    {
+        yield return new WaitForSeconds(time / 2);
+
+        foreach (IDataPersistence dataPersistence in dataPersistenceObjects)
+            dataPersistence.Load(currentGameData);
+
+        yield return new WaitForSeconds(time / 2);
+    }
 
     #region - Data Save -
     public void SaveGameData()
@@ -122,7 +136,7 @@ public class GameStateManager : MonoBehaviour
 
         if (dataPersistenceObjects.Equals(null) || dataPersistenceObjects.Count == 0)
         {
-            Debug.Log("Don't exist persistence objects!");
+            //Debug.Log("Don't exist persistence objects!"); -> Debug Line
             return;
         }
             
@@ -141,9 +155,10 @@ public class GameStateManager : MonoBehaviour
         currentGameData.saveDirectoryData = dynamicDataHandler.EncapsulateData(currentGameData);
         currentApplicationData.StartNewSave(saveIndex, currentGameData.saveDirectoryData);
 
+        saveIndexer = saveIndex;
         staticDataHandler.EncapsulateApplicationData(currentApplicationData);
 
-        menuSystem.StartSceneLoading("Scene_Level1");
+        LoadScreen.Instance.LoadScene("Scene_Level1", saveIndex);
     }
 
     public List<GameSaveData> GetAllGameSaves()

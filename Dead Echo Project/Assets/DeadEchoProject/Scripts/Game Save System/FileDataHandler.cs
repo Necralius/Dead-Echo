@@ -30,7 +30,6 @@ public class FileDataHandler
 
         try
         {
-            data.UpdateSave(DateTime.Now.ToString("yyyyMMdd_HHmmss"));
             string fullPath = string.Empty;
             fullPath = Path.Combine(dataDirPath, dataFileName);
 
@@ -38,16 +37,13 @@ public class FileDataHandler
                 Directory.CreateDirectory(fullPath);
             directoryData.saveFolderPath = fullPath;
 
-            //data.lastScreenshotPath = ScreenshotTaker.Instance.SaveScreenshot(fullPath, dataFileName);
-
             directoryData.screenshotPath = ScreenshotTaker.Instance.SaveScreenshot(fullPath, dataFileName);
 
             fullPath = Path.Combine(fullPath, dataFileName + ".NBSV");
 
             directoryData.savePath = fullPath;
 
-            //data.savePath = fullPath;
-
+            data.UpdateSaveHour();
             string dataToStore = JsonUtility.ToJson(data, true);
 
             using(FileStream stream = new FileStream(fullPath, FileMode.Create)) 

@@ -18,6 +18,7 @@ TagManager:
   - Concrete
   - Wood
   - Metal
+  - Water
   layers:
   - Default
   - TransparentFX
@@ -42,8 +43,8 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
+  - Bullet
+  - WaterLayer
   - Weapon
   - Concrete
   - Flesh

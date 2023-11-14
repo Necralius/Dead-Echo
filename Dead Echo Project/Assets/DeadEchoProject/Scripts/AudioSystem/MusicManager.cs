@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.Searcher.Searcher.AnalyticsEvent;
 
 [Serializable]
 public class MusicManager

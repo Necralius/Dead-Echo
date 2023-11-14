@@ -49,7 +49,7 @@ public class AudioManager : MonoBehaviour
     // ----------------------------------------------------------------------
     void Start()
     {
-        DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(this.gameObject);
         musicManager.AudioManager = this;
 
         if (!_mainMixer) return;

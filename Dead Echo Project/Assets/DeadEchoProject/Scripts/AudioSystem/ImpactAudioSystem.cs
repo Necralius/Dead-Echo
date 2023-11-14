@@ -6,7 +6,6 @@ using UnityEngine.Events;
 public class ImpactAudioSystem : MonoBehaviour
 {
     #region - Dependencies -
-    private AudioSource source => GetComponent<AudioSource>();
     private SphereCollider col => GetComponent<SphereCollider>();
     #endregion
     public float timeToDeactive         = 3f;
@@ -27,23 +26,6 @@ public class ImpactAudioSystem : MonoBehaviour
     {
         col.enabled = true;
         onCollision.Invoke();
-        AudioSystem.Instance.PlayEffectSound(clips[Random.Range(0, clips.Count)], new Vector2(0.60f, 0.70f), new Vector2(0.95f, 1f), source);
+        AudioManager.Instance.PlayOneShotSound("Effects", clips[Random.Range(0, clips.Count)], transform.position, 0.8f, 1, 128);
     }
-    // ----------------------------------------------------------------------
-    // Name: Update
-    // Desc: Its called every frame, its used to manage an timer to deactive the object trigger when necessary.
-    // ----------------------------------------------------------------------
-    //private void Update()
-    //{
-    //    destructionTimer += Time.deltaTime;
-    //    if (destructionTimer >= timeToDeactive) gameObject.SetActive(false);
-
-    //    if (timer >= timeActive)
-    //    {
-    //        col.enabled = false;
-    //        //col.radius = defaultColliderSize;
-    //        return;
-    //    }
-    //    timer += Time.deltaTime;
-    //}
 }

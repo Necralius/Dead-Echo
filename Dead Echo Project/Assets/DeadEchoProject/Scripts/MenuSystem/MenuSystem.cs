@@ -3,12 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using static NekraByte.FPS_Utility.Core.DataTypes;
-using static UnityEngine.Rendering.DebugUI;
 
 public class MenuSystem : MonoBehaviour
 {
@@ -51,9 +48,6 @@ public class MenuSystem : MonoBehaviour
 
     GameStateManager _gameStateManager;
 
-    [SerializeField] private LoadScreen loadingScreen;
-    [SerializeField] private float loadingProgress = 0f;
-
     private void Awake()
     {
         _gameStateManager = GameStateManager.Instance;
@@ -62,6 +56,10 @@ public class MenuSystem : MonoBehaviour
     private void Start()
     {
         resolutions         = Screen.resolutions.ToList();
+
+        currentResolution.width     = 1920;
+        currentResolution.height    = 1080;
+        Screen.SetResolution(currentResolution.width, currentResolution.height, fullscreenActive.isOn);
 
         LoadSettings();
     }
@@ -225,24 +223,26 @@ public class MenuSystem : MonoBehaviour
         Screen.SetResolution(currentResolution.width, currentResolution.height, fullscreenActive.isOn);
         QualitySettings.SetQualityLevel(presetQualityDrp.value);
 
-        QualitySettings.shadows                 = (ShadowQuality)shadowQualityDrp.value;
-        QualitySettings.shadowResolution        = (ShadowResolution)shadowResolutionDrp.value;
-        QualitySettings.anisotropicFiltering    = (AnisotropicFiltering)anisotropicQualityDrp.value;
-        QualitySettings.antiAliasing            = antialisingQualityDrp.value;
+        QualitySettings.shadows                     = (ShadowQuality)shadowQualityDrp.value;
+        QualitySettings.shadowResolution            = (ShadowResolution)shadowResolutionDrp.value;
+        QualitySettings.anisotropicFiltering        = (AnisotropicFiltering)anisotropicQualityDrp.value;
+        QualitySettings.antiAliasing                = antialisingQualityDrp.value;
+        QualitySettings.globalTextureMipmapLimit    = textureQualityDrp.value;
 
-        QualitySettings.vSyncCount              = vSyncDrp.value;
+        if (vSyncActive) QualitySettings.vSyncCount = vSyncDrp.value;
+        else QualitySettings.vSyncCount = 0;
         #endregion
 
         #region - Save -
         if (_gameStateManager.currentApplicationData == null) 
             return;
 
-        _gameStateManager.currentApplicationData.currentResolution     = currentResolution;
-        _gameStateManager.currentApplicationData.resolutionIndex       = currentResolutionIndex;
-        _gameStateManager.currentApplicationData.isFullscreen          = fullscreenActive.isOn;
+        _gameStateManager.currentApplicationData.currentResolution      = currentResolution;
+        _gameStateManager.currentApplicationData.resolutionIndex        = currentResolutionIndex;
+        _gameStateManager.currentApplicationData.isFullscreen           = fullscreenActive.isOn;
 
-        _gameStateManager.currentApplicationData.vSyncActive           = vSyncActive.isOn;
-        _gameStateManager.currentApplicationData.vSyncCount            = vSyncDrp.value;
+        _gameStateManager.currentApplicationData.vSyncActive            = vSyncActive.isOn;
+        _gameStateManager.currentApplicationData.vSyncCount             = vSyncDrp.value;
 
         _gameStateManager.currentApplicationData.shadowQuality          = shadowQualityDrp.value;
         _gameStateManager.currentApplicationData.shadowResolution       = shadowResolutionDrp.value;
@@ -270,10 +270,10 @@ public class MenuSystem : MonoBehaviour
         if (_gameStateManager.currentApplicationData == null)
             return;
 
-        resolutionDrp.value = _gameStateManager.currentApplicationData.resolutionIndex;
+        resolutionDrp.value         = _gameStateManager.currentApplicationData.resolutionIndex;
 
-        vSyncActive.isOn    = _gameStateManager.currentApplicationData.vSyncActive;
-        vSyncDrp.value      = _gameStateManager.currentApplicationData.vSyncCount;
+        vSyncActive.isOn            = _gameStateManager.currentApplicationData.vSyncActive;
+        vSyncDrp.value              = _gameStateManager.currentApplicationData.vSyncCount;
 
         presetQualityDrp.value      = _gameStateManager.currentApplicationData.qualityLevelIndex;
 
@@ -335,7 +335,7 @@ public class MenuSystem : MonoBehaviour
         _gameStateManager.currentApplicationData.crouchType     = crouchTypeDrp.value;
 
         _gameStateManager.SaveApplicationData();
-    }
+    } 
 
     // ----------------------------------------------------------------------
     // Name: UpdateGameplaySettings
@@ -397,36 +397,15 @@ public class MenuSystem : MonoBehaviour
     }
     public void QuitToMenu()
     {
-        StartSceneLoading("Scene_MainMenu");
-    }
-    public void StartSceneLoading(string sceneName)
-    {
-        if (loadingScreen == null) return;
-
-        loadingScreen.gameObject.SetActive(true);
-        loadingProgress = 0f;
-
-        StartCoroutine(LoadScene(sceneName));
+        LoadScreen.Instance.LoadScene("Scene_MainMenu", -1);
     }
     public void LoadGameSave(int saveIndex)
     {
-        GameStateManager.Instance.SetSaveToLoad(saveIndex);
-
-        StartSceneLoading("Scene_Level1");
+        LoadScreen.Instance.LoadScene("Scene_Level1", saveIndex); //Load the scene
     }
-    private IEnumerator LoadScene(string sceneName)
+
+    public void RespawnFromLastSave()
     {
-        AsyncOperation opr = SceneManager.LoadSceneAsync(sceneName);
-
-        while (!opr.isDone)
-        {
-            loadingProgress = opr.progress;
-            loadingScreen.UpdateState(loadingProgress);
-            yield return null;
-        }
-
-        loadingScreen.gameObject.SetActive(false);
-
-        yield return null;
+        _gameStateManager.LoadGame(_gameStateManager.saveIndexer);
     }
 }

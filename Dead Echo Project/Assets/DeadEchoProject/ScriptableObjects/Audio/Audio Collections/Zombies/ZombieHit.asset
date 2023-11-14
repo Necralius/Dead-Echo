@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a42031bcf1f556439523fbbad2c0771, type: 3}
+  m_Name: ZombieHit
+  m_EditorClassIdentifier: 
+  _audioGroup: Zombies
+  _volume: 1
+  _spatialBlend: 1
+  _priority: 128
+  _audioClipBanks:
+  - Clips:
+    - {fileID: 8300000, guid: 9e3cf602ef52df24fb4d80b4fe322ebd, type: 3}
+    - {fileID: 8300000, guid: 04df662ee26dec34797685c756d8af68, type: 3}
+    - {fileID: 8300000, guid: 519a72bb4d70e16479094b6bbbe97d4e, type: 3}
+    - {fileID: 8300000, guid: 41b5bb003d7f72b4ca488eb2ab5ccaa6, type: 3}
+    - {fileID: 8300000, guid: d80467716ccb17c4abec49535abd3e86, type: 3}
+    - {fileID: 8300000, guid: 2adc052378e7b7f4d8acef01a238cc8d, type: 3}
+    - {fileID: 8300000, guid: eae32d091be625b4ca5cbed070d1234f, type: 3}
+    - {fileID: 8300000, guid: c742a11d3fa9b2f4eaab2b7cfb1e3252, type: 3}
+    - {fileID: 8300000, guid: ecdd8345549f3b04ab91598213250f8b, type: 3}
+    - {fileID: 8300000, guid: dd9969996194d504a95c2c1821b18f48, type: 3}
+    - {fileID: 8300000, guid: 47f3bd384cbcad742998969e9671fe4c, type: 3}
+    - {fileID: 8300000, guid: 4fc2f2396c96d134a90e0258c361dd4d, type: 3}
+    - {fileID: 8300000, guid: cacb171ca5c66cc43956a93f17d43f51, type: 3}
+    - {fileID: 8300000, guid: a766620d33c16af4f9132295ad738cd4, type: 3}
+    - {fileID: 8300000, guid: 6b79f19c04469804c92de973a07ecc4c, type: 3}
+    - {fileID: 8300000, guid: f5fce2c118f209e4b900e5834322c305, type: 3}
+    - {fileID: 8300000, guid: 1d59a693bae8ca24ea40f262f7f98b83, type: 3}
+    - {fileID: 8300000, guid: 983649c79f72fc7489c6af4db76dfc89, type: 3}
+    - {fileID: 8300000, guid: 8c8388346fd55264fb9be032fbbab6bf, type: 3}
+  floorTag: 0

@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static NekraByte.FPS_Utility.Core.DataTypes;
 
-public class CharacterManager : MonoBehaviour
+public class CharacterManager : MonoBehaviour, IDataPersistence
 {
     #region - Singleton Pattern -
     public static CharacterManager Instance;
@@ -12,20 +13,37 @@ public class CharacterManager : MonoBehaviour
 
     //Inspector assinged
     [Header("Dependencies")]
-    [SerializeField] private CapsuleCollider            _meleeTrigger   = null;
-    [SerializeField] private Camera                     _fpsCamera      = null;
-    [SerializeField] public ScreenDamageManager         _damageManager  = null;
+    public                      ScreenDamageManager        _damageManager  = null;
+    [SerializeField] private    CapsuleCollider            _meleeTrigger   = null;
+    [SerializeField] private    Camera                     _fpsCamera      = null;
 
     [Header("Health System")]
-    [Range(0f, 300)] public float      _currentHealth  = 100f;
-    public float                       _maxHealth      = 100f;
+    private                 float      _currentHealth  = 100f;
+    [Range(0f, 300)] public float      _maxHealth      = 100f;
 
     //Private
     private Collider                _collider               = null;
     private ControllerManager       _fpsController          = null;
     private GameSceneManager        _gameSceneManager       = null;
 
+    [SerializeField] private    float _cureValuePerSec  = 1f;
+    private                     float _cureTimer        = 0f;
+    private                     float _timeToCure       = 4f;
+
+    public bool isDead = false;
+
     // ------------------------------------------ Methods ------------------------------------------ //
+
+    public float CurrentHealth
+    {
+        get => _currentHealth;
+        set
+        {
+            if (value > _maxHealth) _currentHealth = _maxHealth;
+            else if (value < 0) _currentHealth = 0;
+            else _currentHealth = value;
+        }
+    }
 
     #region - BuiltIn Methods -
     //
@@ -37,6 +55,7 @@ public class CharacterManager : MonoBehaviour
         _collider               = GetComponentInChildren<Collider>();
         _fpsController          = GetComponent<ControllerManager>();
         _gameSceneManager       = GameSceneManager.Instance;
+        RegisterDataSaver();
 
         if (_gameSceneManager != null)
         {
@@ -50,6 +69,19 @@ public class CharacterManager : MonoBehaviour
             _gameSceneManager.RegisterPlayerInfo(_collider.GetInstanceID(), playerInfo);
         }
     }
+
+    private void Update()
+    {
+        if (CurrentHealth < _maxHealth)
+        {
+            if (_cureTimer >= _timeToCure)
+            {
+                CurrentHealth += _cureValuePerSec / 1000;
+                InGame_UIManager.Instance.UpdatePlayerState(_fpsController, this);
+            }
+            else _cureTimer += Time.deltaTime;
+        }
+    }
     #endregion
 
     #region - Damage System -
@@ -59,19 +91,21 @@ public class CharacterManager : MonoBehaviour
     //
     public void TakeDamage(float value)
     {
-        _currentHealth = Mathf.Max(_currentHealth - value, 0f);
+        CurrentHealth = Mathf.Max(_currentHealth - value, 0f);
 
         if (_damageManager != null)
         {
-            _damageManager.minBloodAmount   = (1.0f - (_currentHealth / 100f));
+            _damageManager.minBloodAmount   = (1.0f - (CurrentHealth / 100f));
             _damageManager.bloodAmount      = Mathf.Min(_damageManager.minBloodAmount + 0.3f, 1f);
         }
-        if (_currentHealth <= (_maxHealth / 4)) _damageManager.SetCriticalHealth();
+
+        if (CurrentHealth <= (_maxHealth / 4)) _damageManager.SetCriticalHealth();
         else _damageManager.SetCriticalHealth();
 
         InGame_UIManager.Instance.UpdatePlayerState(_fpsController, this);
 
-        if (_currentHealth <= 0) Die();
+        if (CurrentHealth <= 0) Die();
+        _cureTimer = 0f;
     }
     #endregion
 
@@ -81,7 +115,45 @@ public class CharacterManager : MonoBehaviour
     //
     private void Die()
     {
-        GameSceneManager.Instance.DeathScreen();
-        Time.timeScale = 0f;
+        GameSceneManager.Instance.DeathScreen(true);
+        Cursor.lockState    = CursorLockMode.None;
+        isDead              = true;
+    }
+    public void Revive()
+    {
+        GameSceneManager.Instance.DeathScreen(false);
+        Cursor.lockState = CursorLockMode.Locked;
+        isDead = false;
+        CurrentHealth = _maxHealth;
+    }
+
+    //
+    //
+    //
+    //
+    public void RegisterDataSaver()
+    {
+        if (GameStateManager.Instance != null)
+            GameStateManager.Instance.RegisterDataHandler(this);
+
+    }
+
+    //
+    //
+    //
+    //
+    public void Load(GameSaveData gameData)
+    {
+        CurrentHealth = gameData.playerHealth;
+        Revive();
+    }
+
+    //
+    //
+    //
+    //
+    public void Save(GameSaveData gameData)
+    {
+        gameData.playerHealth = CurrentHealth;
     }
 }

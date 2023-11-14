@@ -21,9 +21,8 @@ public abstract class AIState : MonoBehaviour
     protected AiStateMachine _stateMachine;
     public virtual void OnAnimatorUpdated()
     {
-        if (GameSceneManager.Instance._gameIsPaused) return;
-        if (_stateMachine.useRootPosition) _stateMachine.navAgent.velocity = _stateMachine.animator.deltaPosition / Time.deltaTime;
-        if (_stateMachine.useRootRotation) _stateMachine.transform.rotation = _stateMachine.animator.rootRotation;
+        if (_stateMachine.useRootPosition && !GameSceneManager.Instance._gameIsPaused) _stateMachine.navAgent.velocity = _stateMachine.animator.deltaPosition / Time.deltaTime;
+        if (_stateMachine.useRootRotation && !GameSceneManager.Instance._gameIsPaused) _stateMachine.transform.rotation = _stateMachine.animator.rootRotation;
     }
 
     // ----------------------------------------------------------------------

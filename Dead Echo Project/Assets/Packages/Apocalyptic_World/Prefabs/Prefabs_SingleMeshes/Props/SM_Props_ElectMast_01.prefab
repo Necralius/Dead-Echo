@@ -391,7 +391,7 @@ GameObject:
   - component: {fileID: 9162747559814751128}
   m_Layer: 31
   m_Name: SM_Props_ElectMast_01_LOD0
-  m_TagString: Untagged
+  m_TagString: Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647

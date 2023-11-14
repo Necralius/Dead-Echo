@@ -3355,8 +3355,8 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.1
-  m_Center: {x: 0, y: 0.05, z: 0}
+  m_Radius: 0.13
+  m_Center: {x: 0, y: 0.07, z: 0}
 --- !u!54 &3996685925352506013
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -4102,7 +4102,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4227858433
   _fov: 190
-  _sight: 1
+  _sight: 0.364
   _hearing: 1
   _agression: 1
   _intelligence: 1
@@ -4115,6 +4115,7 @@ MonoBehaviour:
   _upperBodyThreshold: 30
   _limpThreshold: 30
   _crawlThreshold: 60
+  _isDead: 0
   _screamChance: 1
   _screamRadius: 38.6
   _screamPosition: 1
@@ -4244,10 +4245,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e3a9b53669961694180b8622c90e96bb, type: 2}
   - {fileID: 11400000, guid: 9ef3a359ca625e246abebcd97d1a18a7, type: 2}
   - {fileID: 11400000, guid: efcb15d6add758e4fbf64bd610064de8, type: 2}
+  _onRagdoll: {fileID: 0}
   _floorData:
     _type: 0
     _terrainTextureDetector:
       _textureAreas: []
+    _footDistance: 0
 --- !u!82 &6241325715358931066
 AudioSource:
   m_ObjectHideFlags: 0
@@ -4257,8 +4260,7 @@ AudioSource:
   m_GameObject: {fileID: 6839494796936052910}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 228923197736661539, guid: 23950ac16e716fa4493c6e6ca0c78757,
-    type: 2}
+  OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1

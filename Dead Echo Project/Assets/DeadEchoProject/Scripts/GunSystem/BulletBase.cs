@@ -180,7 +180,8 @@ public class BulletBase : MonoBehaviour
 
         ObjectPooler.Instance.SpawnFromPool(LayerMask.LayerToName(hit.collider.gameObject.layer) + "Hit", hit.point + hit.normal * 0.001f, Quaternion.LookRotation(hit.normal));
         ObjectPooler.Instance.SpawnFromPool(LayerMask.LayerToName(hit.collider.gameObject.layer) + "Decal", hit.point + hit.normal * 0.001f, Quaternion.LookRotation(hit.normal));
-        
+
+        if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Water")) Debug.Log("True Water");
         if (collection[hit.transform.tag] != null)
             AudioManager.Instance.PlayOneShotSound(collection[hit.transform.tag], hit.point, collection);
 
